@@ -8,10 +8,9 @@ namespace Sandbox
         static void Main(string[] args)
         {
             Window window = new Window(800, 600, "Sandbox");
-
+            
             while (window.IsOpen)
             {
-                
             }
         }
     }
