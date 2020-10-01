@@ -58,6 +58,11 @@ namespace JAngine
             GLFW.SetWindowShouldClose(_window, true);
         }
 
+        public void SwapBuffers()
+        {
+            GLFW.SwapBuffers(_window);
+        }
+
         public void PollInput()
         {
             GLFW.PollEvents();
