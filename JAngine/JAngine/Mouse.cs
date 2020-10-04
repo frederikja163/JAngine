@@ -61,7 +61,8 @@ namespace JAngine
                     _buttonStates[button] = state;
                 }
                 
-                var delegates = OnMouseButton.GetInvocationList();
+                var delegates = OnMouseButton?.GetInvocationList();
+                if (delegates == null) return;
                 foreach (var d in delegates)
                 {
                     var e = (MouseButtonEvent) d;
@@ -75,7 +76,8 @@ namespace JAngine
             GLFW.SetCursorPosCallback(handle, (window, x, y) =>
             {
                 Position = new Vector2((float)x, (float)y);
-                var delegates = OnMouseMoved.GetInvocationList();
+                var delegates = OnMouseMoved?.GetInvocationList();
+                if (delegates == null) return;
                 foreach (var d in delegates)
                 {
                     var e = (MouseMoveEvent) d;

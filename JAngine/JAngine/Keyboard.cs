@@ -160,7 +160,8 @@ namespace JAngine
                 var key = (Key) keyRaw;
                 var state = (KeyState) action;
                 var args = new KeyEventArgs(key, code, state);
-                var delegates = OnKey.GetInvocationList();
+                var delegates = OnKey?.GetInvocationList();
+                if (delegates == null) return;
                 foreach (var d in delegates)
                 {
                     var e = (KeyEvent) d;

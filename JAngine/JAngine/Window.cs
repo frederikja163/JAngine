@@ -46,6 +46,7 @@ namespace JAngine
             GLFW.MakeContextCurrent(_window);
 
             Mouse = new Mouse(_window);
+            Keyboard = new Keyboard(_window);
         }
         
         public bool IsOpen
@@ -69,5 +70,6 @@ namespace JAngine
         }
         
         public Mouse Mouse { get; }
+        public Keyboard Keyboard { get; }
     }
 }
