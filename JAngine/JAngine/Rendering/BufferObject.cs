@@ -1,7 +1,7 @@
 using System;
 using OpenTK.Graphics.OpenGL4;
 
-namespace JAngine
+namespace JAngine.Rendering
 {
     public abstract class BufferObject<T> : IDisposable
         where T : unmanaged

@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-namespace JAngine
+namespace JAngine.Rendering
 {
     public sealed class Shader : IDisposable
     {

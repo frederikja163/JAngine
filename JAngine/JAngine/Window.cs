@@ -1,4 +1,5 @@
 ﻿using System;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -6,7 +7,7 @@ using GlfwWindow = OpenTK.Windowing.GraphicsLibraryFramework.Window;
 
 namespace JAngine
 {
-    public sealed unsafe class Window
+    public sealed unsafe class Window : IDisposable
     {
         public struct ConstructorParameters
         {
@@ -22,8 +23,9 @@ namespace JAngine
             }
         }
 
-        private static bool _glfwInitialized;
-        private GlfwWindow* _window;
+        private static int _totalWindows = 0;
+        private static bool _isOpenglLoaded = false;
+        private GlfwWindow* _handle;
         
         public Window(int width, int height, string title) : this(new ConstructorParameters(width, height, title))
         {
@@ -32,41 +34,56 @@ namespace JAngine
         public Window(ConstructorParameters parameters)
         {
             ConstructorParameters p = parameters;
-            if (!_glfwInitialized)
+            if (_totalWindows == 0)
             {
                 //Do all the hint thingies here
                 if (!GLFW.Init())
                 {
                     throw new Exception("Glfw failed to initialize");
                 }
-                _glfwInitialized = true;
             }
 
-            _window = GLFW.CreateWindow(p.Width, p.Height, p.Title, null, null);
-            GLFW.MakeContextCurrent(_window);
+            _handle = GLFW.CreateWindow(p.Width, p.Height, p.Title, null, null);
+            GLFW.MakeContextCurrent(_handle);
+            _totalWindows++;
 
-            Mouse = new Mouse(_window);
-            Keyboard = new Keyboard(_window);
+            if (!_isOpenglLoaded)
+            {
+                GL.LoadBindings(new GLFWBindingsContext());
+            }
+
+            Mouse = new Mouse(_handle);
+            Keyboard = new Keyboard(_handle);
         }
         
         public bool IsOpen
         {
-            get => !GLFW.WindowShouldClose(_window);
+            get => !GLFW.WindowShouldClose(_handle);
         }
 
         public void Close()
         {
-            GLFW.SetWindowShouldClose(_window, true);
+            GLFW.SetWindowShouldClose(_handle, true);
         }
 
         public void SwapBuffers()
         {
-            GLFW.SwapBuffers(_window);
+            GLFW.SwapBuffers(_handle);
         }
 
         public void PollInput()
         {
             GLFW.PollEvents();
+        }
+
+        public void Dispose()
+        {
+            GLFW.DestroyWindow(_handle);
+            _totalWindows--;
+            if (_totalWindows == 0)
+            {
+                GLFW.Terminate();
+            }
         }
         
         public Mouse Mouse { get; }
