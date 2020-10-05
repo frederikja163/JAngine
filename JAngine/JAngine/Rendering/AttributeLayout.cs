@@ -3,16 +3,18 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace JAngine.Rendering
 {
-    public struct VertexLayout
+    public struct AttributeLayout
     {
         internal readonly struct LayoutElement
         {
+            public int Location { get; }
             public int Count { get; }
             public int Size { get; }
             public VertexAttribPointerType Type { get; }
 
-            public LayoutElement(int count, int size, VertexAttribPointerType type)
+            public LayoutElement(int location, int count, int size, VertexAttribPointerType type)
             {
+                Location = location;
                 Count = count;
                 Size = size;
                 Type = type;
@@ -23,17 +25,17 @@ namespace JAngine.Rendering
         private int _index;
         private int _stride;
         
-        public VertexLayout(int count)
+        public AttributeLayout(int count)
         {
             _index = 0;
             _stride = 0;
             _attributes = new LayoutElement[count];
         }
 
-        public unsafe VertexLayout AddAttribute<T>(int count) where T : unmanaged
+        public unsafe AttributeLayout AddAttribute<T>(int location, int count) where T : unmanaged
         {
             var size = sizeof(T);
-            _attributes[_index++] = new LayoutElement(count, size, ParseType<T>());
+            _attributes[_index++] = new LayoutElement(location, count, size, ParseType<T>());
             _stride += size * count;
             return this;
         }

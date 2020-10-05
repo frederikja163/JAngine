@@ -3,13 +3,13 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace JAngine.Rendering
 {
-    public abstract class BufferObject<T> : IDisposable
+    public abstract class Buffer<T> : IDisposable
         where T : unmanaged
     {
         protected readonly int _handle;
         protected abstract BufferTarget Target { get; }
 
-        public unsafe BufferObject(T[] data)
+        public unsafe Buffer(T[] data)
         {
             _handle = GL.GenBuffer();
             Bind();

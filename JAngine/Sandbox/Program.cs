@@ -28,13 +28,14 @@ namespace Sandbox
             var shader = new Shader(File.OpenText("shader.vert"), File.OpenText("shader.frag"));
             shader.Bind();
 
-            var layout = new VertexLayout(1);
-            layout.AddAttribute<float>(3);
-            var vbo = new VertexBufferObject(_verts, layout);
-            vbo.Bind();
+            var vbo = new VertexBuffer(_verts);
+            var layout = new AttributeLayout(1);
+            layout.AddAttribute<float>(0, 3);
             
-            var ebo = new ElementBufferObject(_indices);
-            ebo.Bind();
+            var ebo = new ElementBuffer(_indices);
+            var vao = new VertexArray();
+            vao.SetElementBuffer(ebo);
+            vao.AddAttributes(vbo, layout);
             
             while (window.IsOpen)
             {
@@ -42,9 +43,9 @@ namespace Sandbox
                 
                 GL.Clear(ClearBufferMask.ColorBufferBit);
                 
-                GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
-                
+                vao.Bind();
                 GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
+                vao.Unbind();
                 
                 window.SwapBuffers();
             }
