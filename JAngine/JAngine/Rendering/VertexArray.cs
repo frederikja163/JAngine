@@ -12,7 +12,8 @@ namespace JAngine.Rendering
             _handle = GL.GenVertexArray();
         }
 
-        public void AddAttributes(VertexBuffer vbo, AttributeLayout layout)
+        public void AddAttributes<T>(VertexBuffer<T> vbo, AttributeLayout layout)
+            where T : unmanaged
         {
             Bind();
             vbo.Bind();
@@ -44,6 +45,11 @@ namespace JAngine.Rendering
         public void Unbind()
         {
             GL.BindVertexArray(0);
+        }
+
+        public void Draw()
+        {
+            
         }
         
         public void Dispose()

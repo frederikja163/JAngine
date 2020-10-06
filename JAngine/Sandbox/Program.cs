@@ -28,7 +28,7 @@ namespace Sandbox
             var shader = new Shader(File.OpenText("shader.vert"), File.OpenText("shader.frag"));
             shader.Bind();
 
-            var vbo = new VertexBuffer(_verts);
+            var vbo = new VertexBuffer<float>(_verts);
             var layout = new AttributeLayout(1);
             layout.AddAttribute<float>(0, 3);
             

@@ -2,11 +2,12 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace JAngine.Rendering
 {
-    public sealed class VertexBuffer : Buffer<float>
+    public sealed class VertexBuffer<T> : Buffer<T>
+        where T : unmanaged
     {
         protected override BufferTarget Target => BufferTarget.ArrayBuffer;
         
-        public VertexBuffer(float[] data) : base(data)
+        public VertexBuffer(T[] data) : base(data)
         {
         }
     }
