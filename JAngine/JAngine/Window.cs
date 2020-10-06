@@ -1,4 +1,5 @@
 ﻿using System;
+using JAngine.Rendering;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -64,6 +65,11 @@ namespace JAngine
         public void Close()
         {
             GLFW.SetWindowShouldClose(_handle, true);
+        }
+
+        public void Clear()
+        {
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         }
 
         public void SwapBuffers()

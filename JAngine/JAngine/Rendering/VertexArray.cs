@@ -6,10 +6,12 @@ namespace JAngine.Rendering
     public sealed class VertexArray : IDisposable
     {
         private int _handle;
+        private ElementBuffer _ebo;
 
-        public VertexArray()
+        public VertexArray(ElementBuffer ebo)
         {
             _handle = GL.GenVertexArray();
+            SetElementBuffer(ebo);
         }
 
         public void AddAttributes<T>(VertexBuffer<T> vbo, AttributeLayout layout)
@@ -31,6 +33,7 @@ namespace JAngine.Rendering
 
         public void SetElementBuffer(ElementBuffer ebo)
         {
+            _ebo = ebo;
             Bind();
             ebo.Bind();
             Unbind();
@@ -47,9 +50,11 @@ namespace JAngine.Rendering
             GL.BindVertexArray(0);
         }
 
-        public void Draw()
+        public void Draw(int start = 0, int count = -1)
         {
-            
+            Bind();
+            GL.DrawElements(PrimitiveType.Triangles, count == -1 ? _ebo.Count : count, DrawElementsType.UnsignedInt, start);
+            Unbind();
         }
         
         public void Dispose()

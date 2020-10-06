@@ -3,7 +3,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace JAngine.Rendering
 {
-    public struct AttributeLayout
+    public class AttributeLayout
     {
         internal readonly struct LayoutElement
         {
@@ -32,11 +32,12 @@ namespace JAngine.Rendering
             _attributes = new LayoutElement[count];
         }
 
-        public unsafe AttributeLayout AddAttribute<T>(int location, int count) where T : unmanaged
+        public unsafe AttributeLayout AddAttribute<T>(int count, int location = -1) where T : unmanaged
         {
             var size = sizeof(T);
-            _attributes[_index++] = new LayoutElement(location, count, size, ParseType<T>());
+            _attributes[_index] = new LayoutElement(location == -1 ? _index : location, count, size, ParseType<T>());
             _stride += size * count;
+            _index += 1;
             return this;
         }
 
