@@ -19,6 +19,23 @@ namespace Sandbox
             shader.Bind();
             var q = new Quad();
             var angle = 0f;
+
+            window.Keyboard.OnKey += (sender, eventArgs) =>
+            {
+                if (eventArgs.State != KeyState.Released)
+                {
+                    Console.WriteLine(eventArgs.Key + " - " + eventArgs.State);
+                }
+                return false;
+            };
+            window.Mouse.OnMouseButton += (sender, eventArgs) =>
+            {
+                if (eventArgs.State != MouseButtonState.Released)
+                {
+                    Console.WriteLine(eventArgs.Button + " - " + eventArgs.State);
+                }
+                return false;
+            };
             
             while (window.IsOpen)
             {
@@ -26,13 +43,13 @@ namespace Sandbox
                 
                 window.Clear();
 
-                if (window.Keyboard[Key.A] == KeyState.JustPressed)
+                if (window.Keyboard.IsPressed(Key.A))
                 {
-                    angle += 0.01f;
+                    angle += 0.1f;
                 }
-                if (window.Keyboard[Key.D] == KeyState.JustPressed)
+                if (window.Keyboard.IsPressed(Key.D))
                 {
-                    angle -= 0.01f;
+                    angle -= 0.1f;
                 }
 
                 var mat = Matrix4.CreateRotationY(angle);

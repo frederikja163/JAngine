@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using GlfwWindow = OpenTK.Windowing.GraphicsLibraryFramework.Window;
@@ -130,12 +131,13 @@ namespace JAngine
         Men = 348
     }
 
-    public enum KeyState
+    [Flags]
+    public enum KeyState : byte
     {
-        JustPressed = 1,
+        Released = 1,
         Pressed = 2,
-        JustReleased = 0,
-        Released = 3
+        JustPressed = Pressed | 4,
+        JustReleased = Released | 8
     }
 
     public sealed unsafe class Keyboard
@@ -154,22 +156,68 @@ namespace JAngine
             }
         }
 
-        private Dictionary<Key, KeyState> _keys;
+        private readonly Dictionary<Key, KeyState> _keyStates;
+        private readonly List<(Key key, int code)> _pressedKeys;
 
         internal Keyboard(GlfwWindow* handle)
         {
-            _keys = new Dictionary<Key, KeyState>();
+            _keyStates = new Dictionary<Key, KeyState>();
+            _pressedKeys = new List<(Key key, int code)>();
             
             GLFW.SetKeyCallback(handle, (window, keyRaw, code, action, mods) =>
             {
                 var key = (Key) keyRaw;
-                var state = (KeyState) action;
-                var args = new KeyEventArgs(key, code, state);
                 
-                if (!_keys.TryAdd(key, state))
+                KeyState state;
+                if (action == InputAction.Press && (this[key] & KeyState.Released) == KeyState.Released)
                 {
-                    _keys[key] = state;
+                    state = KeyState.JustPressed;
+                    _pressedKeys.Add((key, code));
                 }
+                else if (action == InputAction.Release)
+                {
+                    state = KeyState.JustReleased;
+                }
+                else
+                {
+                    return;
+                }
+                
+                _keyStates[key] = state;
+            });
+        }
+
+        internal void PrePoll()
+        {
+            for (int i = _pressedKeys.Count - 1; i >= 0; i--)
+            {
+                var pressedKey = _pressedKeys[i];
+                var key = pressedKey.key;
+                switch (_keyStates[key])
+                {
+                    case KeyState.JustPressed:
+                        _keyStates[key] = KeyState.Pressed;
+                        break;
+                    case KeyState.JustReleased:
+                        _keyStates[key] = KeyState.Released;
+                        _pressedKeys.RemoveAt(i);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        
+        internal void PostPoll()
+        {
+            for (int i = _pressedKeys.Count - 1; i >= 0; i--)
+            {
+                var pressedKey = _pressedKeys[i];
+                var key = pressedKey.key;
+                var code = pressedKey.code;
+                var state = _keyStates[key];
+            
+                var args = new KeyEventArgs(key, code, state);
                 
                 var delegates = OnKey?.GetInvocationList();
                 if (delegates == null) return;
@@ -181,10 +229,16 @@ namespace JAngine
                         return;
                     }
                 }
-            });
+            }
         }
 
-        public KeyState this[Key key] => _keys.TryGetValue(key, out var state) ? state : KeyState.Released;
+        public bool IsPressed(Key key)
+        {
+            return (this[key] & KeyState.Pressed) == KeyState.Pressed;
+        }
+
+        public KeyState this[Key key] => _keyStates.TryGetValue(key, out var state) ? state : KeyState.Released;
+        
         public delegate bool KeyEvent(Keyboard sender, KeyEventArgs e);
 
         public KeyEvent? OnKey;

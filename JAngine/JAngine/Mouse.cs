@@ -19,10 +19,10 @@ namespace JAngine
     
     public enum MouseButtonState
     {
-        JustPressed = 1,
+        Released = 1,
         Pressed = 2,
-        JustReleased = 0,
-        Released = 3
+        JustPressed = Pressed | 4,
+        JustReleased = Released | 8
     }
 
     public unsafe class Mouse
@@ -41,7 +41,8 @@ namespace JAngine
             }
         }
 
-        private Dictionary<MouseButton, MouseButtonState> _buttonStates;
+        private readonly Dictionary<MouseButton, MouseButtonState> _buttonStates;
+        private List<MouseButton> _pressedButtons;
         
         internal Mouse(GlfwWindow* handle)
         {
@@ -49,28 +50,28 @@ namespace JAngine
             Position = new Vector2((float)x, (float)y);
             
             _buttonStates = new Dictionary<MouseButton, MouseButtonState>();
+            _pressedButtons = new List<MouseButton>();
             
             GLFW.SetMouseButtonCallback(handle, (window, buttonRaw, actionRaw, mods) =>
             {
                 var button = (MouseButton) buttonRaw;
-                var state = (MouseButtonState) actionRaw;
-                var args = new MouseButtonEventArgs(button, state, Position);
-                
-                if (!_buttonStates.TryAdd(button, state))
+
+                MouseButtonState state;
+                if (actionRaw == InputAction.Press)
                 {
-                    _buttonStates[button] = state;
+                    state = MouseButtonState.JustPressed;
+                    _pressedButtons.Add(button);
                 }
-                
-                var delegates = OnMouseButton?.GetInvocationList();
-                if (delegates == null) return;
-                foreach (var d in delegates)
+                else if (actionRaw == InputAction.Release)
                 {
-                    var e = (MouseButtonEvent) d;
-                    if (e.Invoke(this, args))
-                    {
-                        return;
-                    }
+                    state = MouseButtonState.JustReleased;
                 }
+                else
+                {
+                    return;
+                }
+
+                _buttonStates[button] = state;
             });
 
             GLFW.SetCursorPosCallback(handle, (window, x, y) =>
@@ -87,6 +88,49 @@ namespace JAngine
                     }
                 }
             });
+        }
+
+        internal void PrePoll()
+        {
+            for (int i = _pressedButtons.Count - 1; i >= 0; i--)
+            {
+                var button = _pressedButtons[i];
+                switch (_buttonStates[button])
+                {
+                    case MouseButtonState.JustPressed:
+                        _buttonStates[button] = MouseButtonState.Pressed;
+                        break;
+                    case MouseButtonState.JustReleased:
+                        _buttonStates[button] = MouseButtonState.Released;
+                        _pressedButtons.RemoveAt(i);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        
+        internal void PostPoll()
+        {
+            for (int i = _pressedButtons.Count - 1; i >= 0; i--)
+            {
+                var button = _pressedButtons[i];
+                var state = _buttonStates[button];
+                var args = new MouseButtonEventArgs(button, state, Position);
+                
+                _buttonStates[button] = state;
+                
+                var delegates = OnMouseButton?.GetInvocationList();
+                if (delegates == null) return;
+                foreach (var d in delegates)
+                {
+                    var e = (MouseButtonEvent) d;
+                    if (e.Invoke(this, args))
+                    {
+                        return;
+                    }
+                }
+            }
         }
 
         public MouseButtonState this[MouseButton b] =>

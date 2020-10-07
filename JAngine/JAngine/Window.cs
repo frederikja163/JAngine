@@ -80,7 +80,11 @@ namespace JAngine
 
         public void PollInput()
         {
+            Mouse.PrePoll();
+            Keyboard.PrePoll();
             GLFW.PollEvents();
+            Mouse.PostPoll();
+            Keyboard.PostPoll();
         }
 
         public void Dispose()
