@@ -3,14 +3,15 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace JAngine.Rendering
 {
-    public sealed class VertexArray : IDisposable
+    public sealed class VertexArray : IDisposable, IDrawable
     {
-        private int _handle;
+        private readonly int _handle;
         private ElementBuffer _ebo;
 
         public VertexArray(ElementBuffer ebo)
         {
             _handle = GL.GenVertexArray();
+            _ebo = ebo;
             SetElementBuffer(ebo);
         }
 
@@ -50,10 +51,15 @@ namespace JAngine.Rendering
             GL.BindVertexArray(0);
         }
 
-        public void Draw(int start = 0, int count = -1)
+        public void Draw()
+        {
+            Draw(_ebo.Count, 0);
+        }
+
+        public void Draw(int count, int start = 0)
         {
             Bind();
-            GL.DrawElements(PrimitiveType.Triangles, count == -1 ? _ebo.Count : count, DrawElementsType.UnsignedInt, start);
+            GL.DrawElements(PrimitiveType.Triangles, count, DrawElementsType.UnsignedInt, start);
             Unbind();
         }
         

@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using GlfwWindow = OpenTK.Windowing.GraphicsLibraryFramework.Window;
 
@@ -153,13 +154,23 @@ namespace JAngine
             }
         }
 
+        private Dictionary<Key, KeyState> _keys;
+
         internal Keyboard(GlfwWindow* handle)
         {
+            _keys = new Dictionary<Key, KeyState>();
+            
             GLFW.SetKeyCallback(handle, (window, keyRaw, code, action, mods) =>
             {
                 var key = (Key) keyRaw;
                 var state = (KeyState) action;
                 var args = new KeyEventArgs(key, code, state);
+                
+                if (!_keys.TryAdd(key, state))
+                {
+                    _keys[key] = state;
+                }
+                
                 var delegates = OnKey?.GetInvocationList();
                 if (delegates == null) return;
                 foreach (var d in delegates)
@@ -172,7 +183,8 @@ namespace JAngine
                 }
             });
         }
-        
+
+        public KeyState this[Key key] => _keys.TryGetValue(key, out var state) ? state : KeyState.Released;
         public delegate bool KeyEvent(Keyboard sender, KeyEventArgs e);
 
         public KeyEvent? OnKey;

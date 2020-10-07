@@ -51,6 +51,7 @@ namespace JAngine
             if (!_isOpenglLoaded)
             {
                 GL.LoadBindings(new GLFWBindingsContext());
+                GL.CullFace(CullFaceMode.Front);
             }
 
             Mouse = new Mouse(_handle);

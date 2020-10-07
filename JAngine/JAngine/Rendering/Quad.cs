@@ -1,6 +1,6 @@
 namespace JAngine.Rendering
 {
-    public static class Quad
+    public sealed class Quad : IDrawable
     {
         private static VertexArray _vao;
         private static VertexBuffer<Vertex> _vbo;
@@ -20,7 +20,7 @@ namespace JAngine.Rendering
             _vao.AddAttributes(_vbo, Vertex.Layout);
         }
 
-        public static void Draw()
+        public void Draw()
         {
             _vao.Draw();
         }
