@@ -11,13 +11,15 @@ namespace JAngine.Rendering
             public int Count { get; }
             public int Size { get; }
             public VertexAttribPointerType Type { get; }
+            public int Divisor { get; }
 
-            public LayoutElement(int location, int count, int size, VertexAttribPointerType type)
+            public LayoutElement(int location, int count, int size, VertexAttribPointerType type, int divisor)
             {
                 Location = location;
                 Count = count;
                 Size = size;
                 Type = type;
+                Divisor = divisor;
             }
         }
 
@@ -32,10 +34,10 @@ namespace JAngine.Rendering
             _attributes = new LayoutElement[count];
         }
 
-        public unsafe AttributeLayout AddAttribute<T>(int count, int location = -1) where T : unmanaged
+        public unsafe AttributeLayout AddAttribute<T>(int count, int location = -1, int divisor = 0) where T : unmanaged
         {
             var size = sizeof(T);
-            _attributes[_index] = new LayoutElement(location == -1 ? _index : location, count, size, ParseType<T>());
+            _attributes[_index] = new LayoutElement(location == -1 ? _index : location, count, size, ParseType<T>(), divisor);
             _stride += size * count;
             _index += 1;
             return this;

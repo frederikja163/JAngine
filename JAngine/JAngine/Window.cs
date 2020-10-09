@@ -46,6 +46,7 @@ namespace JAngine
 
             _handle = GLFW.CreateWindow(p.Width, p.Height, p.Title, null, null);
             GLFW.MakeContextCurrent(_handle);
+            GLFW.SwapInterval(0);
             _totalWindows++;
 
             if (!_isOpenglLoaded)

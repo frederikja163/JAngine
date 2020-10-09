@@ -15,6 +15,12 @@ namespace JAngine.Rendering
             SetElementBuffer(ebo);
         }
 
+        public void AddAttribute<T>(VertexBuffer<T> vbo, int count, int location, int divisor = 0)
+            where T : unmanaged
+        {
+            AddAttributes(vbo, new AttributeLayout(1).AddAttribute<T>(count, location, divisor));
+        }
+
         public void AddAttributes<T>(VertexBuffer<T> vbo, AttributeLayout layout)
             where T : unmanaged
         {
@@ -26,6 +32,10 @@ namespace JAngine.Rendering
                 var attr = layout[i];
                 GL.VertexAttribPointer(attr.Location, attr.Count, attr.Type, false, layout.Stride, offSet);
                 GL.EnableVertexAttribArray(attr.Location);
+                if (attr.Divisor != 0)
+                {
+                    GL.VertexAttribDivisor(attr.Location, attr.Divisor);
+                }
                 offSet += attr.Count * attr.Size;
             }
             vbo.Unbind();
@@ -56,10 +66,15 @@ namespace JAngine.Rendering
             Draw(_ebo.Count, 0);
         }
 
-        public void Draw(int count, int start = 0)
+        public void Draw(int count, int start = 0, int instances = 1)
         {
             Bind();
-            GL.DrawElements(PrimitiveType.Triangles, count, DrawElementsType.UnsignedInt, start);
+            // for (int i = 0; i < instances; i++)
+            // {
+            //     
+            // GL.DrawElements(PrimitiveType.Triangles, count, DrawElementsType.UnsignedInt, (IntPtr)start);
+            // }
+            GL.DrawElementsInstanced(PrimitiveType.Triangles, count, DrawElementsType.UnsignedInt, (IntPtr)start, instances);
             Unbind();
         }
         

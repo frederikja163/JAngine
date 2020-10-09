@@ -7,7 +7,7 @@ namespace JAngine.Rendering
     {
         protected override BufferTarget Target => BufferTarget.ArrayBuffer;
         
-        public VertexBuffer(T[] data) : base(data)
+        public VertexBuffer(params T[] data) : base(data)
         {
         }
     }
