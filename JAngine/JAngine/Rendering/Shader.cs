@@ -6,15 +6,16 @@ namespace JAngine.Rendering
 {
     public abstract class SubShader : IAsset, IDisposable
     {
-        //TODO: Turn into private field with internal property, for entire solution.
-        internal readonly int Handle;
+        private readonly int _handle;
 
+        internal int Handle => _handle;
+        
         protected SubShader(ShaderType type, StreamReader reader)
         {
-            Handle = GL.CreateShader(type);
-            GL.ShaderSource(Handle, reader.ReadToEnd());
-            GL.CompileShader(Handle);
-            GL.GetShaderInfoLog(Handle, out var il);
+            _handle = GL.CreateShader(type);
+            GL.ShaderSource(_handle, reader.ReadToEnd());
+            GL.CompileShader(_handle);
+            GL.GetShaderInfoLog(_handle, out var il);
             if (!string.IsNullOrWhiteSpace(il))
             {
                 throw Log.Error(il);
@@ -23,7 +24,7 @@ namespace JAngine.Rendering
         
         public void Dispose()
         {
-            GL.DeleteShader(Handle);
+            GL.DeleteShader(_handle);
         }
     }
 
@@ -41,10 +42,11 @@ namespace JAngine.Rendering
         }
     }
     
-    //TODO: Redo shaders at some point.
     public sealed class Shader : IDisposable
     {
         private readonly int _handle;
+        
+        internal int Handle => _handle;
 
         public Shader(params SubShader[] shaders)
         {

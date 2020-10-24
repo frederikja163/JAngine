@@ -30,6 +30,7 @@ namespace JAngine.Rendering
         
         private readonly int _handle;
         private int _vertexBufferCount = 0;
+        internal int Handle => _handle;
 
         public VertexArray()
         {
