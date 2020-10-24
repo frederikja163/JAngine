@@ -32,10 +32,6 @@ namespace JAngine.Rendering
                 var attr = layout[i];
                 GL.VertexAttribPointer(attr.Location, attr.Count, attr.Type, false, layout.Stride, offSet);
                 GL.EnableVertexAttribArray(attr.Location);
-                if (attr.Divisor != 0)
-                {
-                    GL.VertexAttribDivisor(attr.Location, attr.Divisor);
-                }
                 offSet += attr.Count * attr.Size;
             }
             vbo.Unbind();

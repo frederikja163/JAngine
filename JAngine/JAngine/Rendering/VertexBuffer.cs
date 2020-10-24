@@ -7,8 +7,11 @@ namespace JAngine.Rendering
     {
         protected override BufferTarget Target => BufferTarget.ArrayBuffer;
         
-        public VertexBuffer(params T[] data) : base(data)
+        public VertexBuffer(int stride, params T[] data) : base(data)
         {
+            Stride = stride;
         }
+        
+        public int Stride { get; }
     }
 }

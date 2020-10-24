@@ -19,7 +19,6 @@ namespace Sandbox
 
             using var shader = new Shader(File.OpenText("shader.vert"), File.OpenText("shader.frag"));
             shader.Bind();
-            var rect = new Rectangle();
 
             window.Keyboard.OnKey += (sender, eventArgs) =>
             {
@@ -37,28 +36,16 @@ namespace Sandbox
                 }
                 return false;
             };
-
-            float frameRate = 0;
-            var watch = new Stopwatch();
-            var timer = new Timer(1000);
-            timer.AutoReset = true;
-            timer.Start();
-            timer.Elapsed += (sender, eventArgs) => Console.WriteLine(frameRate);
             
             while (window.IsOpen)
             {
-                watch.Restart();
-                
                 window.PollInput();
                 
                 window.Clear();
                 
-                rect.Draw();
+                
                 
                 window.SwapBuffers();
-
-                var dt = watch.ElapsedTicks / (float) Stopwatch.Frequency;
-                frameRate = (frameRate + 1 / dt) / 2;
             }
         }
     }
