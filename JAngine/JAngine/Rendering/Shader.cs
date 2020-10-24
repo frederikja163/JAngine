@@ -1,51 +1,70 @@
 using System;
+using System.IO;
 using OpenTK.Graphics.OpenGL4;
 
 namespace JAngine.Rendering
 {
+    public abstract class SubShader : IAsset, IDisposable
+    {
+        //TODO: Turn into private field with internal property, for entire solution.
+        internal readonly int Handle;
+
+        protected SubShader(ShaderType type, StreamReader reader)
+        {
+            Handle = GL.CreateShader(type);
+            GL.ShaderSource(Handle, reader.ReadToEnd());
+            GL.CompileShader(Handle);
+            GL.GetShaderInfoLog(Handle, out var il);
+            if (!string.IsNullOrWhiteSpace(il))
+            {
+                throw Log.Error(il);
+            }
+        }
+        
+        public void Dispose()
+        {
+            GL.DeleteShader(Handle);
+        }
+    }
+
+    public sealed class VertexShader : SubShader
+    {
+        public VertexShader(StreamReader reader) : base(ShaderType.VertexShader, reader)
+        {
+        }
+    }
+    
+    public sealed class FragmentShader : SubShader
+    {
+        public FragmentShader(StreamReader reader) : base(ShaderType.FragmentShader, reader)
+        {
+        }
+    }
+    
     //TODO: Redo shaders at some point.
     public sealed class Shader : IDisposable
     {
         private readonly int _handle;
 
-        public Shader(string vertexSrc, string fragmentSrc)
+        public Shader(params SubShader[] shaders)
         {
             _handle = GL.CreateProgram();
-
-            int AttachShader(string src, ShaderType type)
+            foreach (var shader in shaders)
             {
-                int shader = GL.CreateShader(type);
-                GL.ShaderSource(shader, src);
-                GL.CompileShader(shader);
-                GL.GetShaderInfoLog(shader, out var il);
-                if (!string.IsNullOrWhiteSpace(il))
-                {
-                    throw Log.Error(il);
-                }
-
-                GL.AttachShader(_handle, shader);
-
-                return shader;
+                GL.AttachShader(_handle, shader.Handle);
             }
-
-            void RemoveShader(int shader)
-            {
-                GL.DetachShader(_handle, shader);
-                GL.DeleteShader(shader);
-            }
-
-            int vert = AttachShader(vertexSrc, ShaderType.VertexShader);
-            int frag = AttachShader(fragmentSrc, ShaderType.FragmentShader);
-
+            
             GL.LinkProgram(_handle);
             GL.GetProgramInfoLog(_handle, out string il);
             if (!string.IsNullOrWhiteSpace(il))
             {
                 throw Log.Error(il);
             }
-
-            RemoveShader(vert);
-            RemoveShader(frag);
+            
+            foreach (var shader in shaders)
+            {
+                GL.DetachShader(_handle, shader.Handle);
+            }
             
             GL.UseProgram(_handle);
         }

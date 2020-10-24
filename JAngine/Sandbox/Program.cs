@@ -16,7 +16,7 @@ namespace Sandbox
             Log.AddLogger(new FileLogger("log.txt"));
             Log.AddLogger(new ConsoleLogger());
             
-            // Assets.AddAssets(Assembly.GetExecutingAssembly(), "");
+            Assets.AddAssets(Assembly.GetExecutingAssembly(), "");
             
             var window = new Window(800, 600, "Sandbox");
             window.MakeCurrent();
@@ -28,7 +28,7 @@ namespace Sandbox
             vao.AddVertexBuffer(vbo, 0, sizeof(float) * 2, 
                 new VertexArray.Attribute(0, 2, VertexAttribType.Float, sizeof(float) * 2));
             vao.SetElementBuffer(ebo);
-            var shader = new Shader(Assets.GetAsset("shader.vert").ReadToEnd(), Assets.GetAsset("shader.frag").ReadToEnd());
+            var shader = new Shader(Assets.GetAsset<VertexShader>("shader.vert"), Assets.GetAsset<FragmentShader>("shader.frag"));
             
             GL.ClearColor(Color.Aqua);
 
