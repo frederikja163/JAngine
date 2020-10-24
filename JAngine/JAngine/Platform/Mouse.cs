@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using GlfwWindow = OpenTK.Windowing.GraphicsLibraryFramework.Window;
 
-namespace JAngine
+namespace Slope
 {
     public enum MouseButton
     {
@@ -25,7 +24,7 @@ namespace JAngine
         JustReleased = Released | 8
     }
 
-    public unsafe class Mouse
+    public unsafe sealed class Mouse
     {
         public struct MouseButtonEventArgs
         {
@@ -42,8 +41,10 @@ namespace JAngine
         }
 
         private readonly Dictionary<MouseButton, MouseButtonState> _buttonStates;
-        private List<MouseButton> _pressedButtons;
-        
+        private readonly List<MouseButton> _pressedButtons;
+        private readonly GLFWCallbacks.MouseButtonCallback _mouseButtonCallback;
+        private readonly GLFWCallbacks.CursorPosCallback _cursorPosCallback;
+
         internal Mouse(GlfwWindow* handle)
         {
             GLFW.GetCursorPos(handle, out var x, out var y);
@@ -51,43 +52,49 @@ namespace JAngine
             
             _buttonStates = new Dictionary<MouseButton, MouseButtonState>();
             _pressedButtons = new List<MouseButton>();
-            
-            GLFW.SetMouseButtonCallback(handle, (window, buttonRaw, actionRaw, mods) =>
-            {
-                var button = (MouseButton) buttonRaw;
 
-                MouseButtonState state;
-                if (actionRaw == InputAction.Press)
-                {
-                    state = MouseButtonState.JustPressed;
-                    _pressedButtons.Add(button);
-                }
-                else if (actionRaw == InputAction.Release)
-                {
-                    state = MouseButtonState.JustReleased;
-                }
-                else
+            _mouseButtonCallback = MouseButtonCallback;
+            GLFW.SetMouseButtonCallback(handle, _mouseButtonCallback);
+            _cursorPosCallback = CursorPosCallback;
+            GLFW.SetCursorPosCallback(handle, _cursorPosCallback);
+        }
+
+        private void MouseButtonCallback(GlfwWindow* window, OpenTK.Windowing.GraphicsLibraryFramework.MouseButton buttonRaw,
+            InputAction action, KeyModifiers mods)
+        {
+            var button = (MouseButton) buttonRaw;
+
+            MouseButtonState state;
+            if (action == InputAction.Press)
+            {
+                state = MouseButtonState.JustPressed;
+                _pressedButtons.Add(button);
+            }
+            else if (action == InputAction.Release)
+            {
+                state = MouseButtonState.JustReleased;
+            }
+            else
+            {
+                return;
+            }
+
+            _buttonStates[button] = state;
+        }
+
+        private void CursorPosCallback(GlfwWindow* window, double x, double y)
+        {
+            Position = new Vector2((float)x, (float)y);
+            var delegates = OnMouseMoved?.GetInvocationList();
+            if (delegates == null) return;
+            foreach (var d in delegates)
+            {
+                var e = (MouseMoveEvent) d;
+                if (e.Invoke(this, Position))
                 {
                     return;
                 }
-
-                _buttonStates[button] = state;
-            });
-
-            GLFW.SetCursorPosCallback(handle, (window, x, y) =>
-            {
-                Position = new Vector2((float)x, (float)y);
-                var delegates = OnMouseMoved?.GetInvocationList();
-                if (delegates == null) return;
-                foreach (var d in delegates)
-                {
-                    var e = (MouseMoveEvent) d;
-                    if (e.Invoke(this, Position))
-                    {
-                        return;
-                    }
-                }
-            });
+            }
         }
 
         internal void PrePoll()
