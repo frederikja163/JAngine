@@ -9,7 +9,7 @@ namespace JAngine.Platform
 {
     public sealed unsafe class Window : IDisposable
     {
-        private static readonly List<Window> _windows = new List<Window>();
+        private static readonly List<Window> Windows = new List<Window>();
         private readonly GlfwWindow* _handle;
         private Vector2i _size;
         private readonly Mouse _mouse;
@@ -17,14 +17,14 @@ namespace JAngine.Platform
 
         public Window(int width, int height, string title)
         {
-            if (_windows.Count == 0)
+            if (Windows.Count == 0)
             {
                 if (!GLFW.Init())
                 {
                     throw new Exception("Glfw failed to initialize!");
                 }
             }
-            _windows.Add(this);
+            Windows.Add(this);
             
             _handle = GLFW.CreateWindow(width, height, title, null, null);
             if (_handle == null)
@@ -84,8 +84,8 @@ namespace JAngine.Platform
         public void Dispose()
         {
             GLFW.DestroyWindow(_handle);
-            _windows.Remove(this);
-            if (_windows.Count == 0)
+            Windows.Remove(this);
+            if (Windows.Count == 0)
             {
                 GLFW.Terminate();
             }

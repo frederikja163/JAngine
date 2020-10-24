@@ -1,11 +1,7 @@
 #version 330 core
-in layout(location = 0) vec3 vPosition;
-in layout(location = 1) vec2 vTextureCoordinate;
-
-out vec4 fColor;
+in layout(location = 0) vec2 vPosition;
 
 void main()
 {
-    gl_Position = vec4(vPosition / 50, 1);
-    fColor = vec4(vTextureCoordinate, 0, 1);
+    gl_Position = vec4(vPosition, 0, 1);
 }
