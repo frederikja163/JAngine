@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.IO;
+using System.Reflection;
 using JAngine;
 using JAngine.Rendering;
 using OpenTK.Graphics.OpenGL4;
@@ -15,6 +16,8 @@ namespace Sandbox
             Log.AddLogger(new FileLogger("log.txt"));
             Log.AddLogger(new ConsoleLogger());
             
+            // Assets.AddAssets(Assembly.GetExecutingAssembly(), "");
+            
             var window = new Window(800, 600, "Sandbox");
             window.MakeCurrent();
             GL.LoadBindings(new GLFWBindingsContext());
@@ -25,7 +28,7 @@ namespace Sandbox
             vao.AddVertexBuffer(vbo, 0, sizeof(float) * 2, 
                 new VertexArray.Attribute(0, 2, VertexAttribType.Float, sizeof(float) * 2));
             vao.SetElementBuffer(ebo);
-            var shader = new Shader(File.ReadAllText("shader.vert"), File.ReadAllText("shader.frag"));
+            var shader = new Shader(Assets.GetAsset("shader.vert").ReadToEnd(), Assets.GetAsset("shader.frag").ReadToEnd());
             
             GL.ClearColor(Color.Aqua);
 
