@@ -1,9 +1,10 @@
 ﻿using System.Drawing;
 using System.IO;
+using JAngine;
 using JAngine.Rendering;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using Window = JAngine.Platform.Window;
+using Window = JAngine.Window;
 
 namespace Sandbox
 {
@@ -11,6 +12,9 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
+            Log.AddLogger(new FileLogger("log.txt"));
+            Log.AddLogger(new ConsoleLogger());
+            
             var window = new Window(800, 600, "Sandbox");
             window.MakeCurrent();
             GL.LoadBindings(new GLFWBindingsContext());

@@ -3,6 +3,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace JAngine.Rendering
 {
+    //TODO: Redo shaders at some point.
     public sealed class Shader : IDisposable
     {
         private readonly int _handle;
@@ -19,7 +20,7 @@ namespace JAngine.Rendering
                 GL.GetShaderInfoLog(shader, out var il);
                 if (!string.IsNullOrWhiteSpace(il))
                 {
-                    throw new Exception(il);
+                    throw Log.Error(il);
                 }
 
                 GL.AttachShader(_handle, shader);
@@ -40,7 +41,7 @@ namespace JAngine.Rendering
             GL.GetProgramInfoLog(_handle, out string il);
             if (!string.IsNullOrWhiteSpace(il))
             {
-                throw new Exception(il);
+                throw Log.Error(il);
             }
 
             RemoveShader(vert);

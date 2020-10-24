@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using Slope;
 using GlfwWindow = OpenTK.Windowing.GraphicsLibraryFramework.Window;
 
-namespace JAngine.Platform
+namespace JAngine
 {
     public sealed unsafe class Window : IDisposable
     {
