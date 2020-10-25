@@ -4,6 +4,7 @@ using System.Reflection;
 using JAngine;
 using JAngine.Rendering;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using Window = JAngine.Window;
 
@@ -29,6 +30,8 @@ namespace Sandbox
                 new VertexArray.Attribute(0, 2, VertexAttribType.Float, sizeof(float) * 2));
             vao.SetElementBuffer(ebo);
             var shader = new Shader(Assets.GetAsset<VertexShader>("shader.vert"), Assets.GetAsset<FragmentShader>("shader.frag"));
+            shader.Bind();
+            shader.SetUniform(shader.GetUniformLocation("uTest"), Vector4.One);
             
             GL.ClearColor(Color.Aqua);
 
