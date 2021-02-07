@@ -33,7 +33,7 @@ namespace Sandbox
             shader.Bind();
             shader.SetUniform(shader.GetUniformLocation("uTest"), Vector4.One);
             
-            GL.ClearColor(Color.Aqua);
+            GL.ClearColor(Color4.Aqua);
 
             while (window.IsRunning)
             {

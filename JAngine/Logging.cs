@@ -11,8 +11,7 @@ namespace JAngine
     {
         Info,
         Warning,
-        Error,
-        Fatal
+        Error
     }
 
     public static class MessageSeverityExtension
@@ -23,8 +22,7 @@ namespace JAngine
                 MessageSeverity.Info => Color4.White,
                 MessageSeverity.Warning => Color4.Yellow,
                 MessageSeverity.Error => Color4.Red,
-                MessageSeverity.Fatal => Color4.DarkRed,
-                _ => throw Log.Error("Could not convert severity to color.")
+                _ => throw new Exception("Could not convert severity to color.")
             };
     }
     
@@ -88,8 +86,7 @@ namespace JAngine
                 MessageSeverity.Info => ConsoleColor.White,
                 MessageSeverity.Warning => ConsoleColor.Yellow,
                 MessageSeverity.Error => ConsoleColor.Red,
-                MessageSeverity.Fatal => ConsoleColor.DarkRed,
-                _ => throw JAngine.Log.Error("Could not convert severity to console color.")
+                _ => throw new Exception("Could not convert severity to console color.")
             };
     }
 
@@ -105,19 +102,8 @@ namespace JAngine
         public static void Warning(string message, [CallerLineNumber] int lineNumber = 0, [CallerFilePath] string filePath = "") =>
             WriteLog(new MessageInfo(MessageSeverity.Warning, DateTime.Now, message, lineNumber, filePath));
         
-        public static Exception Error(string message, [CallerLineNumber] int lineNumber = 0, [CallerFilePath] string filePath = "")
-        {
-            var info = new MessageInfo(MessageSeverity.Error, DateTime.Now, message, lineNumber, filePath);
-            WriteLog(info);
-            return new Exception(info.ToString());
-        }
-        
-        public static Exception Fatal(string message, [CallerLineNumber] int lineNumber = 0, [CallerFilePath] string filePath = "")
-        {
-            var info = new MessageInfo(MessageSeverity.Fatal, DateTime.Now, message, lineNumber, filePath);
-            WriteLog(info);
-            return new Exception(info.ToString());
-        }
+        public static void Error(string message, [CallerLineNumber] int lineNumber = 0, [CallerFilePath] string filePath = "") =>
+            WriteLog(new MessageInfo(MessageSeverity.Error, DateTime.Now, message, lineNumber, filePath));
 
         private static void WriteLog(in MessageInfo info)
         {

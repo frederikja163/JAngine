@@ -6,20 +6,17 @@ namespace JAngine.Rendering
     public sealed class Buffer<T> : IDisposable
         where T : unmanaged
     {
-        private readonly int _handle;
-
-        internal int Handle => _handle;
-
-        public Buffer(int size, BufferStorageFlags flags = BufferStorageFlags.None) : this(new T[size],
-            flags)
+        internal readonly int Handle;
+        
+        public Buffer(int size) : this(new T[size])
         { }
         
-        public Buffer(T[] data, BufferStorageFlags flags = BufferStorageFlags.None)
+        public Buffer(T[] data)
         {
             unsafe
             {
-                GL.CreateBuffers(1, out _handle);
-                GL.NamedBufferStorage(_handle, sizeof(T) * data.Length, data, flags);
+                GL.CreateBuffers(1, out Handle);
+                GL.NamedBufferStorage(Handle, sizeof(T) * data.Length, data, BufferStorageFlags.None);
             }
         }
 
@@ -29,13 +26,13 @@ namespace JAngine.Rendering
         {
             unsafe
             {
-                GL.NamedBufferSubData(_handle, (IntPtr)offset, sizeof(T) * data.Length, data);
+                GL.NamedBufferSubData(Handle, (IntPtr)offset, sizeof(T) * data.Length, data);
             }
         }
         
         public void Dispose()
         {
-            GL.DeleteBuffer(_handle);
+            GL.DeleteBuffer(Handle);
         }
     }
 }

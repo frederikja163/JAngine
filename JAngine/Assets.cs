@@ -55,12 +55,12 @@ namespace JAngine
             var stream = asset.assembly.GetManifestResourceStream(path);
             if (stream == null)
             {
-                throw Log.Error($"Failed to load {name}.");
+                throw new Exception($"Failed to load {name}.");
             }
 
             if (!_loaders.TryGetValue(typeof(T), out var loader))
             {
-                throw Log.Error($"Failed to find loader for asset type {typeof(T)}.");
+                throw new Exception($"Failed to find loader for asset type {typeof(T)}.");
             }
             var sr = new StreamReader(stream);
             return (T)loader.Invoke(sr);

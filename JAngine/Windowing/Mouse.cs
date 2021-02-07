@@ -40,23 +40,21 @@ namespace JAngine
             }
         }
 
-        private readonly Dictionary<MouseButton, MouseButtonState> _buttonStates;
-        private readonly List<MouseButton> _pressedButtons;
-        private readonly GLFWCallbacks.MouseButtonCallback _mouseButtonCallback;
-        private readonly GLFWCallbacks.CursorPosCallback _cursorPosCallback;
+        private readonly Dictionary<MouseButton, MouseButtonState> _buttonStates = new Dictionary<MouseButton, MouseButtonState>();
+        private readonly List<MouseButton> _pressedButtons = new List<MouseButton>();
+        // private readonly GLFWCallbacks.MouseButtonCallback _mouseButtonCallback;
+        // private readonly GLFWCallbacks.CursorPosCallback _cursorPosCallback;
 
         internal Mouse(GlfwWindow* handle)
         {
             GLFW.GetCursorPos(handle, out var x, out var y);
             Position = new Vector2((float)x, (float)y);
-            
-            _buttonStates = new Dictionary<MouseButton, MouseButtonState>();
-            _pressedButtons = new List<MouseButton>();
 
-            _mouseButtonCallback = MouseButtonCallback;
-            GLFW.SetMouseButtonCallback(handle, _mouseButtonCallback);
-            _cursorPosCallback = CursorPosCallback;
-            GLFW.SetCursorPosCallback(handle, _cursorPosCallback);
+            // Not sure if these are needed.
+            // _mouseButtonCallback = MouseButtonCallback;
+            GLFW.SetMouseButtonCallback(handle, MouseButtonCallback);
+            // _cursorPosCallback = CursorPosCallback;
+            GLFW.SetCursorPosCallback(handle, CursorPosCallback);
         }
 
         private void MouseButtonCallback(GlfwWindow* window, OpenTK.Windowing.GraphicsLibraryFramework.MouseButton buttonRaw,

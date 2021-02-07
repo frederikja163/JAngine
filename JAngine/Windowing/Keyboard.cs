@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using GlfwWindow = OpenTK.Windowing.GraphicsLibraryFramework.Window;
 
-namespace JAngine
+namespace JAngine.Windowing
 {
     public enum Key
     {
@@ -155,17 +155,15 @@ namespace JAngine
             }
         }
 
-        private readonly Dictionary<Key, KeyState> _keyStates;
-        private readonly List<(Key key, int code)> _pressedKeys;
-        private readonly GLFWCallbacks.KeyCallback _keyCallback;
+        private readonly Dictionary<Key, KeyState> _keyStates = new Dictionary<Key, KeyState>();
+        private readonly List<(Key key, int code)> _pressedKeys = new List<(Key key, int code)>();
+        // private readonly GLFWCallbacks.KeyCallback _keyCallback;
 
         internal Keyboard(GlfwWindow* handle)
         {
-            _keyStates = new Dictionary<Key, KeyState>();
-            _pressedKeys = new List<(Key key, int code)>();
-            
-            _keyCallback = KeyCallback;
-            GLFW.SetKeyCallback(handle, _keyCallback);
+            // Not sure if this is needed or not.
+            // _keyCallback = KeyCallback;
+            GLFW.SetKeyCallback(handle, KeyCallback);
         }
 
         public KeyState this[Key key] => _keyStates.TryGetValue(key, out var state) ? state : KeyState.Released;

@@ -28,24 +28,23 @@ namespace JAngine.Rendering
                 => new Attribute(values.index, values.count, values.type, values.relativeOffset, values.divisor);
         }
         
-        private readonly int _handle;
+        internal readonly int Handle;
         private int _vertexBufferCount = 0;
-        internal int Handle => _handle;
 
         public VertexArray()
         {
-            GL.CreateVertexArrays(1, out _handle);
+            GL.CreateVertexArrays(1, out Handle);
         }
 
         public void AddVertexBuffer<T>(Buffer<T> buffer, int offset, int stride, params Attribute[] attributes)
             where T : unmanaged
         {
-            GL.VertexArrayVertexBuffer(_handle, _vertexBufferCount, buffer.Handle, (IntPtr)offset, stride);
+            GL.VertexArrayVertexBuffer(Handle, _vertexBufferCount, buffer.Handle, (IntPtr)offset, stride);
             foreach (var attribute in attributes)
             {
-                GL.VertexArrayAttribBinding(_handle, attribute.Index, _vertexBufferCount);
-                GL.EnableVertexArrayAttrib(_handle, attribute.Index);
-                GL.VertexArrayAttribFormat(_handle, attribute.Index, attribute.Count, attribute.Type, false, attribute.RelativeOffset);
+                GL.VertexArrayAttribBinding(Handle, attribute.Index, _vertexBufferCount);
+                GL.EnableVertexArrayAttrib(Handle, attribute.Index);
+                GL.VertexArrayAttribFormat(Handle, attribute.Index, attribute.Count, attribute.Type, false, attribute.RelativeOffset);
             }
             _vertexBufferCount++;
         }
@@ -53,18 +52,18 @@ namespace JAngine.Rendering
         public void SetElementBuffer<T>(Buffer<T> buffer)
             where T : unmanaged
         {
-            GL.VertexArrayElementBuffer(_handle, buffer.Handle);
+            GL.VertexArrayElementBuffer(Handle, buffer.Handle);
         }
 
         public void Draw()
         {
-            GL.BindVertexArray(_handle);
+            GL.BindVertexArray(Handle);
             GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
         }
         
         public void Dispose()
         {
-            GL.DeleteVertexArray(_handle);
+            GL.DeleteVertexArray(Handle);
         }
     }
 }
