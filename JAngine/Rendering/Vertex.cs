@@ -5,24 +5,23 @@ using OpenTK.Mathematics;
 namespace JAngine.Rendering
 {
     [StructLayout(LayoutKind.Sequential)]
-    public readonly ref struct Vertex3D
+    public readonly struct Vertex3D
     {
-        private readonly Vector3 _position;
-        private readonly Vector3 _normal;
-        private readonly Vector2 _textureCoordinate;
+        public readonly Vector3 Position;
+        public readonly Vector3 Normal;
+        public readonly Vector2 TextureCoordinate;
+
+        public Vertex3D(float x, float y, float z, float normX, float normY, float normZ, float u, float v) :
+            this(new Vector3(x, y, z), new Vector3(normX, normY, normZ), new Vector2(u, v))
+        { }
 
         public Vertex3D(Vector3 position, Vector3 normal, Vector2 textureCoordinate)
         {
-            _position = position;
-            _normal = normal;
-            _textureCoordinate = textureCoordinate;
+            Position = position;
+            Normal = normal;
+            TextureCoordinate = textureCoordinate;
         }
 
-        public Vector3 Position => _position;
-
-        public Vector3 Normal => _normal;
-
-        public Vector2 TextureCoordinate => _textureCoordinate;
 
         private static VertexArray.Attribute[]? _attributeLayout;
         
@@ -46,22 +45,62 @@ namespace JAngine.Rendering
             }
         }
     }
-
+    
     [StructLayout(LayoutKind.Sequential)]
-    public readonly ref struct Vertex2D
+    public readonly struct ColoredVertex3D
     {
-        private readonly Vector2 _position;
-        private readonly Vector2 _textureCoordinate;
+        public readonly Vector3 Position;
+        public readonly Vector3 Normal;
+        public readonly Color4 Color;
 
-        public Vertex2D(Vector2 position, Vector2 textureCoordinate)
+        public ColoredVertex3D(float x, float y, float z, float normX, float normY, float normZ, float r, float g, float b, float a) :
+            this(new Vector3(x, y, z), new Vector3(normX, normY, normZ), new Color4(r, g, b, a))
+        { }
+        public ColoredVertex3D(Vector3 position, Vector3 normal, Color4 color)
         {
-            _position = position;
-            _textureCoordinate = textureCoordinate;
+            Position = position;
+            Normal = normal;
+            Color = color;
         }
 
-        public Vector2 Position => _position;
 
-        public Vector2 TextureCoordinate => _textureCoordinate;
+        private static VertexArray.Attribute[]? _attributeLayout;
+        
+        public static VertexArray.Attribute[] GetAttributeLayout
+        {
+            get
+            {
+                if (_attributeLayout == null)
+                {
+                    unsafe
+                    {
+                        _attributeLayout = new VertexArray.Attribute[]
+                        {
+                            (0, 3, VertexAttribType.Float, 0),
+                            (1, 3, VertexAttribType.Float, sizeof(Vector3)),
+                            (2, 4, VertexAttribType.Float, sizeof(Vector3) * 2)
+                        };
+                    }
+                }
+                return _attributeLayout;
+            }
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public readonly struct Vertex2D
+    {
+        public readonly Vector2 Position;
+        public readonly Vector2 TextureCoordinate;
+
+        public Vertex2D(float x, float y, float u, float v) :
+            this(new Vector2(x, y), new Vector2(u, v))
+        { }
+        public Vertex2D(Vector2 position, Vector2 textureCoordinate)
+        {
+            Position = position;
+            TextureCoordinate = textureCoordinate;
+        }
 
         private static VertexArray.Attribute[]? _attributeLayout;
         
@@ -77,6 +116,43 @@ namespace JAngine.Rendering
                         {
                             (0, 2, VertexAttribType.Float, 0),
                             (1, 2, VertexAttribType.Float, sizeof(Vector2))
+                        };
+                    }
+                }
+                return _attributeLayout;
+            }
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public readonly struct ColoredVertex2D
+    {
+        public readonly Vector2 Position;
+        public readonly Color4 Color;
+
+        public ColoredVertex2D(float x, float y, float r, float g, float b, float a) :
+            this(new Vector2(x, y), new Color4(r, g, b, a))
+        { }
+        public ColoredVertex2D(Vector2 position, Color4 color)
+        {
+            Position = position;
+            Color = color;
+        }
+
+        private static VertexArray.Attribute[]? _attributeLayout;
+        
+        public static VertexArray.Attribute[] GetAttributeLayout
+        {
+            get
+            {
+                if (_attributeLayout == null)
+                {
+                    unsafe
+                    {
+                        _attributeLayout = new VertexArray.Attribute[]
+                        {
+                            (0, 2, VertexAttribType.Float, 0),
+                            (1, 4, VertexAttribType.Float, sizeof(Vector2))
                         };
                     }
                 }

@@ -6,7 +6,7 @@ using JAngine.Rendering;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using Window = JAngine.Window;
+using Window = JAngine.Windowing.Window;
 
 namespace Sandbox
 {
@@ -39,7 +39,7 @@ namespace Sandbox
             {
                 GL.Clear(ClearBufferMask.ColorBufferBit);
                 
-                vao.Draw();
+                GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
                 
                 window.SwapBuffers();
                 

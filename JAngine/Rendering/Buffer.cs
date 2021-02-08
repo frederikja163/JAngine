@@ -11,7 +11,7 @@ namespace JAngine.Rendering
         public Buffer(int size) : this(new T[size])
         { }
         
-        public Buffer(T[] data)
+        public Buffer(params T[] data)
         {
             unsafe
             {

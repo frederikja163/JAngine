@@ -4,6 +4,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JAngine", "JAngine\JAngine.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox\Sandbox.csproj", "{C2BE88F9-A96E-4798-B844-E64D2C1B3759}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CubeWave", "CubeWave\CubeWave.csproj", "{C78C7BC6-3992-440D-949B-830B33E03D02}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestProjects", "TestProjects", "{2432499A-8919-4936-8696-708A7A008CD1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceControl", "SourceControl", "{311C1F96-E0D9-4B44-A23E-F75EE98F22A2}"
+ProjectSection(SolutionItems) = preProject
+	.gitignore = .gitignore
+	LICENSE = LICENSE
+	README.md = README.md
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +29,12 @@ Global
 		{C2BE88F9-A96E-4798-B844-E64D2C1B3759}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2BE88F9-A96E-4798-B844-E64D2C1B3759}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2BE88F9-A96E-4798-B844-E64D2C1B3759}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C78C7BC6-3992-440D-949B-830B33E03D02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C78C7BC6-3992-440D-949B-830B33E03D02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C78C7BC6-3992-440D-949B-830B33E03D02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C78C7BC6-3992-440D-949B-830B33E03D02}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C78C7BC6-3992-440D-949B-830B33E03D02} = {2432499A-8919-4936-8696-708A7A008CD1}
 	EndGlobalSection
 EndGlobal

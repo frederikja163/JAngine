@@ -36,7 +36,7 @@ namespace JAngine
             {
                 var startIdx = asset.IndexOf(assetFolderPath + '.', StringComparison.Ordinal) + assetFolderPath.Length + 1;
                 var assetName = asset.Substring(startIdx);
-                if (!_assets.TryAdd(assetName, (assembly.GetName().Name + assetFolderPath, assembly)))
+                if (!_assets.TryAdd(assetName, (assembly.GetName().Name + '.' + assetFolderPath, assembly)))
                 {
                     Log.Warning($"Could not find asset {assetName}.");
                 }

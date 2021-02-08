@@ -3,7 +3,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using GlfwWindow = OpenTK.Windowing.GraphicsLibraryFramework.Window;
 
-namespace JAngine
+namespace JAngine.Windowing
 {
     public enum MouseButton
     {

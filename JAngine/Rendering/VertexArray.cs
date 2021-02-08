@@ -49,18 +49,16 @@ namespace JAngine.Rendering
             _vertexBufferCount++;
         }
 
-        public void SetElementBuffer<T>(Buffer<T> buffer)
-            where T : unmanaged
+        public void SetElementBuffer(Buffer<uint> buffer)
         {
             GL.VertexArrayElementBuffer(Handle, buffer.Handle);
         }
 
-        public void Draw()
+        public void Bind()
         {
             GL.BindVertexArray(Handle);
-            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
         }
-        
+
         public void Dispose()
         {
             GL.DeleteVertexArray(Handle);
