@@ -9,9 +9,14 @@ out vec3 fColor;
 
 void main()
 {
-    vec3 relativePosition = vec3(gl_InstanceID % 100 * 0.25, 0, gl_InstanceID / 100 * 0.25) - vec3(100 * 0.25, 0, 100 * 0.25) / 2;
-    float height = sin(sqrt(dot(relativePosition, relativePosition)) / 1 + uTime * 2) * 1f;
-    gl_Position = uPerspective * uView * vec4(vPos * 0.1f + relativePosition + vec3(0, height, 0), 1);
+    //sin(dist-t)/(dist+1)*e^(-t)
+    vec3 relativePosition = 0.1f*(vec3(gl_InstanceID % 1000, 0, gl_InstanceID / 1000) - vec3(1000, 0, 1000) / 2);
+    
+    float dist = sqrt(dot(relativePosition, relativePosition));
+    float height = sin(dist * 2 - uTime * 10) * 0.5f;
+    //float height = (sin(dist - uTime * 10) / (dist * 0.1f + 1))*exp(-uTime / 2);
+    gl_Position = uPerspective * uView * vec4(vPos * 0.05f + relativePosition + vec3(0, height, 0), 1);
+    //gl_Position = uPerspective * uView * vec4(vPos, 1);
     
     fColor = vPos * 0.5f + 0.5f;
 }

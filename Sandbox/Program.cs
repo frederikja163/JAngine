@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using JAngine;
 using JAngine.Rendering;
+using JAngine.Windowing;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -27,12 +28,12 @@ namespace Sandbox
             var ebo = new Buffer<uint>(new uint[]{0, 1, 2, 0, 2, 3});
             var vao = new VertexArray();
             vao.AddVertexBuffer(vbo, 0, sizeof(float) * 2, 
-                new VertexArray.Attribute(0, 2, VertexAttribType.Float, sizeof(float) * 2));
+                new VertexArray.Attribute(0, 2, VertexAttribType.Float, 0));
             vao.SetElementBuffer(ebo);
             var shader = new Shader(Assets.GetAsset<VertexShader>("shader.vert"), Assets.GetAsset<FragmentShader>("shader.frag"));
             shader.Bind();
             shader.SetUniform(shader.GetUniformLocation("uTest"), Vector4.One);
-            
+
             GL.ClearColor(Color4.Aqua);
 
             while (window.IsRunning)

@@ -26,9 +26,10 @@ namespace CubeWave
             GL.LoadBindings(new GLFWBindingsContext());
             
             GL.Enable(EnableCap.DepthTest);
-            
-            var shader = new Shader(Assets.GetAsset<VertexShader>("shader.vert"),
-                Assets.GetAsset<FragmentShader>("shader.frag"));
+
+            var vertShader = Assets.GetAsset<VertexShader>("shader.vert");
+            var fragShader = Assets.GetAsset<FragmentShader>("shader.frag");
+            var shader = new Shader(vertShader, fragShader);
             
             var positionBuffer = new Buffer<float>(new float[]{
                 -_size, -_size, -_size, //0
@@ -68,15 +69,20 @@ namespace CubeWave
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
                 
                 var t = stopWatch.ElapsedMilliseconds / 5000f;
-                var view = Matrix4.LookAt(new Vector3(MathF.Cos(t) * 5, 5f, MathF.Sin(t) * 5), Vector3.Zero, Vector3.UnitY);
+                var view = Matrix4.LookAt(new Vector3(MathF.Cos(t) * 5, 5, MathF.Sin(t) * 5), Vector3.Zero, Vector3.UnitY);
                 shader.SetUniform(viewLoc, ref view);
                 shader.SetUniform(timeLoc, ref t);
-                GL.DrawElementsInstanced(PrimitiveType.Triangles, 36, DrawElementsType.UnsignedInt, IntPtr.Zero, 10000);
+                GL.DrawElementsInstanced(PrimitiveType.Triangles, 36, DrawElementsType.UnsignedInt, IntPtr.Zero, 1000000);
                 
                 window.SwapBuffers();
                 
                 window.PollEvents();
             }
+            
+            vao.Dispose();
+            ebo.Dispose();
+            positionBuffer.Dispose();
+            shader.Dispose();
             
             window.Dispose();
         }
