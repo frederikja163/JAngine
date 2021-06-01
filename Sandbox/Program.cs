@@ -36,16 +36,13 @@ void main()
             Window window = new Window(engine, 800, 600, "Sandbox");
             using GameLoop gameLoop = new GameLoop(engine, () =>
             {
-                window.Queue(() =>
-                {
-                    VertexBuffer<Vertex> vertexBuffer =
-                        new VertexBuffer<Vertex>(new Vertex(0, 0), new Vertex(1, 1), new Vertex(0, 1));
-                    ElementBuffer elementBuffer = new ElementBuffer(0, 1, 2);
-                    VertexArray vao = new VertexArray(elementBuffer);
-                    vao.AddVertexBuffer(vertexBuffer, new VertexArray.Attribute(0, 2, VertexAttribType.Float));
-                    ShaderProgram shader = ShaderProgram.CreateVertexFragment(VertexSrc, FragmentSrc);
-                    window.Draw(vao, shader);
-                });
+                VertexBuffer<Vertex> vertexBuffer =
+                    new VertexBuffer<Vertex>(window, new Vertex(0, 0), new Vertex(1, 1), new Vertex(0, 1));
+                ElementBuffer elementBuffer = new ElementBuffer(window, 0, 1, 2);
+                VertexArray vao = new VertexArray(window, elementBuffer);
+                vao.AddVertexBuffer(vertexBuffer, new VertexArray.Attribute(0, 2, VertexAttribType.Float));
+                ShaderProgram shader = ShaderProgram.CreateVertexFragment(window, VertexSrc, FragmentSrc);
+                window.Draw(vao, shader);
             }, () =>
             {
             },() =>

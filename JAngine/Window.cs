@@ -71,8 +71,8 @@ namespace JAngine
 
                 foreach ((VertexArray vao, ShaderProgram shader) in _drawables)
                 {
-                    vao.Bind();
-                    shader.Bind();
+                    GL.BindVertexArray(vao.Handle);
+                    GL.UseProgram(shader.Handle);
             
                     GL.DrawElements(PrimitiveType.Triangles, vao.ElementBuffer.Size, DrawElementsType.UnsignedInt, 0);
                 }

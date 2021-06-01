@@ -3,75 +3,76 @@ using OpenTK.Graphics.OpenGL;
 
 namespace JAngine.Rendering.LowLevel
 {
-    public sealed class ShaderProgram : IDisposable
+    public sealed class ShaderProgram : GlObject
     {
-        private sealed class Shader : IDisposable
+        private sealed class Shader : GlObject
         {
-            internal uint Handle;
-
-            public Shader(string src, ShaderType type)
+            public Shader(Window window, string src, ShaderType type) : base(window, () => GL.CreateShader(type))
             {
-                Handle = GL.CreateShader(type);
-                GL.ShaderSource(Handle, src);
-                GL.CompileShader(Handle);
-                int compileStatus = 0;
-                GL.GetShaderi(Handle, ShaderParameterName.CompileStatus, ref compileStatus);
-                if (compileStatus == 0)
+                Window.Queue(() =>
                 {
-                    GL.GetShaderInfoLog(Handle, out string il);
+                    GL.ShaderSource(Handle, src);
+                    GL.CompileShader(Handle);
+                    int compileStatus = 0;
+                    GL.GetShaderi(Handle, ShaderParameterName.CompileStatus, ref compileStatus);
+                    if (compileStatus == 0)
+                    {
+                        GL.GetShaderInfoLog(Handle, out string il);
+                        throw new Exception(il);
+                    }
+                });
+            }
+
+            public override void Dispose()
+            {
+                Window.Queue(() =>
+                {
+                    GL.DeleteShader(Handle);
+                });
+            }
+        }
+
+        private ShaderProgram(Window window, params Shader[] shaders) : base(window, GL.CreateProgram)
+        {
+            window.Queue(() =>
+            {
+                foreach (Shader shader in shaders)
+                {
+                    GL.AttachShader(Handle, shader.Handle);
+                }
+                GL.LinkProgram(Handle);
+                int linkStatus = 0;
+                GL.GetProgrami(Handle, ProgramPropertyARB.LinkStatus, ref linkStatus);
+                if (linkStatus == 0)
+                {
+                    int ilLength = 0;
+                    GL.GetProgrami(Handle, ProgramPropertyARB.InfoLogLength, ref ilLength);
+                    int _ = 0;
+                    GL.GetProgramInfoLog(Handle, ilLength, ref _, out string il);
                     throw new Exception(il);
                 }
-            }
 
-            public void Dispose()
-            {
-                GL.DeleteShader(Handle);
-            }
+                foreach (Shader shader in shaders)
+                {
+                    GL.DetachShader(Handle, shader.Handle);
+                }
+            });
         }
 
-        internal readonly uint Handle;
-
-        private ShaderProgram(params Shader[] shaders)
+        public static ShaderProgram CreateVertexFragment(Window window, string vertexSrc, string fragmentSrc)
         {
-            Handle = GL.CreateProgram();
-            foreach (Shader shader in shaders)
-            {
-                GL.AttachShader(Handle, shader.Handle);
-            }
-            GL.LinkProgram(Handle);
-            int linkStatus = 0;
-            GL.GetProgrami(Handle, ProgramPropertyARB.LinkStatus, ref linkStatus);
-            if (linkStatus == 0)
-            {
-                int ilLength = 0;
-                GL.GetProgrami(Handle, ProgramPropertyARB.InfoLogLength, ref ilLength);
-                int _ = 0;
-                GL.GetProgramInfoLog(Handle, ilLength, ref _, out string il);
-                throw new Exception(il);
-            }
+            using Shader vertex = new Shader(window, vertexSrc, ShaderType.VertexShader);
+            using Shader fragment = new Shader(window, fragmentSrc, ShaderType.FragmentShader);
 
-            foreach (Shader shader in shaders)
-            {
-                GL.DetachShader(Handle, shader.Handle);
-            }
+            return new ShaderProgram(window, vertex, fragment);
         }
 
-        public static ShaderProgram CreateVertexFragment(string vertexSrc, string fragmentSrc)
+        public override void Dispose()
         {
-            using Shader vertex = new Shader(vertexSrc, ShaderType.VertexShader);
-            using Shader fragment = new Shader(fragmentSrc, ShaderType.FragmentShader);
-
-            return new ShaderProgram(vertex, fragment);
-        }
-
-        internal void Bind()
-        {
-            GL.UseProgram(Handle);
-        }
-
-        public void Dispose()
-        {
-            GL.DeleteProgram(Handle);
+            Window.Queue(() =>
+            {
+                GL.DeleteProgram(Handle);
+            });
         }
     }
 }

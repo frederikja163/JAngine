@@ -3,30 +3,32 @@ using OpenTK.Graphics.OpenGL;
 
 namespace JAngine.Rendering.LowLevel
 {
-    public abstract class Buffer<T> : IDisposable
+    public abstract class Buffer<T> : GlObject
         where T : unmanaged
     {
-        internal readonly uint Handle;
         public int Size { get; }
 
-        private Buffer()
-        {
-            Handle = GL.CreateBuffer();
-        }
+        private Buffer(Window window) : base(window, GL.CreateBuffer) { }
 
-        protected Buffer(int size) : this()
+        protected Buffer(Window window, int size) : this(window)
         {
             Size = size;
-            GL.NamedBufferStorage(Handle, size, IntPtr.Zero, BufferStorageMask.MapWriteBit);
+            Window.Queue(() =>
+            {
+                GL.NamedBufferStorage(Handle, size, IntPtr.Zero, BufferStorageMask.MapWriteBit);
+            });
         }
 
-        protected Buffer(T[] data) : this()
+        protected Buffer(Window window, T[] data) : this(window)
         {
             Size = data.Length;
-            GL.NamedBufferStorage(Handle, data, BufferStorageMask.MapWriteBit);
+            Window.Queue(() =>
+            {
+                GL.NamedBufferStorage(Handle, data, BufferStorageMask.MapWriteBit);
+            });
         }
         
-        public void Dispose()
+        public override void Dispose()
         {
             GL.DeleteBuffer(Handle);
         }
@@ -35,22 +37,22 @@ namespace JAngine.Rendering.LowLevel
     public class VertexBuffer<T> : Buffer<T>
         where T : unmanaged
     {
-        public VertexBuffer(int size) : base(size)
+        public VertexBuffer(Window window, int size) : base(window, size)
         {
         }
 
-        public VertexBuffer(params T[] data) : base(data)
+        public VertexBuffer(Window window, params T[] data) : base(window, data)
         {
         }
     }
 
     public class ElementBuffer : Buffer<uint>
     {
-        public ElementBuffer(int size) : base(size)
+        public ElementBuffer(Window window, int size) : base(window, size)
         {
         }
 
-        public ElementBuffer(params uint[] data) : base(data)
+        public ElementBuffer(Window window, params uint[] data) : base(window, data)
         {
         }
     }
