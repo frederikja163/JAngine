@@ -64,7 +64,7 @@ namespace JAngine.Rendering.LowLevel
             return new ShaderProgram(vertex, fragment);
         }
 
-        public void Bind()
+        internal void Bind()
         {
             GL.UseProgram(Handle);
         }

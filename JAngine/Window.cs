@@ -1,4 +1,5 @@
 using System;
+using JAngine.Rendering;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using GlfwWindow = OpenTK.Windowing.GraphicsLibraryFramework.Window;
 
@@ -31,23 +32,22 @@ namespace JAngine
     // TODO: Create better windowing.
     public sealed unsafe class Window : IDisposable
     {
+        private readonly IContainer<Window> _container;
         internal readonly GlfwWindow* Handle;
-
-        public Window(int width, int height, string title)
+        public Renderer Renderer { get; }
+        
+        public Window(IContainer<Window> container, int width, int height, string title)
         {
-            GlfwTracker.StartTracking();
-
+            _container = container;
+            _container.Add(this);
             Handle = GLFW.CreateWindow(width, height, title, null, null);
+            
+            Renderer = new ();
         }
 
-        public void MakeCurrent()
+        public void Bind()
         {
             GLFW.MakeContextCurrent(Handle);
-        }
-
-        public void PollInput()
-        {
-            GLFW.PollEvents();
         }
 
         public bool IsOpen => !GLFW.WindowShouldClose(Handle);
@@ -60,7 +60,7 @@ namespace JAngine
         public void Dispose()
         {
             GLFW.DestroyWindow(Handle);
-            GlfwTracker.StopTracking();
+            _container.Remove(this);
         }
     }
 }

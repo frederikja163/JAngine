@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using OpenTK.Graphics.OpenGL;
 
@@ -9,14 +10,12 @@ namespace JAngine.Rendering.LowLevel
         
         internal readonly uint Handle;
         private uint _vertexBufferCount = 0;
-        
-        public VertexArray()
+        public readonly ElementBuffer ElementBuffer;
+
+        public VertexArray(ElementBuffer elementBuffer)
         {
             Handle = GL.CreateVertexArray();
-        }
-
-        public VertexArray(ElementBuffer elementBuffer) : this()
-        {
+            ElementBuffer = elementBuffer;
             GL.VertexArrayElementBuffer(Handle, elementBuffer.Handle);
         }
 
@@ -45,7 +44,7 @@ namespace JAngine.Rendering.LowLevel
             }
         }
 
-        public void Bind()
+        internal void Bind()
         {
             GL.BindVertexArray(Handle);
         }

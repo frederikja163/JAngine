@@ -1,3 +1,4 @@
+using JAngine;
 using JAngine.Rendering;
 using JAngine.Rendering.LowLevel;
 using OpenTK.Graphics;
@@ -31,26 +32,28 @@ void main()
         
         private static void Main()
         {
-            using Window window = new Window(800, 600, "Sandbox");
-            window.MakeCurrent();
-            GLLoader.LoadBindings(new GLFWBindingsContext());
-
-            VertexBuffer<Vertex> vertexBuffer =
-                new VertexBuffer<Vertex>(new Vertex(0, 0), new Vertex(1, 1), new Vertex(0, 1));
-            VertexArray vao = new VertexArray();
-            vao.AddVertexBuffer(vertexBuffer, new VertexArray.Attribute(0, 2, VertexAttribType.Float));
-            ShaderProgram shader = ShaderProgram.CreateVertexFragment(VertexSrc, FragmentSrc);
-
-            while (window.IsOpen)
+            using Engine engine = new Engine();
+            Window window = new Window(engine, 800, 600, "Sandbox");
+            using GameLoop gameLoop = new GameLoop(engine, () =>
             {
-                window.PollInput();
-                
-                vao.Bind();
-                shader.Bind();
-                GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
-                
+                window.Bind();
+                GLLoader.LoadBindings(new GLFWBindingsContext());
+            }, () =>
+            {
+                VertexBuffer<Vertex> vertexBuffer =
+                    new VertexBuffer<Vertex>(new Vertex(0, 0), new Vertex(1, 1), new Vertex(0, 1));
+                ElementBuffer elementBuffer = new ElementBuffer(0, 1, 2);
+                VertexArray vao = new VertexArray(elementBuffer);
+                vao.AddVertexBuffer(vertexBuffer, new VertexArray.Attribute(0, 2, VertexAttribType.Float));
+                ShaderProgram shader = ShaderProgram.CreateVertexFragment(VertexSrc, FragmentSrc);
+                window.Renderer.Draw(vao, shader);
+            
                 window.SwapBuffers();
-            }
+            },() =>
+            {
+                window.Dispose();
+            });
+            engine.Run();
         }
     }
 }
