@@ -1,5 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Threading;
 using JAngine.Rendering;
+using JAngine.Rendering.LowLevel;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using GlfwWindow = OpenTK.Windowing.GraphicsLibraryFramework.Window;
 
@@ -34,7 +39,14 @@ namespace JAngine
     {
         private readonly IContainer<Window> _container;
         internal readonly GlfwWindow* Handle;
-        public Renderer Renderer { get; }
+        private readonly Queue<Action> _queue = new();
+        private readonly Thread _thread;
+        private readonly List<(VertexArray vao, ShaderProgram shader)> _drawables = new ();
+        
+        public void Queue(Action command)
+        {
+            _queue.Enqueue(command);
+        }
         
         public Window(IContainer<Window> container, int width, int height, string title)
         {
@@ -42,20 +54,38 @@ namespace JAngine
             _container.Add(this);
             Handle = GLFW.CreateWindow(width, height, title, null, null);
             
-            Renderer = new ();
+            _thread = new Thread(Run);
+            _thread.Start();
         }
 
-        public void Bind()
+        private void Run()
         {
             GLFW.MakeContextCurrent(Handle);
+            GLLoader.LoadBindings(new GLFWBindingsContext());
+            while (IsOpen)
+            {
+                while (_queue.TryDequeue(out Action? command))
+                {
+                    command();
+                }
+
+                foreach ((VertexArray vao, ShaderProgram shader) in _drawables)
+                {
+                    vao.Bind();
+                    shader.Bind();
+            
+                    GL.DrawElements(PrimitiveType.Triangles, vao.ElementBuffer.Size, DrawElementsType.UnsignedInt, 0);
+                }
+                GLFW.SwapBuffers(Handle);
+            }
+        }
+        
+        public void Draw(VertexArray vao, ShaderProgram shader)
+        {
+            _drawables.Add((vao, shader));
         }
 
         public bool IsOpen => !GLFW.WindowShouldClose(Handle);
-
-        public void SwapBuffers()
-        {
-            GLFW.SwapBuffers(Handle);
-        }
 
         public void Dispose()
         {
