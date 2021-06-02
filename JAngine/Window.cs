@@ -41,7 +41,7 @@ namespace JAngine
         internal readonly GlfwWindow* Handle;
         private readonly Queue<Action> _queue = new();
         private readonly Thread _thread;
-        private readonly List<(VertexArray vao, ShaderProgram shader)> _drawables = new ();
+        private readonly List<IDrawable> _drawables = new ();
         
         public void Queue(Action command)
         {
@@ -69,20 +69,20 @@ namespace JAngine
                     command();
                 }
 
-                foreach ((VertexArray vao, ShaderProgram shader) in _drawables)
+                foreach (IDrawable drawable in _drawables)
                 {
-                    GL.BindVertexArray(vao.Handle);
-                    GL.UseProgram(shader.Handle);
+                    GL.BindVertexArray(drawable.VertexArray.Handle);
+                    GL.UseProgram(drawable.Shader.Handle);
             
-                    GL.DrawElements(PrimitiveType.Triangles, vao.ElementBuffer.Size, DrawElementsType.UnsignedInt, 0);
+                    GL.DrawElements(PrimitiveType.Triangles, drawable.VertexArray.ElementBuffer.Size, DrawElementsType.UnsignedInt, 0);
                 }
                 GLFW.SwapBuffers(Handle);
             }
         }
         
-        public void Draw(VertexArray vao, ShaderProgram shader)
+        public void Draw(IDrawable drawable)
         {
-            _drawables.Add((vao, shader));
+            _drawables.Add(drawable);
         }
 
         public bool IsOpen => !GLFW.WindowShouldClose(Handle);

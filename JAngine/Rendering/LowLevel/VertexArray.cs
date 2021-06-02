@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
 
 namespace JAngine.Rendering.LowLevel
@@ -26,14 +27,14 @@ namespace JAngine.Rendering.LowLevel
             Window.Queue(() =>
             {
                 GL.VertexArrayVertexBuffer(Handle, ++_vertexBufferCount, buffer.Handle, IntPtr.Zero, sizeof(T));
-                uint offset = 0;
+                int offset = 0;
                 foreach (Attribute attribute in attributes)
                 {
                     GL.VertexArrayAttribBinding(Handle, attribute.Location, _vertexBufferCount);
                     GL.VertexArrayAttribFormat(Handle, attribute.Location, attribute.ValueCount, attribute.Type, false,
-                        offset);
+                        (uint)offset);
                     GL.EnableVertexArrayAttrib(Handle, attribute.Location);
-                    offset += attribute.Type switch
+                    int attributeSize = attribute.Type switch
                     {
                         VertexAttribType.Byte => sizeof(sbyte),
                         VertexAttribType.UnsignedByte => sizeof(byte),
@@ -45,6 +46,7 @@ namespace JAngine.Rendering.LowLevel
                         VertexAttribType.Double => sizeof(double),
                         _ => throw new ArgumentOutOfRangeException()
                     };
+                    offset += attributeSize * attribute.ValueCount;
                 }
             });
         }
