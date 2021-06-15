@@ -22,6 +22,10 @@ namespace JAngine
                 {
                     throw new Exception("Glfw failed to init");
                 }
+                GLFW.WindowHint(WindowHintInt.ContextVersionMajor, 4);
+                GLFW.WindowHint(WindowHintInt.ContextVersionMinor, 6);
+                GLFW.WindowHint(WindowHintClientApi.ClientApi, ClientApi.OpenGlApi);
+                GLFW.WindowHint(WindowHintOpenGlProfile.OpenGlProfile, OpenGlProfile.Core);
             }
         }
 
@@ -51,36 +55,53 @@ namespace JAngine
         public Window(IContainer<Window> container, int width, int height, string title)
         {
             _container = container;
-            _container.Add(this);
             Handle = GLFW.CreateWindow(width, height, title, null, null);
-            
+            _container.Add(this);
+
             _thread = new Thread(Run);
             _thread.Start();
         }
 
         private void Run()
         {
-            GLFW.MakeContextCurrent(Handle);
-            GLLoader.LoadBindings(new GLFWBindingsContext());
-            while (IsOpen)
+            try
             {
-                while (_queue.TryDequeue(out Action? command))
+                GLFW.MakeContextCurrent(Handle);
+                GLLoader.LoadBindings(new GLFWBindingsContext());
+                while (IsOpen)
                 {
-                    command();
-                }
+                    while (_queue.TryDequeue(out Action? command))
+                    {
+                        command();
+                    }
 
-                foreach (IDrawable drawable in _drawables)
-                {
-                    GL.BindVertexArray(drawable.VertexArray.Handle);
-                    GL.UseProgram(drawable.Shader.Handle);
-            
-                    GL.DrawElements(PrimitiveType.Triangles, drawable.VertexArray.ElementBuffer.Size, DrawElementsType.UnsignedInt, 0);
+                    foreach (IDrawable drawable in _drawables)
+                    {
+                        GL.BindVertexArray(drawable.VertexArray.Handle);
+                        GL.UseProgram(drawable.Shader.Handle);
+
+                        int texLocation = GL.GetUniformLocation(drawable.Shader.Handle, "uTexture[0]");
+                        GL.BindTextures(0, drawable.Textures.TextureHandles);
+                        for (int i = 0; i < 32; i++)
+                        {
+                            GL.ProgramUniform1i(drawable.Shader.Handle, texLocation + i, i);
+                        }
+
+                        GL.DrawElements(PrimitiveType.Triangles, drawable.VertexArray.ElementBuffer.Size,
+                            DrawElementsType.UnsignedInt, 0);
+                    }
+
+                    GLFW.SwapBuffers(Handle);
                 }
-                GLFW.SwapBuffers(Handle);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
         }
         
-        public void Draw(IDrawable drawable)
+        public void AddDrawable(IDrawable drawable)
         {
             _drawables.Add(drawable);
         }

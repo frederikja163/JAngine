@@ -16,7 +16,7 @@ namespace JAngine
 
         public void Run()
         {
-            while (_windows.Count != 0 && _gameLoops.Count != 0)
+            while (_windows.Count != 0)
             {
                 GLFW.PollEvents();
             }

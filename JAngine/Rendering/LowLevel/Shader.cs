@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
 
 namespace JAngine.Rendering.LowLevel
 {
+    // TODO: Create custom shading language.
+    // TODO: Create asset loading system.
     public sealed class ShaderProgram : GlObject
     {
         private sealed class Shader : GlObject
