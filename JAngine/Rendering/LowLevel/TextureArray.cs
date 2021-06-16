@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 using PixelFormatDrawing = System.Drawing.Imaging.PixelFormat;
@@ -11,12 +12,12 @@ namespace JAngine.Rendering.LowLevel
     public sealed class TextureArray : IDisposable
     {
         internal readonly Window Window;
-        internal readonly uint[] TextureHandles;
+        internal readonly TextureHandle[] TextureHandles;
 
         public TextureArray(Window window)
         {
             Window = window;
-            TextureHandles = new uint[32];
+            TextureHandles = new TextureHandle[32];
             Window.Queue(() =>
             {
                 GL.CreateTextures(TextureTarget.Texture2d, TextureHandles);

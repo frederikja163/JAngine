@@ -9,15 +9,22 @@ namespace JAngine.Rendering
         public ShaderProgram Shader { get; }
         public TextureArray Textures { get; }
         public int InstanceCount { get; set; }
+        public Window Window { get; }
     }
 
-    public record Drawable(VertexArray VertexArray, ShaderProgram Shader, TextureArray Textures) : IDrawable
+    public record Drawable(Window Window, VertexArray VertexArray, ShaderProgram Shader, TextureArray Textures) : IDrawable
     {
         public int InstanceCount { get; set; }
 
-        public Drawable(VertexArray vertexArray, ShaderProgram shader, TextureArray textures, int instanceCount = 1) : this(vertexArray, shader, textures)
+        public Drawable(Window window, VertexArray vertexArray, ShaderProgram shader, TextureArray textures, int instanceCount = 1) :
+            this(window, vertexArray, shader, textures)
         {
             InstanceCount = instanceCount;
+        }
+
+        public void Dispose()
+        {
+            
         }
     }
 }

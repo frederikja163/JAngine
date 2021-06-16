@@ -1,11 +1,12 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
 namespace JAngine.Rendering.LowLevel
 {
-    public sealed unsafe class VertexArray : GlObject
+    public sealed unsafe class VertexArray : GlObject<VertexArrayHandle>
     {
         public record Attribute(uint Location, int ValueCount, VertexAttribType Type);
         

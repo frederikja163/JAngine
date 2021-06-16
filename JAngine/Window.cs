@@ -101,9 +101,14 @@ namespace JAngine
             }
         }
         
-        public void AddDrawable(IDrawable drawable)
+        internal void AddDrawable(IDrawable drawable)
         {
             _drawables.Add(drawable);
+        }
+
+        internal void RemoveDrawable(IDrawable drawable)
+        {
+            _drawables.Remove(drawable);
         }
 
         public bool IsOpen => !GLFW.WindowShouldClose(Handle);

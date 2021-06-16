@@ -1,9 +1,10 @@
 using System;
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
 namespace JAngine.Rendering.LowLevel
 {
-    public abstract class Buffer<T> : GlObject
+    public abstract class Buffer<T> : GlObject<BufferHandle>
         where T : unmanaged
     {
         public int Size { get; }
@@ -27,10 +28,24 @@ namespace JAngine.Rendering.LowLevel
                 GL.NamedBufferStorage(Handle, data, BufferStorageMask.MapWriteBit);
             });
         }
+
+        public void SetSubData(int startIndex, params T[] data)
+        {
+            Window.Queue(() =>
+            {
+                unsafe
+                {
+                    GL.NamedBufferSubData(Handle, (IntPtr)(startIndex * sizeof(T)), data);
+                }
+            });
+        }
         
         public override void Dispose()
         {
-            GL.DeleteBuffer(Handle);
+            Window.Queue(() =>
+            {
+                GL.DeleteBuffer(Handle);
+            });
         }
     }
 

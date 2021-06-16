@@ -49,12 +49,11 @@ void main()
             using Engine engine = new Engine();
 
             Window window = new Window(engine, 800, 600, "Sandbox");
-            ShapeArray<TextureVertex, PositionInstance> shapeArray = new ShapeArray<TextureVertex, PositionInstance>(window,
+            ShapeArray<TextureVertex, PositionInstance> shapes = new ShapeArray<TextureVertex, PositionInstance>(window,
                 ShaderProgram.CreateVertexFragment(window, VertexSrc, FragmentSrc),
                 new TextureArray(window, "test.png"),
                 new []
                 {
-                    new PositionInstance(0f, 0f),
                     new PositionInstance(1f, 0.2f),
                     new PositionInstance(-1f, -1f)
                 },
@@ -63,6 +62,11 @@ void main()
                 new TextureVertex(0.5f, -0.5f),
                 new TextureVertex(-0.5f, -0.5f),
                 new TextureVertex(-0.5f, 0));
+            shapes.Add(new PositionInstance(1f, -1f));
+            for (int i = 0; i < 100; i++)
+            {
+                shapes.Add(new PositionInstance(i / 100f, 0.5f));
+            }
             engine.Run();
         }
     }
