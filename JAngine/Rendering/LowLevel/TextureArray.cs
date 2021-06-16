@@ -34,7 +34,7 @@ namespace JAngine.Rendering.LowLevel
                 IntPtr ptr = data.Scan0;
 
                 GL.TextureStorage2D(TextureHandles[0], 1, SizedInternalFormat.Rgba32f, bitmap.Width, bitmap.Height);
-                GL.TextureSubImage2D(TextureHandles[0], 0, 0, 0, bitmap.Width, bitmap.Height, PixelFormat.Rgba, PixelType.UnsignedByte, ptr);
+                GL.TextureSubImage2D(TextureHandles[0], 0, 0, 0, bitmap.Width, bitmap.Height, PixelFormat.Bgra, PixelType.UnsignedByte, ptr);
                 
                 GL.TextureParameteri(TextureHandles[0], TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
                 GL.TextureParameteri(TextureHandles[0], TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);

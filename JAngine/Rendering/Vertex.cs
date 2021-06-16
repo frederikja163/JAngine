@@ -22,7 +22,7 @@ namespace JAngine.Rendering
         {
         }
 
-        private static VertexArray.Attribute[] AttributesField = new[]
+        private static readonly VertexArray.Attribute[] AttributesField = new[]
         {
             new VertexArray.Attribute(0, 2, VertexAttribType.Float),
         };
@@ -41,7 +41,7 @@ namespace JAngine.Rendering
             Color = color;
         }
 
-        private static VertexArray.Attribute[] AttributesField = new[]
+        private static readonly VertexArray.Attribute[] AttributesField = new[]
         {
             new VertexArray.Attribute(0, 2, VertexAttribType.Float),
             new VertexArray.Attribute(1, 4, VertexAttribType.Float),
@@ -67,7 +67,7 @@ namespace JAngine.Rendering
             TextureCoordinate = Position;
         }
 
-        private static VertexArray.Attribute[] AttributesField = new[]
+        private static readonly VertexArray.Attribute[] AttributesField = new[]
         {
             new VertexArray.Attribute(0, 2, VertexAttribType.Float),
             new VertexArray.Attribute(1, 2, VertexAttribType.Float),

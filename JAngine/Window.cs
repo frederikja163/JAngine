@@ -87,8 +87,8 @@ namespace JAngine
                             GL.ProgramUniform1i(drawable.Shader.Handle, texLocation + i, i);
                         }
 
-                        GL.DrawElements(PrimitiveType.Triangles, drawable.VertexArray.ElementBuffer.Size,
-                            DrawElementsType.UnsignedInt, 0);
+                        GL.DrawElementsInstanced(PrimitiveType.Triangles, drawable.VertexArray.ElementBuffer.Size,
+                            DrawElementsType.UnsignedInt, 0, drawable.InstanceCount);
                     }
 
                     GLFW.SwapBuffers(Handle);

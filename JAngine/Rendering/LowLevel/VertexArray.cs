@@ -21,12 +21,13 @@ namespace JAngine.Rendering.LowLevel
             });
         }
 
-        public void AddVertexBuffer<T>(VertexBuffer<T> buffer, params Attribute[] attributes)
+        public void AddVertexBuffer<T>(VertexBuffer<T> buffer, uint divisor, params Attribute[] attributes)
             where T : unmanaged
         {
             Window.Queue(() =>
             {
                 GL.VertexArrayVertexBuffer(Handle, ++_vertexBufferCount, buffer.Handle, IntPtr.Zero, sizeof(T));
+                GL.VertexArrayBindingDivisor(Handle, _vertexBufferCount, divisor);
                 int offset = 0;
                 foreach (Attribute attribute in attributes)
                 {
