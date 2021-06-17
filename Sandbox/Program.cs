@@ -14,13 +14,15 @@ namespace Sandbox
 #version 450 core
 layout(location = 0) in vec2 vPosition;
 layout(location = 1) in vec2 vTexCoord;
-layout(location = 2) in vec2 vInstancePosition;
+layout(location = 2) in mat4 vInstanceTransform;
+
+uniform mat4 uCamera;
 
 out vec2 fTexCoord;
 
 void main()
 {
-    gl_Position = vec4(vPosition + vInstancePosition, 0, 1);
+    gl_Position = transpose(vInstanceTransform) * vec4(vPosition, 0, 1);
     fTexCoord = vTexCoord;
 }
 ";
@@ -49,23 +51,23 @@ void main()
             using Engine engine = new Engine();
 
             Window window = new Window(engine, 800, 600, "Sandbox");
-            ShapeArray<TextureVertex, PositionInstance> shapes = new ShapeArray<TextureVertex, PositionInstance>(window,
+            ShapeArray<TextureVertex, TransformInstance> shapes = new ShapeArray<TextureVertex, TransformInstance>(window,
                 ShaderProgram.CreateVertexFragment(window, VertexSrc, FragmentSrc),
                 new TextureArray(window, "test.png"),
                 new []
                 {
-                    new PositionInstance(1f, 0.2f),
-                    new PositionInstance(-1f, -1f)
+                    new TransformInstance(1f, 0.2f),
+                    new TransformInstance(-1f, -1f)
                 },
                 new TextureVertex(0, 0.5f),
                 new TextureVertex(0.5f, 0),
                 new TextureVertex(0.5f, -0.5f),
                 new TextureVertex(-0.5f, -0.5f),
                 new TextureVertex(-0.5f, 0));
-            shapes.Add(new PositionInstance(1f, -1f));
+            shapes.Add(new TransformInstance(1f, -1f));
             for (int i = 0; i < 100; i++)
             {
-                shapes.Add(new PositionInstance(i / 100f, 0.5f));
+                shapes.Add(new TransformInstance(i / 100f, 0.5f));
             }
             engine.Run();
         }

@@ -5,6 +5,7 @@ using JAngine.Rendering;
 using JAngine.Rendering.LowLevel;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using GlfwWindow = OpenTK.Windowing.GraphicsLibraryFramework.Window;
 
@@ -46,6 +47,7 @@ namespace JAngine
         private readonly Queue<Action> _queue = new();
         private readonly Thread _thread;
         private readonly List<IDrawable> _drawables = new ();
+        private readonly Matrix4 CameraMatrix;
         
         public void Queue(Action command)
         {
@@ -54,6 +56,11 @@ namespace JAngine
         
         public Window(IContainer<Window> container, int width, int height, string title)
         {
+            Width = width;
+            Height = height;
+            CameraMatrix = Matrix4.LookAt(Vector3.UnitZ, Vector3.Zero, Vector3.UnitY) *
+                Matrix4.CreateOrthographic(Width, Height, 0.001f, 1000f);
+            
             _container = container;
             Handle = GLFW.CreateWindow(width, height, title, null, null);
             _container.Add(this);
@@ -87,6 +94,9 @@ namespace JAngine
                             GL.ProgramUniform1i(drawable.Shader.Handle, texLocation + i, i);
                         }
 
+                        int camLocation = GL.GetUniformLocation(drawable.Shader.Handle, "uCamera");
+                        GL.ProgramUniformMatrix4f(drawable.Shader.Handle, camLocation, false, CameraMatrix.Row0.X);
+                        
                         GL.DrawElementsInstanced(PrimitiveType.Triangles, drawable.VertexArray.ElementBuffer.Size,
                             DrawElementsType.UnsignedInt, 0, drawable.InstanceCount);
                     }
@@ -100,6 +110,9 @@ namespace JAngine
                 throw;
             }
         }
+        
+        public int Width { get; }
+        public int Height { get; }
         
         internal void AddDrawable(IDrawable drawable)
         {

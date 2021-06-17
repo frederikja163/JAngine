@@ -1,8 +1,9 @@
 using System.ComponentModel;
-using System.Numerics;
 using System.Runtime.InteropServices;
 using JAngine.Rendering.LowLevel;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
+using Vector2 = System.Numerics.Vector2;
 
 namespace JAngine.Rendering
 {
@@ -19,22 +20,26 @@ namespace JAngine.Rendering
         public VertexArray.Attribute[] Attributes => AttributesField;
     }
 
-    public struct PositionInstance : IInstance
+    public struct TransformInstance : IInstance
     {
-        public readonly Vector2 Position;
+        public readonly Matrix4 Matrix;
 
-        public PositionInstance(Vector2 position)
+        public TransformInstance(Vector2 position)
         {
-            Position = position;
+            Matrix =  Matrix4.CreateTranslation(position.X, position.Y, 0);
         }
 
-        public PositionInstance(float x, float y) : this(new Vector2(x, y))
+        public TransformInstance(float x, float y)
         {
+            Matrix = Matrix4.CreateTranslation(x, y, 0);
         }
         
         private static readonly VertexArray.Attribute[] AttributesField = new []
         {
-            new VertexArray.Attribute(2, 2, VertexAttribType.Float),
+            new VertexArray.Attribute(2, 4, VertexAttribType.Float),
+            new VertexArray.Attribute(3, 4, VertexAttribType.Float),
+            new VertexArray.Attribute(4, 4, VertexAttribType.Float),
+            new VertexArray.Attribute(5, 4, VertexAttribType.Float),
         };
 
         public VertexArray.Attribute[] Attributes => AttributesField;
