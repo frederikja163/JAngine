@@ -14,7 +14,10 @@ namespace Sandbox
 #version 450 core
 layout(location = 0) in vec2 vPosition;
 layout(location = 1) in vec2 vTexCoord;
-layout(location = 2) in mat4 vInstanceTransform;
+layout(location = 2) in vec4 vInstanceTransform1;
+layout(location = 3) in vec4 vInstanceTransform2;
+layout(location = 4) in vec4 vInstanceTransform3;
+layout(location = 5) in vec4 vInstanceTransform4;
 
 uniform mat4 uCamera;
 
@@ -22,7 +25,8 @@ out vec2 fTexCoord;
 
 void main()
 {
-    gl_Position = transpose(vInstanceTransform) * vec4(vPosition, 0, 1);
+    mat4 instanceTransform = mat4(vInstanceTransform1.xyzw, vInstanceTransform2.xyzw, vInstanceTransform3.xyzw, vInstanceTransform4.xyzw);
+    gl_Position = uCamera * instanceTransform * vec4(vPosition, 0, 1);
     fTexCoord = vTexCoord;
 }
 ";

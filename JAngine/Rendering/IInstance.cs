@@ -26,14 +26,24 @@ namespace JAngine.Rendering
 
         public TransformInstance(Vector2 position)
         {
-            Matrix =  Matrix4.CreateTranslation(position.X, position.Y, 0);
+            Matrix = Matrix4.CreateTranslation(position.X, position.Y, 0);
         }
 
         public TransformInstance(float x, float y)
         {
-            Matrix = Matrix4.CreateTranslation(x, y, 0);
+            Matrix = Matrix4.CreateTranslation(x, y, 0) * Matrix4.CreateScale(100);
+        }
+
+        public TransformInstance(Matrix4 matrix)
+        {
+            Matrix = matrix;
         }
         
+        public TransformInstance(Transform transform)
+        {
+            Matrix = transform.GetMatrix();
+        }
+
         private static readonly VertexArray.Attribute[] AttributesField = new []
         {
             new VertexArray.Attribute(2, 4, VertexAttribType.Float),
