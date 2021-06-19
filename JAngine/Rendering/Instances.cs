@@ -117,8 +117,8 @@ namespace JAngine.Rendering
         private static TransformData CreateData(float rotation, Vector2 position, Vector2 scale)
         {
             return new TransformData(Matrix4.CreateScale(scale.X, scale.Y, 1) *
-                                     Matrix4.CreateTranslation(position.X, position.Y, 0) *
-                                     Matrix4.CreateRotationZ(rotation));
+                                     Matrix4.CreateRotationZ(rotation) *
+                                     Matrix4.CreateTranslation(position.X, position.Y, 0));
         }
     }
 }

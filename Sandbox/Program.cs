@@ -79,6 +79,7 @@ void main()
             void Loop(float dt)
             {
                 big.Position += Vector2.One * -5f * dt;
+                big.Rotation += dt;
                 if (x++ > 100)
                 {
                     x -= 100;
