@@ -64,9 +64,11 @@ void main()
                 new TextureVertex(0.5f, -0.5f),
                 new TextureVertex(-0.5f, -0.5f),
                 new TextureVertex(-0.5f, 0));
+
+            TransformInstance[] instances = new TransformInstance[100];
             for (int i = 0; i < 100; i++)
             {
-                new TransformInstance(shape, new Vector2(i, 1), Vector2.One * 50);
+                instances[i] = new TransformInstance(shape, new Vector2(i, 1), Vector2.One * 50);
             }
             var big = new TransformInstance(shape, Vector2.One * 100, Vector2.One * 100);
 

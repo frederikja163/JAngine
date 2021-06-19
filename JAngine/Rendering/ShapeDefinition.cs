@@ -9,8 +9,9 @@ namespace JAngine.Rendering
     public abstract class ShapeDefinition<TInstanceData> : IDrawable, IDisposable
         where TInstanceData : unmanaged, IVertex
     {
-        protected readonly ElementBuffer _elementBuffer;
+        protected readonly ElementBuffer ElementBuffer;
         protected VertexBuffer<TInstanceData> InstanceBuffer;
+        protected readonly Queue<int> AvailableIndices = new ();
 
         internal ShapeDefinition(Window window, ShaderProgram shader, TextureArray textures, int triCount)
         {
@@ -26,10 +27,10 @@ namespace JAngine.Rendering
                 elements[i * 3 + 1] = i + 1;
                 elements[i * 3 + 2] = i + 2;
             }
-            _elementBuffer = new ElementBuffer(Window, elements);
+            ElementBuffer = new ElementBuffer(Window, elements);
             
             
-            VertexArray = new VertexArray(Window, _elementBuffer);
+            VertexArray = new VertexArray(Window, ElementBuffer);
 
             Window.AddDrawable(this);
         }
@@ -47,6 +48,8 @@ namespace JAngine.Rendering
 
         internal abstract int Add(object instance);
 
+        internal abstract void Remove(int index);
+
         public virtual void Dispose()
         {
             InstanceBuffer.Dispose();
@@ -63,7 +66,7 @@ namespace JAngine.Rendering
         where TInstanceData : unmanaged, IVertex
     {
         private readonly VertexBuffer<TVertex> _vertexBuffer;
-        protected TInstance[] Instances;
+        protected TInstance?[] Instances;
         
         public ShapeDefinition(Window window, ShaderProgram shader, TextureArray textures, int size, params TVertex[] points)
             : base(window, shader, textures, points.Length - 2)
@@ -77,7 +80,7 @@ namespace JAngine.Rendering
             InstanceCount = 0;
         }
         
-        public TInstance this[int i] => Instances[i];
+        public TInstance? this[int i] => Instances[i];
         
         public ShapeDefinition(Window window, ShaderProgram shader, TextureArray textures, params TVertex[] points)
             : this(window, shader, textures, 1, points)
@@ -97,7 +100,9 @@ namespace JAngine.Rendering
         internal override int Add(object instanceObj)
         {
             TInstance instance = (TInstance)instanceObj;
-            int index = InstanceCount++;
+            int index = AvailableIndices.Count >= 1 ?
+                AvailableIndices.Dequeue() :
+                InstanceCount++;
             if (index >= Instances.Length)
             {
                 Resize(InstanceCount * 2);
@@ -108,11 +113,22 @@ namespace JAngine.Rendering
             return index;
         }
 
+        internal override void Remove(int index)
+        {
+            InstanceBuffer.SetSubData(index, default(TInstanceData));
+            Instances[index] = null;
+            AvailableIndices.Enqueue(index);
+        }
+
         public IEnumerator<TInstance> GetEnumerator()
         {
             for (int i = 0; i < InstanceCount; i++)
             {
-                yield return Instances[i];
+                if (Instances[i] != null)
+                {
+                    continue;
+                }
+                yield return Instances[i]!;
             }
         }
 

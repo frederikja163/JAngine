@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
@@ -8,12 +9,13 @@ using Vector2 = System.Numerics.Vector2;
 
 namespace JAngine.Rendering
 {
-    public class Instance<TData>
+    public class Instance<TData> : IDisposable
         where TData : unmanaged, IVertex
     {
         private readonly ShapeDefinition<TData> _shapeDefinition;
         private readonly int _index;
         private TData _data;
+        private bool _isDisposed = false;
 
         public TData Data
         {
@@ -33,7 +35,16 @@ namespace JAngine.Rendering
             _index = _shapeDefinition.Add(this);
         }
         
-        // TODO: Allow to dispose instances and create new ones with the earliest available index.
+        public void Dispose()
+        {
+            if (_isDisposed)
+            {
+                throw new Exception("This object has already been disposed!");
+            }
+
+            _isDisposed = true;
+            _shapeDefinition.Remove(_index);
+        }
     }
     
     public readonly struct TransformData : IVertex
