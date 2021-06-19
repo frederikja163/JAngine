@@ -11,10 +11,10 @@ namespace JAngine
         public float DeltaTime { get; private set; }
         private readonly Thread _thread;
         private readonly Action _init;
-        private readonly Action _loop;
+        private readonly Action<float> _loop;
         private readonly Action? _dispose;
 
-        public GameLoop(IContainer<GameLoop> container, Action init, Action loop, Action? dispose = null)
+        public GameLoop(IContainer<GameLoop> container, Action init, Action<float> loop, Action? dispose = null)
         {
             _container = container;
             _container.Add(this);
@@ -34,11 +34,14 @@ namespace JAngine
             stopwatch.Start();
             while (IsRunning)
             {
-                long ticks = stopwatch.ElapsedTicks;
+                do
+                {
+                    long ticks = stopwatch.ElapsedTicks;
+                    DeltaTime = ticks / (float) Stopwatch.Frequency;
+                } while (DeltaTime < 1 / 60f);
                 stopwatch.Restart();
-                DeltaTime = ticks / (float) Stopwatch.Frequency;
                 
-                _loop();
+                _loop(DeltaTime);
             }
             
             _dispose?.Invoke();

@@ -81,6 +81,8 @@ namespace JAngine
                     {
                         command();
                     }
+                    
+                    GL.Clear(ClearBufferMask.ColorBufferBit);
 
                     foreach (IDrawable drawable in _drawables)
                     {

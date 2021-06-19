@@ -4,11 +4,6 @@ using OpenTK.Mathematics;
 
 namespace JAngine.Rendering
 {
-    public interface IVertex
-    {
-        public VertexArray.Attribute[] Attributes { get; }
-    }
-    
     public readonly struct Vertex : IVertex
     {
         public readonly Vector2 Position;

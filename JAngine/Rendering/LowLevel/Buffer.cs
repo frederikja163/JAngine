@@ -4,6 +4,12 @@ using OpenTK.Graphics.OpenGL;
 
 namespace JAngine.Rendering.LowLevel
 {
+    
+    public interface IVertex
+    {
+        public VertexArray.Attribute[] Attributes { get; }
+    }
+    
     public abstract class Buffer<T> : GlObject<BufferHandle>
         where T : unmanaged
     {
@@ -16,7 +22,7 @@ namespace JAngine.Rendering.LowLevel
             Size = size;
             Window.Queue(() =>
             {
-                GL.NamedBufferStorage(Handle, size, IntPtr.Zero, BufferStorageMask.MapWriteBit);
+                GL.NamedBufferStorage(Handle, size, IntPtr.Zero, BufferStorageMask.DynamicStorageBit);
             });
         }
 
@@ -25,7 +31,7 @@ namespace JAngine.Rendering.LowLevel
             Size = data.Length;
             Window.Queue(() =>
             {
-                GL.NamedBufferStorage(Handle, data, BufferStorageMask.MapWriteBit);
+                GL.NamedBufferStorage(Handle, data, BufferStorageMask.DynamicStorageBit);
             });
         }
 
@@ -50,7 +56,7 @@ namespace JAngine.Rendering.LowLevel
     }
 
     public class VertexBuffer<T> : Buffer<T>
-        where T : unmanaged
+        where T : unmanaged, IVertex
     {
         public VertexBuffer(Window window, int size) : base(window, size)
         {

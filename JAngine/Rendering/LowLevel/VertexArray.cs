@@ -23,7 +23,7 @@ namespace JAngine.Rendering.LowLevel
         }
 
         public void AddVertexBuffer<T>(VertexBuffer<T> buffer, uint divisor, params Attribute[] attributes)
-            where T : unmanaged
+            where T : unmanaged, IVertex
         {
             Window.Queue(() =>
             {
