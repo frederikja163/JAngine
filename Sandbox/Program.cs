@@ -2,9 +2,6 @@ using JAngine;
 using JAngine.Rendering;
 using JAngine.Rendering.LowLevel;
 using OpenTK.Mathematics;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-using Vector2 = System.Numerics.Vector2;
-using Window = JAngine.Window;
 
 namespace Sandbox
 {
@@ -74,6 +71,7 @@ void main()
 
             int x = 0;
             var loop = new GameLoop(engine, Init, Loop);
+            loop.Start();
 
             void Init()
             {

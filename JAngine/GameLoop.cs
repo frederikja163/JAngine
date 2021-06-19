@@ -20,10 +20,14 @@ namespace JAngine
             _container.Add(this);
 
             _thread = new Thread(Run);
-            _thread.Start();
             _init = init;
             _loop = loop;
             _dispose = dispose;
+        }
+
+        public void Start()
+        {
+            _thread.Start();
         }
 
         private void Run()

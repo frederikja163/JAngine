@@ -7,13 +7,41 @@ namespace JAngine.Rendering
     public readonly struct Vertex : IVertex
     {
         public readonly Vector2 Position;
+        public readonly Vector2 TextureCoordinate;
+        public readonly Color4<Rgba> Color;
+        
+        public Vertex(Vector2 position, Vector2 textureCoordinate)
+            : this(position, textureCoordinate, Color4.White)
+        {
+        }
 
-        public Vertex(Vector2 position)
+        public Vertex(Vector2 position, Vector2 textureCoordinate, Color4<Rgba> color)
+        {
+            Position = position;
+            TextureCoordinate = textureCoordinate;
+            Color = color;
+        }
+
+        private static readonly VertexArray.Attribute[] AttributesField = new[]
+        {
+            new VertexArray.Attribute(0, 2, VertexAttribType.Float),
+            new VertexArray.Attribute(1, 2, VertexAttribType.Float),
+            new VertexArray.Attribute(2, 4, VertexAttribType.Float),
+        };
+
+        public VertexArray.Attribute[] Attributes => AttributesField;
+    }
+    
+    public readonly struct PositionVertex : IVertex
+    {
+        public readonly Vector2 Position;
+
+        public PositionVertex(Vector2 position)
         {
             Position = position;
         }
 
-        public Vertex(float x, float y) : this(new Vector2(x, y))
+        public PositionVertex(float x, float y) : this(new Vector2(x, y))
         {
         }
 
