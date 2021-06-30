@@ -56,6 +56,8 @@ namespace JAngine
         
         public Window(IContainer<Window> container, int width, int height, string title)
         {
+            Log.Info($"Creating window {title} with size ({width}, {height}).");
+            
             Width = width;
             Height = height;
             CameraMatrix = Matrix4.LookAt(Vector3.UnitZ, Vector3.Zero, Vector3.UnitY) *
@@ -75,6 +77,15 @@ namespace JAngine
             {
                 GLFW.MakeContextCurrent(Handle);
                 GLLoader.LoadBindings(new GLFWBindingsContext());
+                
+                Log.Info("--[OpenGL context]--");
+                Log.Info($"\tVendor: \t{GL.GetString(StringName.Vendor)}");
+                Log.Info($"\tRenderer: \t{GL.GetString(StringName.Renderer)}");
+                Log.Info($"\tGl version: \t{GL.GetString(StringName.Version)}");
+                Log.Info($"\tGlSl version: \t{GL.GetString(StringName.ShadingLanguageVersion)}");
+                // Log.Info($"Extensions: {GL.GetString(StringName.Extensions)}");
+                Log.Info("--[OpenGL context]--");
+                
                 while (IsOpen)
                 {
                     while (_queue.TryDequeue(out Action? command))
