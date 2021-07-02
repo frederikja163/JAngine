@@ -14,11 +14,11 @@ namespace JAngine
         Fatal
     }
     
-    public record LogMessage(Severity Severity, int LineNumber, string FilePath, string MemberName, object Object)
+    public record LogMessage(DateTime Time, Severity Severity, int LineNumber, string FilePath, string MemberName, object Object)
     {
         public override string ToString()
         {
-            return $"[{Severity} - {Path.GetFileNameWithoutExtension(FilePath)}#{LineNumber}] {Object}";
+            return $"[{Severity} | {Time.ToString("yy-MM-dd HH:mm:ss.fffffff UTCz")} | {Path.GetFileNameWithoutExtension(FilePath)}#{LineNumber}] {Object}";
         }
     }
 
@@ -75,15 +75,15 @@ namespace JAngine
         }
         
         public static void Debug(object obj, [CallerLineNumber] int line = 0, [CallerFilePath] string path = "", [CallerMemberName] string member = "")
-            => SendMessage(new LogMessage(Severity.Debug, line, path, member, obj));
+            => SendMessage(new LogMessage(DateTime.Now, Severity.Debug, line, path, member, obj));
         public static void Info(object obj, [CallerLineNumber] int line = 0, [CallerFilePath] string path = "", [CallerMemberName] string member = "")
-            => SendMessage(new LogMessage(Severity.Info, line, path, member, obj));
+            => SendMessage(new LogMessage(DateTime.Now, Severity.Info, line, path, member, obj));
         public static void Warn(object obj, [CallerLineNumber] int line = 0, [CallerFilePath] string path = "", [CallerMemberName] string member = "")
-            => SendMessage(new LogMessage(Severity.Warn, line, path, member, obj));
+            => SendMessage(new LogMessage(DateTime.Now, Severity.Warn, line, path, member, obj));
         public static void Error(object obj, [CallerLineNumber] int line = 0, [CallerFilePath] string path = "", [CallerMemberName] string member = "")
-            => SendMessage(new LogMessage(Severity.Error, line, path, member, obj));
+            => SendMessage(new LogMessage(DateTime.Now, Severity.Error, line, path, member, obj));
         public static void Fatal(object obj, [CallerLineNumber] int line = 0, [CallerFilePath] string path = "", [CallerMemberName] string member = "")
-            => SendMessage(new LogMessage(Severity.Fatal, line, path, member, obj));
+            => SendMessage(new LogMessage(DateTime.Now, Severity.Fatal, line, path, member, obj));
 
         private static void SendMessage(LogMessage logMessage)
         {
