@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
@@ -63,12 +65,78 @@ namespace JAngine.Rendering.LowLevel
             });
         }
 
+        // Create a ShaderProgram from raw strings of pure glsl code.
         public static ShaderProgram CreateVertexFragment(Window window, string vertexSrc, string fragmentSrc)
         {
             using Shader vertex = new Shader(window, vertexSrc, ShaderType.VertexShader);
             using Shader fragment = new Shader(window, fragmentSrc, ShaderType.FragmentShader);
 
             return new ShaderProgram(window, vertex, fragment);
+        }
+
+        internal static void CreateCache(StreamReader reader, StreamWriter writer)
+        {
+            // TODO: Parse custom shading language.
+            ShaderType? stage = null;
+            Dictionary<ShaderType, StringBuilder> stages = new ();
+            StringBuilder? stageBuilder = null;
+            while (!reader.EndOfStream)
+            {
+                string line = reader.ReadLine()!;
+                if (line.StartsWith("#"))
+                {
+                    string[] args = line.Split(' ');
+                    switch(args[0])
+                    {
+                        // TOOD: Support other stages here than just vertex and fragment stages.
+                        case "#stage":
+                            stage = args[1] switch
+                            {
+                                "Vertex" => ShaderType.VertexShader,
+                                "Fragment" => ShaderType.FragmentShader,
+                                _ => throw new Exception("That is not a supported shader type.")
+                            };
+                            if (!stages.TryGetValue(stage.Value, out StringBuilder? builder))
+                            {
+                                builder = new StringBuilder();
+                                stages.Add(stage.Value, builder);
+                                // Write a global header to all shaders.
+                                builder.AppendLine("#version 450 core");
+                            }
+                            stageBuilder = builder;
+                            break;
+                    }
+                }
+                else if (stage != null && stageBuilder != null)
+                {
+                    stageBuilder.AppendLine(line);
+                }
+            }
+
+            void WriteStage(StringBuilder builder)
+            {
+                char length = (char)builder.Length;
+                writer.Write(length);
+                writer.Write(builder.ToString());
+            }
+
+            WriteStage(stages[ShaderType.VertexShader]);
+            WriteStage(stages[ShaderType.FragmentShader]);
+        }
+
+        internal static ShaderProgram Load(Window window, StreamReader reader)
+        {
+            string ReadStage()
+            {
+                int length = reader.Read();
+                char[] buffer = new char[length];
+                reader.Read(buffer);
+                return new string(buffer);
+            }
+
+            string vertexSrc = ReadStage();
+            string fragmentSrc = ReadStage();
+            return ShaderProgram.CreateVertexFragment(window, vertexSrc, fragmentSrc);
         }
 
         public override void Dispose()
