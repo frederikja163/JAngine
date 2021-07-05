@@ -5,17 +5,14 @@ using OpenTK.Graphics.OpenGL;
 namespace JAngine.Rendering.LowLevel
 {
     
-    public interface IVertex
-    {
-        public VertexArray.Attribute[] Attributes { get; }
-    }
-    
     public abstract class Buffer<T> : GlObject<BufferHandle>
         where T : unmanaged
     {
         public int Size { get; }
 
-        private Buffer(Window window) : base(window, GL.CreateBuffer) { }
+        private Buffer(Window window) : base(window, GL.CreateBuffer, GL.DeleteBuffer)
+        {
+        }
 
         protected Buffer(Window window, int size) : this(window)
         {
@@ -45,14 +42,11 @@ namespace JAngine.Rendering.LowLevel
                 }
             });
         }
-        
-        public override void Dispose()
-        {
-            Window.Queue(() =>
-            {
-                GL.DeleteBuffer(Handle);
-            });
-        }
+    }
+
+    public interface IVertex
+    {
+        public VertexArray.Attribute[] Attributes { get; }
     }
 
     public class VertexBuffer<T> : Buffer<T>

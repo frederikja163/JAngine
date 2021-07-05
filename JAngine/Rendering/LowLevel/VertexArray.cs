@@ -13,10 +13,10 @@ namespace JAngine.Rendering.LowLevel
         private uint _vertexBufferCount = 0;
         public readonly ElementBuffer ElementBuffer;
 
-        public VertexArray(Window window, ElementBuffer elementBuffer) : base(window, GL.CreateVertexArray)
+        public VertexArray(ElementBuffer elementBuffer) : base(elementBuffer.Window, GL.CreateVertexArray, GL.DeleteVertexArray)
         {
             ElementBuffer = elementBuffer;
-            window.Queue(() =>
+            Window.Queue(() =>
             {
                 GL.VertexArrayElementBuffer(Handle, elementBuffer.Handle);
             });
@@ -25,6 +25,11 @@ namespace JAngine.Rendering.LowLevel
         public void AddVertexBuffer<T>(VertexBuffer<T> buffer, uint divisor, params Attribute[] attributes)
             where T : unmanaged, IVertex
         {
+            if (buffer.Window != Window)
+            {
+                throw new Exception("Vertex buffer must be from the same window context as the Vertex Array");
+            }
+
             Window.Queue(() =>
             {
                 GL.VertexArrayVertexBuffer(Handle, ++_vertexBufferCount, buffer.Handle, IntPtr.Zero, sizeof(T));
@@ -50,14 +55,6 @@ namespace JAngine.Rendering.LowLevel
                     };
                     offset += attributeSize * attribute.ValueCount;
                 }
-            });
-        }
-
-        public override void Dispose()
-        {
-            Window.Queue(() =>
-            {
-                GL.DeleteVertexArray(Handle);
             });
         }
     }

@@ -24,7 +24,8 @@ namespace JAngine
                 DirectoryInfo info = Directory.CreateDirectory(GetCachePath(""));
                 info.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
             }
-            Assets.AddType<ShaderProgram>(ShaderProgram.CreateCache, ShaderProgram.Load);
+            Assets.AddType<ShaderProgram>(ShaderProgram.CreateCache, ShaderProgram.CreateObject);
+            Assets.AddType<Texture>(Texture.CreateCache, Texture.CreateObject);
         }
 
         public static void AddType<T>(CacheObjectDelegate cacheObject, LoadObjectDelegate loadObject)
@@ -74,7 +75,8 @@ namespace JAngine
             using StreamReader reader = new StreamReader(GetAssetPath(path));
 
             string cachePath = GetCachePath(path);
-            Directory.CreateDirectory(Path.GetDirectoryName(cachePath));
+            string cacheDirectoryName = Path.GetDirectoryName(cachePath)!;
+            Directory.CreateDirectory(cacheDirectoryName);
             using StreamWriter writer = File.CreateText(cachePath);
 
             asset!.CacheObject(reader, writer);
@@ -87,7 +89,7 @@ namespace JAngine
 
         private static string GetCachePath(string path)
         {
-            return Path.Combine("Assets", ".Cache", path);
+            return Path.Combine("Assets", ".Cache", path + ".cache");
         }
     }
 }

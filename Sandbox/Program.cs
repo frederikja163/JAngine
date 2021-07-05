@@ -13,8 +13,8 @@ namespace Sandbox
             using Engine engine = new Engine();
 
             Window window = new Window(engine, 800, 600, "Sandbox");
-            ShapeDefinition<TextureVertex, TransformInstance, TransformData> shape = new(window,
-                Assets.Load<ShaderProgram>(window, "Shaders/Test.vert"),
+            ShapeDefinition<TextureVertex, TransformInstance, TransformData> shape = new(
+                Assets.Load<ShaderProgram>(window, "Shaders/Test.shader"),
                 new TextureArray(window, "Textures/test.png"),
                 new TextureVertex(0, 0.5f),
                 new TextureVertex(0.5f, 0),

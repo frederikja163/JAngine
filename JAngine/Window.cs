@@ -38,7 +38,7 @@ namespace JAngine
             }
         }
     }
-    
+
     // TODO: Create better windowing.
     public sealed unsafe class Window : IDisposable
     {
@@ -46,26 +46,41 @@ namespace JAngine
         internal readonly GlfwWindow* Handle;
         private readonly Queue<Action> _queue = new();
         private readonly Thread _thread;
-        private readonly List<IDrawable> _drawables = new ();
-        private readonly Matrix4 CameraMatrix;
-        
+        private readonly List<IDrawable> _drawables = new();
+        private readonly Matrix4 _cameraMatrix;
+        private int _maxTextureUnits;
+
         public void Queue(Action command)
         {
             _queue.Enqueue(command);
         }
-        
+
         public Window(IContainer<Window> container, int width, int height, string title)
         {
             Log.Info($"Creating window {title} with size ({width}, {height}).");
-            
+
             Width = width;
             Height = height;
-            CameraMatrix = Matrix4.LookAt(Vector3.UnitZ, Vector3.Zero, Vector3.UnitY) *
+            _cameraMatrix = Matrix4.LookAt(Vector3.UnitZ, Vector3.Zero, Vector3.UnitY) *
                 Matrix4.CreateOrthographic(Width, Height, 0.001f, 1000f);
-            
+
             _container = container;
             Handle = GLFW.CreateWindow(width, height, title, null, null);
             _container.Add(this);
+
+            GLFW.MakeContextCurrent(Handle);
+            GLLoader.LoadBindings(new GLFWBindingsContext());
+            Log.Info("--[OpenGL context]--");
+            Log.Info($"\tVendor: \t{GL.GetString(StringName.Vendor)}");
+            Log.Info($"\tRenderer: \t{GL.GetString(StringName.Renderer)}");
+            Log.Info($"\tGl version: \t{GL.GetString(StringName.Version)}");
+            Log.Info($"\tGlSl version: \t{GL.GetString(StringName.ShadingLanguageVersion)}");
+            // Log.Info($"Extensions: {GL.GetString(StringName.Extensions)}");
+            Log.Info("");
+            GL.GetInteger(GetPName.MaxCombinedTextureImageUnits, ref _maxTextureUnits);
+            Log.Info($"\tMax texture units: {MaxTextureUnits}");
+            Log.Info("--[OpenGL context]--");
+            GLFW.MakeContextCurrent(null);
 
             _thread = new Thread(Run);
             _thread.Start();
@@ -76,23 +91,13 @@ namespace JAngine
             try
             {
                 GLFW.MakeContextCurrent(Handle);
-                GLLoader.LoadBindings(new GLFWBindingsContext());
-                
-                Log.Info("--[OpenGL context]--");
-                Log.Info($"\tVendor: \t{GL.GetString(StringName.Vendor)}");
-                Log.Info($"\tRenderer: \t{GL.GetString(StringName.Renderer)}");
-                Log.Info($"\tGl version: \t{GL.GetString(StringName.Version)}");
-                Log.Info($"\tGlSl version: \t{GL.GetString(StringName.ShadingLanguageVersion)}");
-                // Log.Info($"Extensions: {GL.GetString(StringName.Extensions)}");
-                Log.Info("--[OpenGL context]--");
-                
                 while (IsOpen)
                 {
                     while (_queue.TryDequeue(out Action? command))
                     {
                         command();
                     }
-                    
+
                     GL.Clear(ClearBufferMask.ColorBufferBit);
 
                     foreach (IDrawable drawable in _drawables)
@@ -108,8 +113,8 @@ namespace JAngine
                         }
 
                         int camLocation = GL.GetUniformLocation(drawable.Shader.Handle, "uCamera");
-                        GL.ProgramUniformMatrix4f(drawable.Shader.Handle, camLocation, false, CameraMatrix.Row0.X);
-                        
+                        GL.ProgramUniformMatrix4f(drawable.Shader.Handle, camLocation, false, _cameraMatrix.Row0.X);
+
                         GL.DrawElementsInstanced(PrimitiveType.Triangles, drawable.VertexArray.ElementBuffer.Size,
                             DrawElementsType.UnsignedInt, 0, drawable.InstanceCount);
                     }
@@ -123,10 +128,11 @@ namespace JAngine
                 throw;
             }
         }
-        
+
         public int Width { get; }
         public int Height { get; }
-        
+
+        public int MaxTextureUnits => _maxTextureUnits;
         internal void AddDrawable(IDrawable drawable)
         {
             _drawables.Add(drawable);

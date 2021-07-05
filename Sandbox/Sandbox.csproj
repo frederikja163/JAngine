@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Assets\Shaders\Test.vert">
+      <None Update="Assets\Shaders\Test.shader">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Assets\Textures\test.png">

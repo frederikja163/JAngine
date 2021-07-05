@@ -13,7 +13,9 @@ namespace JAngine.Rendering.LowLevel
     {
         private sealed class Shader : GlObject<ShaderHandle>
         {
-            public Shader(Window window, string src, ShaderType type) : base(window, () => GL.CreateShader(type))
+            private static void Delete(in ShaderHandle shader) => GL.DeleteShader(shader);
+
+            public Shader(Window window, string src, ShaderType type) : base(window, () => GL.CreateShader(type), Delete)
             {
                 Window.Queue(() =>
                 {
@@ -38,9 +40,10 @@ namespace JAngine.Rendering.LowLevel
             }
         }
 
-        private ShaderProgram(Window window, params Shader[] shaders) : base(window, GL.CreateProgram)
+        private static void Delete(in ProgramHandle program) => GL.DeleteProgram(program);
+        private ShaderProgram(params Shader[] shaders) : base(shaders[0].Window, GL.CreateProgram, Delete)
         {
-            window.Queue(() =>
+            Window.Queue(() =>
             {
                 foreach (Shader shader in shaders)
                 {
@@ -71,7 +74,7 @@ namespace JAngine.Rendering.LowLevel
             using Shader vertex = new Shader(window, vertexSrc, ShaderType.VertexShader);
             using Shader fragment = new Shader(window, fragmentSrc, ShaderType.FragmentShader);
 
-            return new ShaderProgram(window, vertex, fragment);
+            return new ShaderProgram(vertex, fragment);
         }
 
         internal static void CreateCache(StreamReader reader, StreamWriter writer)
@@ -124,7 +127,7 @@ namespace JAngine.Rendering.LowLevel
             WriteStage(stages[ShaderType.FragmentShader]);
         }
 
-        internal static ShaderProgram Load(Window window, StreamReader reader)
+        internal static ShaderProgram CreateObject(Window window, StreamReader reader)
         {
             string ReadStage()
             {

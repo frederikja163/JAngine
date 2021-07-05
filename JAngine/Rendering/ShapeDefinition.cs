@@ -13,9 +13,16 @@ namespace JAngine.Rendering
         protected VertexBuffer<TInstanceData> InstanceBuffer;
         protected readonly Queue<int> AvailableIndices = new ();
 
-        internal ShapeDefinition(Window window, ShaderProgram shader, TextureArray textures, int triCount)
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        internal ShapeDefinition(ShaderProgram shader, TextureArray textures, int triCount)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
-            Window = window;
+            if (shader.Window != textures.Window)
+            {
+                throw new Exception("The shader and the texturearray must come from the same window context.");
+            }
+
+            Window = shader.Window;
             Shader = shader;
             Textures = textures;
             
@@ -30,7 +37,7 @@ namespace JAngine.Rendering
             ElementBuffer = new ElementBuffer(Window, elements);
             
             
-            VertexArray = new VertexArray(Window, ElementBuffer);
+            VertexArray = new VertexArray(ElementBuffer);
 
             Window.AddDrawable(this);
         }
@@ -68,32 +75,32 @@ namespace JAngine.Rendering
         private readonly VertexBuffer<TVertex> _vertexBuffer;
         protected TInstance?[] Instances;
         
-        public ShapeDefinition(Window window, ShaderProgram shader, TextureArray textures, int size, params TVertex[] points)
-            : base(window, shader, textures, points.Length - 2)
+        public ShapeDefinition(ShaderProgram shader, TextureArray textures, int size, params TVertex[] points)
+            : base(shader, textures, points.Length - 2)
         {
             _vertexBuffer = new VertexBuffer<TVertex>(Window, points);
             VertexArray.AddVertexBuffer(_vertexBuffer, 0, points[0].Attributes);
             
             Instances = new TInstance[size];
-            InstanceBuffer = new VertexBuffer<TInstanceData>(window, size);
+            InstanceBuffer = new VertexBuffer<TInstanceData>(Window, size);
             VertexArray.AddVertexBuffer(InstanceBuffer, 1, default(TInstanceData).Attributes);
             InstanceCount = 0;
         }
         
         public TInstance? this[int i] => Instances[i];
         
-        public ShapeDefinition(Window window, ShaderProgram shader, TextureArray textures, params TVertex[] points)
-            : this(window, shader, textures, 1, points)
+        public ShapeDefinition(ShaderProgram shader, TextureArray textures, params TVertex[] points)
+            : this(shader, textures, 1, points)
         {
         }
         
         public void Resize(int newSize)
         {
-            TInstance[] oldArray = Instances;
+            TInstance[] oldArray = Instances!;
             Instances = new TInstance[newSize];
             Array.Copy(oldArray, Instances, Math.Min(oldArray.Length, newSize));
             InstanceBuffer.Dispose();
-            InstanceBuffer = new VertexBuffer<TInstanceData>(Window, GetData(Instances));
+            InstanceBuffer = new VertexBuffer<TInstanceData>(Window, GetData(Instances!));
             VertexArray.AddVertexBuffer(InstanceBuffer, 1, default(TInstanceData).Attributes);
         }
 
