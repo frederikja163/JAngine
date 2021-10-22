@@ -15,7 +15,7 @@ namespace Sandbox
             Window window = new Window(engine, 800, 600, "Sandbox");
             ShapeDefinition<TextureVertex, TransformInstance, TransformData> shape = new(
                 Assets.Load<ShaderProgram>(window, "Shaders/Test.shader"),
-                new TextureArray(window, "Textures/test.png"),
+                new TextureArray(window, "Textures/test.png", "Textures/test2.jpg"),
                 new TextureVertex(0, 0.5f),
                 new TextureVertex(0.5f, 0),
                 new TextureVertex(0.5f, -0.5f),

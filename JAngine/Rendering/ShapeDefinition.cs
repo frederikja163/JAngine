@@ -131,7 +131,7 @@ namespace JAngine.Rendering
         {
             for (int i = 0; i < InstanceCount; i++)
             {
-                if (Instances[i] != null)
+                if (Instances[i] == null)
                 {
                     continue;
                 }
