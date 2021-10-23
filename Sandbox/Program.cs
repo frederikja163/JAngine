@@ -32,11 +32,11 @@ namespace Sandbox
             int x = 0;
             var loop = new GameLoop(engine, Init, Loop);
             loop.Start();
-
+            
             void Init()
             {
             }
-
+            
             void Loop(float dt)
             {
                 big.Position += Vector2.One * -5f * dt;
