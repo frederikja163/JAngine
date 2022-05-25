@@ -22,7 +22,7 @@ namespace JAngine.Rendering.LowLevel
             });
         }
 
-        public void AddVertexBuffer<T>(VertexBuffer<T> buffer, uint divisor, params Attribute[] attributes)
+        public void AddVertexBuffer<T>(VertexBuffer<T> buffer, uint divisor)
             where T : unmanaged, IVertex
         {
             if (buffer.Window != Window)
@@ -35,7 +35,7 @@ namespace JAngine.Rendering.LowLevel
                 GL.VertexArrayVertexBuffer(Handle, ++_vertexBufferCount, buffer.Handle, IntPtr.Zero, sizeof(T));
                 GL.VertexArrayBindingDivisor(Handle, _vertexBufferCount, divisor);
                 int offset = 0;
-                foreach (Attribute attribute in attributes)
+                foreach (Attribute attribute in T.Attributes)
                 {
                     GL.VertexArrayAttribBinding(Handle, attribute.Location, _vertexBufferCount);
                     GL.VertexArrayAttribFormat(Handle, attribute.Location, attribute.ValueCount, attribute.Type, false,

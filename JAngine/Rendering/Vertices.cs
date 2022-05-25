@@ -29,7 +29,7 @@ namespace JAngine.Rendering
             new VertexArray.Attribute(2, 4, VertexAttribType.Float),
         };
 
-        public VertexArray.Attribute[] Attributes => AttributesField;
+        public static VertexArray.Attribute[] Attributes => AttributesField;
     }
     
     public readonly struct PositionVertex : IVertex
@@ -50,7 +50,7 @@ namespace JAngine.Rendering
             new VertexArray.Attribute(0, 2, VertexAttribType.Float),
         };
 
-        public VertexArray.Attribute[] Attributes => AttributesField;
+        public static VertexArray.Attribute[] Attributes => AttributesField;
     }
     
     public readonly struct ColorVertex : IVertex
@@ -70,7 +70,7 @@ namespace JAngine.Rendering
             new VertexArray.Attribute(1, 4, VertexAttribType.Float),
         };
 
-        public VertexArray.Attribute[] Attributes => AttributesField;
+        public static VertexArray.Attribute[] Attributes => AttributesField;
     }
     
     public readonly struct TextureVertex : IVertex
@@ -96,6 +96,6 @@ namespace JAngine.Rendering
             new VertexArray.Attribute(1, 2, VertexAttribType.Float),
         };
 
-        public VertexArray.Attribute[] Attributes => AttributesField;
+        public static VertexArray.Attribute[] Attributes => AttributesField;
     }
 }

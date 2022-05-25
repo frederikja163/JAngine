@@ -46,7 +46,7 @@ namespace JAngine.Rendering.LowLevel
 
     public interface IVertex
     {
-        public VertexArray.Attribute[] Attributes { get; }
+        public static abstract VertexArray.Attribute[] Attributes { get; }
     }
 
     public class VertexBuffer<T> : Buffer<T>

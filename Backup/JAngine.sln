@@ -1,14 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
-MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SourceControl", "SourceControl", "{311C1F96-E0D9-4B44-A23E-F75EE98F22A2}"
-	ProjectSection(SolutionItems) = preProject
-		.gitignore = .gitignore
-		LICENSE = LICENSE
-		README.md = README.md
-	EndProjectSection
+ProjectSection(SolutionItems) = preProject
+	.gitignore = .gitignore
+	LICENSE = LICENSE
+	README.md = README.md
+EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JAngine", "JAngine\JAngine.csproj", "{B7E31878-F70D-40E1-B4F2-7AFC1DDBE8F6}"
 EndProject
@@ -29,10 +26,6 @@ Global
 		{31BBCA14-496A-4022-80AE-3755BDEAEEB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31BBCA14-496A-4022-80AE-3755BDEAEEB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A06B13E3-B327-4200-8408-1418FF7336BA}
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 EndGlobal

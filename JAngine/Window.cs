@@ -52,7 +52,10 @@ namespace JAngine
 
         public void Queue(Action command)
         {
-            _queue.Enqueue(command);
+            lock (_queue)
+            {
+                _queue.Enqueue(command);
+            }
         }
 
         public Window(IContainer<Window> container, int width, int height, string title)
@@ -70,7 +73,7 @@ namespace JAngine
 
             GLFW.MakeContextCurrent(Handle);
             GLLoader.LoadBindings(new GLFWBindingsContext());
-            Log.Info("--[OpenGL context]--");
+            Log.Info("---[OpenGL context]---");
             Log.Info($"\tVendor: \t{GL.GetString(StringName.Vendor)}");
             Log.Info($"\tRenderer: \t{GL.GetString(StringName.Renderer)}");
             Log.Info($"\tGl version: \t{GL.GetString(StringName.Version)}");
@@ -79,7 +82,7 @@ namespace JAngine
             Log.Info("");
             GL.GetInteger(GetPName.MaxCombinedTextureImageUnits, ref _maxTextureUnits);
             Log.Info($"\tMax texture units: {MaxTextureUnits}");
-            Log.Info("--[OpenGL context]--");
+            Log.Info("---[OpenGL context]---");
             GLFW.MakeContextCurrent(null);
 
             _thread = new Thread(Run);
@@ -93,9 +96,12 @@ namespace JAngine
                 GLFW.MakeContextCurrent(Handle);
                 while (IsOpen)
                 {
-                    while (_queue.TryDequeue(out Action? command))
+                    lock (_queue)
                     {
-                        command();
+                        while (_queue.TryDequeue(out Action? command))
+                        {
+                            command();
+                        }
                     }
 
                     GL.Clear(ClearBufferMask.ColorBufferBit);
