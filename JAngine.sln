@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JAngine", "JAngine\JAngine.csproj", "{1A2DC52F-C919-4CDC-AA1F-70B320D1F99A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox\Sandbox.csproj", "{7E89D166-4250-4F22-8241-744A9AA4AC95}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A2DC52F-C919-4CDC-AA1F-70B320D1F99A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A2DC52F-C919-4CDC-AA1F-70B320D1F99A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A2DC52F-C919-4CDC-AA1F-70B320D1F99A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A2DC52F-C919-4CDC-AA1F-70B320D1F99A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E89D166-4250-4F22-8241-744A9AA4AC95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E89D166-4250-4F22-8241-744A9AA4AC95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E89D166-4250-4F22-8241-744A9AA4AC95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E89D166-4250-4F22-8241-744A9AA4AC95}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
