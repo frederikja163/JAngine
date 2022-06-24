@@ -1,4 +1,5 @@
 using System.Reflection;
+using OpenTK.Windowing.Desktop;
 
 namespace JAngine;
 
@@ -22,17 +23,17 @@ public sealed class Config
 public static class Engine
 {
     private static Config? _config = null;
-    private static HashSet<Assembly> _assemblies = new();
+    private static readonly HashSet<Assembly> Assemblies = new();
     public delegate void AssemblyAddedDelegate(Assembly assembly);
     private static AssemblyAddedDelegate? _onAssemblyAdded = null;
-    private static Queue<Thread> _threads = new();
+    private static readonly Queue<Thread> Threads = new();
 
     public static event AssemblyAddedDelegate? OnAssemblyAdded
     {
         add
         {
             _onAssemblyAdded += value;
-            foreach (Assembly assembly in _assemblies)
+            foreach (Assembly assembly in Assemblies)
             {
                 value?.Invoke(assembly);
             }
@@ -83,6 +84,21 @@ public static class Engine
         {
             AddAssembly(assembly);
         }
+
+        while (Threads.TryDequeue(out Thread? thread))
+        {
+            thread.Join();
+        }
+        Log.Info("Engine execution finished successfully.");
+    }
+
+    public static void AddWindow(GameWindow window)
+    {
+        // TODO: Allow adding non window threads, ex an update thread.
+        Thread thread = new Thread(window.Run);
+        thread.Start();
+        Threads.Enqueue(thread);
+        Log.Trace($"Added new window {window}");
     }
 
     /// <summary>
@@ -98,13 +114,13 @@ public static class Engine
             Log.Trace("Null assembly not found, defaulting to calling assembly.");
         }
 
-        if (_assemblies.Contains(assembly))
+        if (Assemblies.Contains(assembly))
         {
             Log.Warning($"Assembly added twice {assembly.FullName}.");
         }
         else
         {
-            _assemblies.Add(assembly);
+            Assemblies.Add(assembly);
             _onAssemblyAdded?.Invoke(assembly);
             Log.Trace($"Assembly added successfully {assembly.FullName}.");
         }
