@@ -36,7 +36,7 @@ public static class Log
     {
         if (Engine.Config.Trace)
         {
-            LogMessage(Severity.Debug, objs);
+            LogMessage(Severity.Trace, objs);
         }
     }
 }

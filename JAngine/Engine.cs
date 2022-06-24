@@ -8,7 +8,7 @@ namespace JAngine;
 public sealed class Config
 {
     /// <summary>
-    ///  Is the engine in debug mode?
+    /// Is the engine in debug mode?
     /// Debug mode means the engine outputs debug information to the console.
     /// </summary>
     public bool Debug { get; init; } = true;
@@ -22,6 +22,23 @@ public sealed class Config
 public static class Engine
 {
     private static Config? _config = null;
+    private static HashSet<Assembly> _assemblies = new();
+    public delegate void AssemblyAddedDelegate(Assembly assembly);
+    private static AssemblyAddedDelegate? _onAssemblyAdded = null;
+    private static Queue<Thread> _threads = new();
+
+    public static event AssemblyAddedDelegate? OnAssemblyAdded
+    {
+        add
+        {
+            _onAssemblyAdded += value;
+            foreach (Assembly assembly in _assemblies)
+            {
+                value?.Invoke(assembly);
+            }
+        }
+        remove => _onAssemblyAdded -= value;
+    }
 
     /// <summary>
     /// Configuration for the running engine.
@@ -48,14 +65,18 @@ public static class Engine
     /// if no assemblies are provided the engine will use the calling assembly.</param>
     public static void Start(Config config, params Assembly[] assemblies)
     {
-        if (_config == null)
+        if (_config != null)
         {
+            Log.Warning("Engine already started, no need to start it again!");
             return;
         }
+        Log.Info("Starting engine.");
         _config = config;
         
+        OnAssemblyAdded += BootstrapRunner.OnAddAssembly;
         if (assemblies.Length == 0)
         {
+            AddAssembly(Assembly.GetExecutingAssembly());
             AddAssembly(Assembly.GetCallingAssembly());
         }
         foreach (Assembly assembly in assemblies)
@@ -70,10 +91,22 @@ public static class Engine
     /// <param name="assembly">The assembly to add, if none is provided the calling assembly is used.</param>
     public static void AddAssembly(Assembly? assembly = null)
     {
+        Log.Trace("Adding assembly to the engine.");
         if (assembly == null)
         {
             assembly = Assembly.GetCallingAssembly();
+            Log.Trace("Null assembly not found, defaulting to calling assembly.");
         }
-        
+
+        if (_assemblies.Contains(assembly))
+        {
+            Log.Warning($"Assembly added twice {assembly.FullName}.");
+        }
+        else
+        {
+            _assemblies.Add(assembly);
+            _onAssemblyAdded?.Invoke(assembly);
+            Log.Trace($"Assembly added successfully {assembly.FullName}.");
+        }
     }
 }
