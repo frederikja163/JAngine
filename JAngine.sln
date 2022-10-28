@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox\Sandbox.csproj", "{63B09104-7B07-4C79-9443-5FB299643B9D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JAngine", "JAngine\JAngine.csproj", "{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VersionControl", "VersionControl", "{3ED60DA1-6C7B-49D1-91D8-8F8588A5F080}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{63B09104-7B07-4C79-9443-5FB299643B9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63B09104-7B07-4C79-9443-5FB299643B9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63B09104-7B07-4C79-9443-5FB299643B9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63B09104-7B07-4C79-9443-5FB299643B9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
