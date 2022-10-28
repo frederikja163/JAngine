@@ -6,11 +6,6 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <RootNamespace>JAngine</RootNamespace>
-    <Version>0.0.0-beta.0</Version>
-    <Authors>FrederikJA</Authors>
-    <RepositoryUrl>https://github.com/frederikja163/JAngine</RepositoryUrl>
-    <Description>3D Game Engine for C# written in C# using OpenTK bindings for OpenGL.</Description>
-    <PackageLicenseExpression>MIT-0</PackageLicenseExpression>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 

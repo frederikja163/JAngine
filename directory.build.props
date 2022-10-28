@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <Authors>FrederikJA</Authors>
+        <RepositoryUrl>https://github.com/frederikja163/JAngine</RepositoryUrl>
+        <Description>3D Game Engine for C# written in C# using OpenTK bindings for OpenGL.</Description>
+        <PackageLicenseExpression>MIT-0</PackageLicenseExpression>
+    </PropertyGroup>
+</Project>
