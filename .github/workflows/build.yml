@@ -15,8 +15,10 @@ jobs:
         with:
             fetch-depth: 0
             
-      - name: Get version
+      - name: Get version from TAG
         uses: damienaicheh/extract-version-from-tag-action@v1.0.0
+      
+      - name: Calculate Version
         run: |
           if [[ $NUMBER_OF_COMMITS_SINCE_TAG -gt 0 ]]
           then
