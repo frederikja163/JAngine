@@ -53,8 +53,8 @@ jobs:
           path: ./**/*.nupkg
   
   PublishNuget:
-    - runs-on: ubuntu-latest
-    - steps:
+    runs-on: ubuntu-latest
+    steps:
       - name: Get Build Version
         run: |
           Import-Module .\.github\GetBuildVersion.psm1
