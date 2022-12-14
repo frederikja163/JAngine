@@ -17,7 +17,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{6B65CBA4-682B-4C5D-A1C0-6F98222E898E}"
 	ProjectSection(SolutionItems) = preProject
 		.github\GetBuildVersion.psm1 = .github\GetBuildVersion.psm1
-		.github\workflows\nuget.yml = .github\workflows\nuget.yml
+		.github\workflows\build.yml = .github\workflows\build.yml
+		.github\workflows\release.yml = .github\workflows\release.yml
 	EndProjectSection
 EndProject
 Global
