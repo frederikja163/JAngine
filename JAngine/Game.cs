@@ -1,7 +1,9 @@
 using System.Reflection;
+using JAngine.Rendering.OpenGL;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL.Compatibility;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using ClearBufferMask = OpenTK.Graphics.OpenGL.ClearBufferMask;
 using GL = OpenTK.Graphics.OpenGL.GL;
 using StringName = OpenTK.Graphics.OpenGL.StringName;
 
@@ -20,7 +22,9 @@ public record GameSettings(IEnumerable<ILogHandler> LogHandlers, int Width = 108
         new List<ILogHandler>()
             {
                 new ConsoleLogHandler(),
-                new FileLogHandler($"Log/{DateTime.Now.ToString("yyyy-MM/dd HH:mm:ss")}.txt")
+                new FileLogHandler($"Log/{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}.txt"),
+                // TODO: Create latest using hardlink instead.
+                new FileLogHandler($"Log/Latest.txt")
             }
         )
     {
@@ -51,7 +55,7 @@ public sealed unsafe class Game : IDisposable
     }
 
     private readonly Window* _window;
-    
+
     /// <summary>
     /// Initializes the game.
     /// </summary>
@@ -60,19 +64,22 @@ public sealed unsafe class Game : IDisposable
     {
         Log.SetHandlers(gameSettings.LogHandlers);
         _instance = this;
-
+        GLFW.SetErrorCallback(((error, description) => Log.Error($"{error} - {description}"))); ;
+        
         Log.Info("Initializing Game:");
-        if (!GLFW.Init())
+        if (GLFW.Init() == false)
         {
             throw new Exception("Failed to initialize GLFW.");
         }
         Log.Trace("Initialized GLFW.");
+        GLFW.GetError(out string str);
         
-        // GLFW.WindowHint(WindowHintInt.ContextVersionMajor, 4);
-        // GLFW.WindowHint(WindowHintInt.ContextVersionMinor, 5);
-        // GLFW.WindowHint(WindowHintOpenGlProfile.OpenGlProfile, OpenGlProfile.Core);
+        
+        GLFW.WindowHint(WindowHintInt.ContextVersionMajor, 4);
+        GLFW.WindowHint(WindowHintInt.ContextVersionMinor, 5);
+        GLFW.WindowHint(WindowHintOpenGlProfile.OpenGlProfile, OpenGlProfile.Core);
         string name = gameSettings.Title ?? Assembly.GetCallingAssembly().FullName ?? "Not Set.";
-        _window = GLFW.CreateWindow(gameSettings.Width, gameSettings.Height, gameSettings.Title, null, null);
+        _window = GLFW.CreateWindow(gameSettings.Width, gameSettings.Height, name, null, null);
         if (_window is null)
         {
             GLFW.Terminate();
@@ -86,14 +93,45 @@ public sealed unsafe class Game : IDisposable
         
         Log.Info($"Renderer: {GL.GetString(StringName.Renderer)}");
         Log.Info($"Vendor: {GL.GetString(StringName.Vendor)}");
-        Log.Info($"Extensions: {GL.GetString(StringName.Extensions)}");
         Log.Info($"OpenGL Version: {GL.GetString(StringName.Version)}");
         Log.Info($"GLSL Version: {GL.GetString(StringName.ShadingLanguageVersion)}");
+        Log.Info($"Extensions: {GL.GetString(StringName.Extensions)}");
     }
     
+    /// <summary>
+    /// Starts the game and enters the game-loop.
+    /// When calling this method, expect it to only return after the game has completed running.
+    /// </summary>
+    public void Run()
+    {
+        var buf = new Buffer<int>(0, 1, 2, 3, 4, 5);
+        buf.Insert(1, 10);
+        buf.Add(20);
+        buf.RemoveAt(0);
+        buf.Remove(5);
+        buf.WriteBufferToLog();
+        // while (!GLFW.WindowShouldClose(_window))
+        {
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+
+            GLFW.SwapBuffers(_window);
+            
+            GLFW.PollEvents();
+        }
+    }
+    
+    /// <summary>
+    /// Closes any unmanaged resources in the game.
+    /// </summary>
     public void Dispose()
     {
         GLFW.Terminate();
         Log.CloseHandlers();
+    }
+
+    internal void QueueCommand(Action command)
+    {
+        // TODO: Invoke this command on the rendering thread instead.
+        command?.Invoke();
     }
 }

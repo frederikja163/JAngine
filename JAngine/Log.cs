@@ -64,7 +64,7 @@ public sealed class FileLogHandler : IDisposable, ILogHandler
     public void HandleMessage(Message message)
     {
         _streamWriter.WriteLine(message.ToString());
-        _streamWriter.FlushAsync();
+        _streamWriter.Flush();
     }
 
     /// <summary>
