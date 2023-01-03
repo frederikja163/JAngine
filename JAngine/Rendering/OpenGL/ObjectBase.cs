@@ -14,7 +14,7 @@ public abstract class ObjectBase<T>: IDisposable where T : struct
     }
 
     /// <summary>
-    /// Dispose this Object from the GPU's memory.
+    /// Dispose this Object from the GPUs memory.
     /// </summary>
     public abstract void Dispose();
 }

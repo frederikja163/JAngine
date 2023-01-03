@@ -2,9 +2,12 @@ using System.Reflection;
 using JAngine.Rendering.OpenGL;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL.Compatibility;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using ClearBufferMask = OpenTK.Graphics.OpenGL.ClearBufferMask;
+using DrawElementsType = OpenTK.Graphics.OpenGL.DrawElementsType;
 using GL = OpenTK.Graphics.OpenGL.GL;
+using PrimitiveType = OpenTK.Graphics.OpenGL.PrimitiveType;
 using StringName = OpenTK.Graphics.OpenGL.StringName;
 
 namespace JAngine;
@@ -104,16 +107,19 @@ public sealed unsafe class Game : IDisposable
     /// </summary>
     public void Run()
     {
-        var buf = new Buffer<int>(0, 1, 2, 3, 4, 5);
-        buf.Insert(1, 10);
-        buf.Add(20);
-        buf.RemoveAt(0);
-        buf.Remove(5);
-        buf.WriteBufferToLog();
-        // while (!GLFW.WindowShouldClose(_window))
+        var ebo = new Buffer<uint>(0, 1, 2);
+        var shader = new Shader("Assets/shader.vert", "Assets/shader.frag");
+        var vbo = new Buffer<Vector2>(new Vector2(1, 1), new Vector2(1, 0), new Vector2(0, 0));
+        var vao = new VertexArray(shader, ebo);
+        vao.AddAttribute("vPos", vbo);
+        
+        while (!GLFW.WindowShouldClose(_window))
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
+            VertexArray.Bind(vao);
+            GL.DrawElements(PrimitiveType.Triangles, 3, DrawElementsType.UnsignedInt, 0);
+            
             GLFW.SwapBuffers(_window);
             
             GLFW.PollEvents();

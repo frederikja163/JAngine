@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\JAngine\JAngine.csproj" />
+        <ProjectReference Include="..\JAngine\JAngine.csproj" />
+        <None Include="Assets/**" CopyToOutputDirectory="Always" />
     </ItemGroup>
-
 </Project>
