@@ -8,7 +8,7 @@ namespace JAngine.Rendering.OpenGL;
 /// </summary>
 public sealed class Shader : ObjectBase<ProgramHandle>
 {
-    private Dictionary<string, uint> _attributeCache = new Dictionary<string, uint>();
+    private readonly Dictionary<string, uint> _attributeCache = new Dictionary<string, uint>();
 
     /// <summary>
     /// Construct a new Shader for drawing using a VertexShader and a FragmentShader.

@@ -47,6 +47,7 @@ public sealed class VertexArray : ObjectBase<VertexArrayHandle>
     /// <param name="indexBuffer">The IndexBuffer of the VertexArray.</param>
     public VertexArray(Shader shader, Buffer<uint> indexBuffer) : base(GL.CreateVertexArray)
     {
+        Game.Instance.AddVertexArray(this);
         Shader = shader;
         _indexBuffer = indexBuffer;
         IndexBuffer = indexBuffer;
@@ -109,6 +110,7 @@ public sealed class VertexArray : ObjectBase<VertexArrayHandle>
 
     public override void Dispose()
     {
+        Game.Instance.RemoveVertexArray(this);
         Game.Instance.QueueCommand(() =>
         {
             GL.DeleteVertexArray(Handle);

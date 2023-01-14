@@ -1,8 +1,6 @@
 using System.Reflection;
 using JAngine.Rendering.OpenGL;
 using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL.Compatibility;
-using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using ClearBufferMask = OpenTK.Graphics.OpenGL.ClearBufferMask;
 using DrawElementsType = OpenTK.Graphics.OpenGL.DrawElementsType;
@@ -58,6 +56,9 @@ public sealed unsafe class Game : IDisposable
     }
 
     private readonly Window* _window;
+    private readonly List<Action> _commandQueue = new ();
+    private readonly HashSet<VertexArray> _vertexArrays = new ();
+    private readonly object _lockObject = new object();
 
     /// <summary>
     /// Initializes the game.
@@ -67,7 +68,7 @@ public sealed unsafe class Game : IDisposable
     {
         Log.SetHandlers(gameSettings.LogHandlers);
         _instance = this;
-        GLFW.SetErrorCallback(((error, description) => Log.Error($"{error} - {description}"))); ;
+        GLFW.SetErrorCallback(((error, description) => Log.Error($"{error} - {description}")));
         
         Log.Info("Initializing Game:");
         if (GLFW.Init() == false)
@@ -75,11 +76,10 @@ public sealed unsafe class Game : IDisposable
             throw new Exception("Failed to initialize GLFW.");
         }
         Log.Trace("Initialized GLFW.");
-        GLFW.GetError(out string str);
-        
-        
+
         GLFW.WindowHint(WindowHintInt.ContextVersionMajor, 4);
         GLFW.WindowHint(WindowHintInt.ContextVersionMinor, 5);
+        GLFW.WindowHint(WindowHintBool.Floating, true);
         GLFW.WindowHint(WindowHintOpenGlProfile.OpenGlProfile, OpenGlProfile.Core);
         string name = gameSettings.Title ?? Assembly.GetCallingAssembly().FullName ?? "Not Set.";
         _window = GLFW.CreateWindow(gameSettings.Width, gameSettings.Height, name, null, null);
@@ -89,10 +89,14 @@ public sealed unsafe class Game : IDisposable
             throw new Exception("Failed to create Window.");
         }
         Log.Trace("Window created.");
+
         
         GLFW.MakeContextCurrent(_window);
         GLLoader.LoadBindings(new GLFWBindingsContext());
         Log.Trace("OpenGL initialized.");
+        
+        GLFW.SetWindowSizeCallback(_window, (_, width, height) => GL.Viewport(0, 0, width * 10, height * 10));
+        GL.Viewport(0, 0, gameSettings.Width, gameSettings.Height);
         
         Log.Info($"Renderer: {GL.GetString(StringName.Renderer)}");
         Log.Info($"Vendor: {GL.GetString(StringName.Vendor)}");
@@ -107,22 +111,49 @@ public sealed unsafe class Game : IDisposable
     /// </summary>
     public void Run()
     {
-        var ebo = new Buffer<uint>(0, 1, 2);
-        var shader = new Shader("Assets/shader.vert", "Assets/shader.frag");
-        var vbo = new Buffer<Vector2>(new Vector2(1, 1), new Vector2(1, 0), new Vector2(0, 0));
-        var vao = new VertexArray(shader, ebo);
-        vao.AddAttribute("vPos", vbo);
-        
         while (!GLFW.WindowShouldClose(_window))
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            VertexArray.Bind(vao);
-            GL.DrawElements(PrimitiveType.Triangles, 3, DrawElementsType.UnsignedInt, 0);
+            VertexArray[] vertexArrays;
+            Action[] commandQueue;
+            lock (_lockObject)
+            {
+                vertexArrays = _vertexArrays.ToArray();
+                commandQueue = _commandQueue.ToArray();
+                _commandQueue.Clear();
+            }
+
+            foreach (Action command in commandQueue)
+            {
+                command.Invoke();
+            }
+
+            foreach (VertexArray vertexArray in vertexArrays)
+            {
+                VertexArray.Bind(vertexArray);
+                GL.DrawElements(PrimitiveType.Triangles, vertexArray.IndexBuffer.Count, DrawElementsType.UnsignedInt, 0);
+            }
             
             GLFW.SwapBuffers(_window);
             
             GLFW.PollEvents();
+        }
+    }
+
+    internal void AddVertexArray(VertexArray vao)
+    {
+        lock (_lockObject)
+        {
+            _vertexArrays.Add(vao);
+        }
+    }
+
+    internal void RemoveVertexArray(VertexArray vao)
+    {
+        lock (_lockObject)
+        {
+            _vertexArrays.Remove(vao);
         }
     }
     
@@ -137,7 +168,9 @@ public sealed unsafe class Game : IDisposable
 
     internal void QueueCommand(Action command)
     {
-        // TODO: Invoke this command on the rendering thread instead.
-        command?.Invoke();
+        lock (_lockObject)
+        {
+            _commandQueue.Add(command);
+        }
     }
 }
