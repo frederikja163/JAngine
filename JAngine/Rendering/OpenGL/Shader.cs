@@ -11,35 +11,19 @@ public sealed class Shader : ObjectBase<ProgramHandle>
     private readonly Dictionary<string, uint> _attributeCache = new Dictionary<string, uint>();
 
     /// <summary>
-    /// Construct a new Shader for drawing using a VertexShader and a FragmentShader.
+    /// Construct a new Shader using shader stages.
     /// </summary>
-    /// <param name="vertPath">The path on the disc of the VertexShader.</param>
-    /// <param name="fragPath">The path on the disc of the FragmentShader.</param>
+    /// <param name="stages">The stages of the shader program.</param>
     /// <exception cref="Exception">Thrown in the case of a compilation error, or a linking error.</exception>
-    public Shader(string vertPath, string fragPath) : base(GL.CreateProgram)
+    public Shader(params ShaderStage[] stages) : base(GL.CreateProgram)
     {
         Game.Instance.QueueCommand(() =>
         {
-            ShaderHandle CreateShader(ShaderType type, string path)
+            foreach (ShaderStage stage in stages)
             {
-                string src = File.ReadAllText(path);
-                ShaderHandle handle = GL.CreateShader(type);
-                GL.ShaderSource(handle, src);
-                GL.CompileShader(handle);
-                GL.GetShaderInfoLog(handle, out string shaderInfo);
-                if (!string.IsNullOrEmpty(shaderInfo))
-                {
-                    throw new Exception($"Shader compilation failed: {path}");
-                }
-
-                return handle;
+                GL.AttachShader(Handle, stage.Handle);
             }
-
-            ShaderHandle vertHandle = CreateShader(ShaderType.VertexShader, vertPath);
-            ShaderHandle fragHandle = CreateShader(ShaderType.FragmentShader, fragPath);
-
-            GL.AttachShader(Handle, vertHandle);
-            GL.AttachShader(Handle, fragHandle);
+            
             GL.LinkProgram(Handle);
             GL.GetProgramInfoLog(Handle, out string programInfo);
             if (!string.IsNullOrEmpty(programInfo))
@@ -47,10 +31,11 @@ public sealed class Shader : ObjectBase<ProgramHandle>
                 throw new Exception($"Shader linking failed: {programInfo}");
             }
 
-            GL.DetachShader(Handle, vertHandle);
-            GL.DetachShader(Handle, fragHandle);
-            GL.DeleteShader(vertHandle);
-            GL.DeleteShader(fragHandle);
+            
+            foreach (ShaderStage stage in stages)
+            {
+                GL.DetachShader(Handle, stage.Handle);
+            }
         });
     }
 

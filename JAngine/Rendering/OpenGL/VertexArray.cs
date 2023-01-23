@@ -91,7 +91,7 @@ public sealed class VertexArray : ObjectBase<VertexArrayHandle>
                     break;
                 case Vector2i:
                     GL.VertexArrayAttribFormat(Handle, location, 2, VertexAttribType.Int, false, 0);
-                    break;
+                    break; 
                 case Vector3i:
                     GL.VertexArrayAttribFormat(Handle, location, 3, VertexAttribType.Int, false, 0);
                     break;

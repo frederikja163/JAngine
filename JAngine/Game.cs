@@ -1,4 +1,5 @@
 using System.Reflection;
+using JAngine.Extensions.Reflection;
 using JAngine.Rendering.OpenGL;
 using OpenTK.Graphics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -90,7 +91,6 @@ public sealed unsafe class Game : IDisposable
         }
         Log.Trace("Window created.");
 
-        
         GLFW.MakeContextCurrent(_window);
         GLLoader.LoadBindings(new GLFWBindingsContext());
         Log.Trace("OpenGL initialized.");
@@ -103,7 +103,15 @@ public sealed unsafe class Game : IDisposable
         Log.Info($"OpenGL Version: {GL.GetString(StringName.Version)}");
         Log.Info($"GLSL Version: {GL.GetString(StringName.ShadingLanguageVersion)}");
         Log.Info($"Extensions: {GL.GetString(StringName.Extensions)}");
+        
+        Assemblies.Add(Assembly.GetCallingAssembly());
+        Assemblies.Add(Assembly.GetExecutingAssembly());
     }
+
+    /// <summary>
+    /// Called once per frame before rendering.
+    /// </summary>
+    public event Action OnUpdate;
     
     /// <summary>
     /// Starts the game and enters the game-loop.
@@ -115,29 +123,36 @@ public sealed unsafe class Game : IDisposable
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            VertexArray[] vertexArrays;
-            Action[] commandQueue;
-            lock (_lockObject)
-            {
-                vertexArrays = _vertexArrays.ToArray();
-                commandQueue = _commandQueue.ToArray();
-                _commandQueue.Clear();
-            }
-
-            foreach (Action command in commandQueue)
-            {
-                command.Invoke();
-            }
-
-            foreach (VertexArray vertexArray in vertexArrays)
-            {
-                VertexArray.Bind(vertexArray);
-                GL.DrawElements(PrimitiveType.Triangles, vertexArray.IndexBuffer.Count, DrawElementsType.UnsignedInt, 0);
-            }
+            OnUpdate?.Invoke();
             
+            RenderFrame();
+
             GLFW.SwapBuffers(_window);
             
             GLFW.PollEvents();
+        }
+    }
+
+    private void RenderFrame()
+    {
+        VertexArray[] vertexArrays;
+        Action[] commandQueue;
+        lock (_lockObject)
+        {
+            vertexArrays = _vertexArrays.ToArray();
+            commandQueue = _commandQueue.ToArray();
+            _commandQueue.Clear();
+        }
+
+        foreach (Action command in commandQueue)
+        {
+            command.Invoke();
+        }
+
+        foreach (VertexArray vertexArray in vertexArrays)
+        {
+            VertexArray.Bind(vertexArray);
+            GL.DrawElements(PrimitiveType.Triangles, vertexArray.IndexBuffer.Count, DrawElementsType.UnsignedInt, 0);
         }
     }
 
