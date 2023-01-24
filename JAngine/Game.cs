@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Reflection.Metadata;
 using JAngine.Extensions.Reflection;
 using JAngine.Rendering.OpenGL;
 using OpenTK.Graphics;
@@ -60,6 +59,7 @@ public sealed unsafe class Game : IDisposable
     private readonly Window* _window;
     private readonly List<Action> _commandQueue = new ();
     private readonly HashSet<VertexArray> _vertexArrays = new ();
+    private ManualResetEvent? _resetEvent;
     private readonly object _lockObject = new object();
     
     /// <summary>
@@ -115,6 +115,11 @@ public sealed unsafe class Game : IDisposable
     public event Action? OnUpdate;
     
     /// <summary>
+    /// Called once at initialization of the program.
+    /// </summary>
+    public event Action? OnInit;
+    
+    /// <summary>
     /// Starts the game and enters the game-loop.
     /// When calling this method, expect it to only return after the game has completed running.
     /// </summary>
@@ -127,8 +132,6 @@ public sealed unsafe class Game : IDisposable
             while (!GLFW.WindowShouldClose(_window))
             {
                 GL.Clear(ClearBufferMask.ColorBufferBit);
-
-                OnUpdate?.Invoke();
                 
                 RenderFrame();
 
@@ -137,8 +140,11 @@ public sealed unsafe class Game : IDisposable
         });
         renderingThread.Start();
 
+        OnInit?.Invoke();
+        
         while (!GLFW.WindowShouldClose(_window))
         {
+            OnUpdate?.Invoke();
             GLFW.PollEvents();
         }
     }
@@ -147,17 +153,21 @@ public sealed unsafe class Game : IDisposable
     {
         VertexArray[] vertexArrays;
         Action[] commandQueue;
+        ManualResetEvent? resetEvent;
         lock (_lockObject)
         {
             vertexArrays = _vertexArrays.ToArray();
             commandQueue = _commandQueue.ToArray();
             _commandQueue.Clear();
+            resetEvent = _resetEvent;
+            _resetEvent = null;
         }
 
         foreach (Action command in commandQueue)
         {
             command.Invoke();
         }
+        resetEvent?.Set();
 
         foreach (VertexArray vertexArray in vertexArrays)
         {
@@ -191,11 +201,21 @@ public sealed unsafe class Game : IDisposable
         Log.CloseHandlers();
     }
 
-    internal void QueueCommand(Action command)
+    internal Task QueueCommand(Action command)
     {
+        ManualResetEvent resetEvent;
         lock (_lockObject)
         {
             _commandQueue.Add(command);
+
+            if (_resetEvent is null)
+            {
+                _resetEvent = new ManualResetEvent(false);
+            }
+            resetEvent = _resetEvent;
         }
+
+        resetEvent.WaitOne();
+        return Task.CompletedTask;
     }
 }

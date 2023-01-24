@@ -1,4 +1,3 @@
-using JAngine;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
@@ -60,7 +59,11 @@ public abstract class ShaderStage: ObjectBase<ShaderHandle>
 /// </summary>
 public sealed class VertexShader : ShaderStage
 {
-    internal VertexShader(string src) : base(ShaderType.VertexShader, src) { }
+    /// <summary>
+    /// Create a new fragment shader using a src string.
+    /// </summary>
+    /// <param name="src">The source of the shader.</param>
+    public VertexShader(string src) : base(ShaderType.VertexShader, src) { }
 }
 
 internal class VertexLoader : ShaderLoader<VertexShader>
@@ -74,7 +77,11 @@ internal class VertexLoader : ShaderLoader<VertexShader>
 /// </summary>
 public sealed class FragmentShader : ShaderStage
 {
-    internal FragmentShader(string src) : base(ShaderType.FragmentShader, src) { }
+    /// <summary>
+    /// Create a new fragment shader using a src string.
+    /// </summary>
+    /// <param name="src">The source of the shader.</param>
+    public FragmentShader(string src) : base(ShaderType.FragmentShader, src) { }
 }
 
 internal class FragmentLoader : ShaderLoader<FragmentShader>
