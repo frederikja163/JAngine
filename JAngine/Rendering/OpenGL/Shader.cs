@@ -31,7 +31,6 @@ public sealed class Shader : ObjectBase<ProgramHandle>
                 throw new Exception($"Shader linking failed: {programInfo}");
             }
 
-            
             foreach (ShaderStage stage in stages)
             {
                 GL.DetachShader(Handle, stage.Handle);

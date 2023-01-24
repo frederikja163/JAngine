@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Reflection.Metadata;
 using JAngine.Extensions.Reflection;
 using JAngine.Rendering.OpenGL;
 using OpenTK.Graphics;
@@ -60,7 +61,7 @@ public sealed unsafe class Game : IDisposable
     private readonly List<Action> _commandQueue = new ();
     private readonly HashSet<VertexArray> _vertexArrays = new ();
     private readonly object _lockObject = new object();
-
+    
     /// <summary>
     /// Initializes the game.
     /// </summary>
@@ -111,7 +112,7 @@ public sealed unsafe class Game : IDisposable
     /// <summary>
     /// Called once per frame before rendering.
     /// </summary>
-    public event Action OnUpdate;
+    public event Action? OnUpdate;
     
     /// <summary>
     /// Starts the game and enters the game-loop.
@@ -119,16 +120,25 @@ public sealed unsafe class Game : IDisposable
     /// </summary>
     public void Run()
     {
+        GLFW.MakeContextCurrent(null);
+        Thread renderingThread = new Thread(() =>
+        {
+            GLFW.MakeContextCurrent(_window);
+            while (!GLFW.WindowShouldClose(_window))
+            {
+                GL.Clear(ClearBufferMask.ColorBufferBit);
+
+                OnUpdate?.Invoke();
+                
+                RenderFrame();
+
+                GLFW.SwapBuffers(_window);
+            }
+        });
+        renderingThread.Start();
+
         while (!GLFW.WindowShouldClose(_window))
         {
-            GL.Clear(ClearBufferMask.ColorBufferBit);
-
-            OnUpdate?.Invoke();
-            
-            RenderFrame();
-
-            GLFW.SwapBuffers(_window);
-            
             GLFW.PollEvents();
         }
     }

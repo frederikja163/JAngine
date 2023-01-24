@@ -60,7 +60,7 @@ public static class Assets
                 
                 if (loader is null)
                 {
-                    Log.Warn($"{type.FullName} must contain an empty constructor when inheriting from ${nameof(IAssetLoader)}");
+                    // Log.Warn($"{type.FullName} must contain an empty constructor when inheriting from ${nameof(IAssetLoader)}");
                     continue;
                 }
 
