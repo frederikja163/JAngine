@@ -3,13 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sandbox", "Sandbox\Sandbox.csproj", "{63B09104-7B07-4C79-9443-5FB299643B9D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JAngine", "JAngine\JAngine.csproj", "{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VersionControl", "VersionControl", "{3ED60DA1-6C7B-49D1-91D8-8F8588A5F080}"
 	ProjectSection(SolutionItems) = preProject
-		directory.build.props = directory.build.props
 		LICENSE = LICENSE
 		README.md = README.md
 		.gitignore = .gitignore
@@ -22,20 +17,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{6B65
 		.github\workflows\release.yml = .github\workflows\release.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VulkanScratch", "VulkanScratch\VulkanScratch.csproj", "{C57558AC-BA37-4A9B-B2C7-70887258236D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{63B09104-7B07-4C79-9443-5FB299643B9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{63B09104-7B07-4C79-9443-5FB299643B9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{63B09104-7B07-4C79-9443-5FB299643B9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{63B09104-7B07-4C79-9443-5FB299643B9D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C57558AC-BA37-4A9B-B2C7-70887258236D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C57558AC-BA37-4A9B-B2C7-70887258236D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C57558AC-BA37-4A9B-B2C7-70887258236D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C57558AC-BA37-4A9B-B2C7-70887258236D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
