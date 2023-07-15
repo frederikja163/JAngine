@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sandbox", "Sandbox\Sandbox.csproj", "{63B09104-7B07-4C79-9443-5FB299643B9D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JAngine", "JAngine\JAngine.csproj", "{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VersionControl", "VersionControl", "{3ED60DA1-6C7B-49D1-91D8-8F8588A5F080}"
 	ProjectSection(SolutionItems) = preProject
 		directory.build.props = directory.build.props
@@ -22,20 +18,36 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{6B65
 		.github\workflows\release.yml = .github\workflows\release.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JAngine.Core", "JAngine.Core\JAngine.Core.csproj", "{899FE438-BEF4-46B1-BB78-BF0BBD4E610B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox\Sandbox.csproj", "{591E4A93-6C93-4F13-A7E4-D6AAB743BB84}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JAngine.Platform", "JAngine.Platform\JAngine.Platform.csproj", "{4124517B-F1A8-40DB-8B08-CD634214C701}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JAngine.All", "JAngine.All\JAngine.All.csproj", "{ECCD7277-E6B6-424A-BFBA-DD60B157321A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{63B09104-7B07-4C79-9443-5FB299643B9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{63B09104-7B07-4C79-9443-5FB299643B9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{63B09104-7B07-4C79-9443-5FB299643B9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{63B09104-7B07-4C79-9443-5FB299643B9D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{332E126B-FC6A-4803-B6F4-F21EEF9A9F55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{899FE438-BEF4-46B1-BB78-BF0BBD4E610B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{899FE438-BEF4-46B1-BB78-BF0BBD4E610B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{899FE438-BEF4-46B1-BB78-BF0BBD4E610B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{899FE438-BEF4-46B1-BB78-BF0BBD4E610B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{591E4A93-6C93-4F13-A7E4-D6AAB743BB84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{591E4A93-6C93-4F13-A7E4-D6AAB743BB84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{591E4A93-6C93-4F13-A7E4-D6AAB743BB84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{591E4A93-6C93-4F13-A7E4-D6AAB743BB84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4124517B-F1A8-40DB-8B08-CD634214C701}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4124517B-F1A8-40DB-8B08-CD634214C701}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4124517B-F1A8-40DB-8B08-CD634214C701}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4124517B-F1A8-40DB-8B08-CD634214C701}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECCD7277-E6B6-424A-BFBA-DD60B157321A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECCD7277-E6B6-424A-BFBA-DD60B157321A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECCD7277-E6B6-424A-BFBA-DD60B157321A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECCD7277-E6B6-424A-BFBA-DD60B157321A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
