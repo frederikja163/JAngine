@@ -5,10 +5,17 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\JAngine.Core\JAngine.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Include="..\GlobalAssemblyInfo.cs">
+        <Link>GlobalAssemblyInfo.cs</Link>
+      </Compile>
     </ItemGroup>
 
 </Project>

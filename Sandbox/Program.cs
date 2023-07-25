@@ -1,10 +1,9 @@
-﻿
-using JAngine.Platform;
+﻿using JAngine.Rendering;
 
 try
 {
     using Window window = new Window("Test", 100, 100);
-    window.Run();
+    Window.Run();
 }
 catch (Exception e)
 {

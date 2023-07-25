@@ -5,11 +5,12 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\JAngine.Core\JAngine.Core.csproj" />
-      <ProjectReference Include="..\JAngine.Platform\JAngine.Platform.csproj" />
+      <ProjectReference Include="..\JAngine.Rendering\JAngine.Rendering.csproj" />
     </ItemGroup>
 
 </Project>
