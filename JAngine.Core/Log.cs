@@ -51,7 +51,7 @@ public class LogMessage
     public override string ToString()
     {
         // TODO: Simulate some form of tab here instead of just splitting with " | ".
-        string time = Time.ToString("yyyy/MM/dd hh:mm:ss.fff");
+        string time = Time.ToString("yyyy/MM/dd HH:mm:ss.fff");
         string severity = Severity + new string(' ', SeverityFieldSize - Severity.ToString().Length);
         string origin = Frame is not null && Frame.GetMethod() is { } method
             ? (method.DeclaringType is not null ? method.DeclaringType.FullName + "." : "")

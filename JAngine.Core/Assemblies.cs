@@ -12,6 +12,7 @@ internal static class Assemblies
         // TODO: Watch for new .dll files here as well.
         _assemblies = Directory.GetFiles("./", "*.dll", SearchOption.AllDirectories)
             .Select(Assembly.LoadFrom)
+            .CatchExceptions()
             .ToList();
     }
 
