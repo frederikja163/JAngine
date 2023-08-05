@@ -17,15 +17,16 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\JAngine.All\JAngine.All.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Include="Resource2.txt">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Remove="Resource1.txt" />
       <EmbeddedResource Include="Resource1.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\JAngine.Core\JAngine.Core.csproj" />
+      <ProjectReference Include="..\JAngine.Rendering\JAngine.Rendering.csproj" />
     </ItemGroup>
 
 </Project>

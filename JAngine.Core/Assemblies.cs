@@ -31,23 +31,13 @@ internal static class Assemblies
         return _assemblies.SelectMany(a => a.DefinedTypes);
     }
 
-    public static IEnumerable<T> CreateInstances<T>()
+    [Pure]
+    public static IEnumerable<T> CreateInstances<T>(params object[] args)
     {
         return Assemblies.AllTypes()
             .Where(t => t.IsAssignableTo(typeof(T)))
-            .Select(CreateInstanceOrNull)
+            .Select((t) => Activator.CreateInstance(t, args))
+            .CatchExceptions()
             .OfType<T>();
-
-        static T? CreateInstanceOrNull(TypeInfo typeInfo)
-        {
-            try
-            {
-                return (T?)Activator.CreateInstance(typeInfo);
-            }
-            catch (Exception)
-            {
-                return default;
-            }
-        }
     }
 }

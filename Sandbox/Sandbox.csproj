@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\JAngine.All\JAngine.All.csproj" />
       <ProjectReference Include="..\JAngine.Core\JAngine.Core.csproj" />
+      <ProjectReference Include="..\JAngine.Rendering\JAngine.Rendering.csproj" />
     </ItemGroup>
 
 </Project>

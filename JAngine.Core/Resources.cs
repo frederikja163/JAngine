@@ -35,7 +35,7 @@ internal static class Resource
 
     internal static Stream GetPath(string path)
     {
-        string p = path.Replace(Path.DirectorySeparatorChar, '.');
+        string p = path.Replace('/', '.').Replace('\\', '.');
         if (ResourcePaths.TryGetValue(p, out Assembly? assembly))
         {
             return assembly.GetManifestResourceStream(p) ?? throw new UnreachableException();
