@@ -138,8 +138,7 @@ public sealed class FileLogger : ILogger
 
     static FileLogger()
     {
-        int fileCount;
-        string time = DateTime.Now.ToString("yyyy-MM-dd");
+        string time = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
         if (Directory.Exists("Logs"))
         {
             string[] files = Directory.GetFiles("Logs", "*.txt");
@@ -151,19 +150,13 @@ public sealed class FileLogger : ILogger
             {
                 File.Delete(file);
             }
-
-            // Get the amount of logs today.
-            fileCount = files.Take(10)
-                .Select(Path.GetFileNameWithoutExtension)
-                .Count(f => f?.StartsWith(time) ?? false);
         }
         else
         {
             Directory.CreateDirectory("Logs");
-            fileCount = 0;
         }
 
-        string path = $"Logs/{time}-{fileCount}.txt";
+        string path = $"Logs/{time}.txt";
         FileStream fileStream = File.Open(path, FileMode.CreateNew, FileAccess.Write);
         StreamWriter = new StreamWriter(fileStream);
         StreamWriter.AutoFlush = true;

@@ -42,7 +42,21 @@ internal static class Glfw
     [DllImport(DllName, EntryPoint = "glfwTerminate", CallingConvention = CallingConvention.Cdecl)]
     public static extern void Terminate();
     
+    [DllImport(DllName, EntryPoint = "glfwGetProcAddress", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr GetProcAddress([MarshalAs(UnmanagedType.LPStr)] string procName);
     
+    [DllImport(DllName, EntryPoint = "glfwMakeContextCurrent", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void MakeContextCurrent(Glfw.Window window);
+
+    [DllImport(DllName, EntryPoint = "glfwSwapBuffers", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SwapBuffers(Glfw.Window window);
+
+    [DllImport(DllName, EntryPoint = "glfwWindowShouldClose", CallingConvention = CallingConvention.Cdecl)]
+    public static extern bool WindowShouldClose(Glfw.Window window);
+    
+    [DllImport(DllName, EntryPoint = "glfwSetWindowShouldClose", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void WindowSetShouldClose(Glfw.Window window, bool value);
+
     [DllImport(DllName, EntryPoint = "glfwWindowHint", CallingConvention = CallingConvention.Cdecl)]
     public static extern void WindowHint(Hint hint, int value);
     public static void WindowHint(Hint hint, bool value) => WindowHint(hint, value ? 1 : 0);

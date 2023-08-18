@@ -1,11 +1,13 @@
+using System.Numerics;
 using JAngine.Core;
+using JAngine.Rendering.OpenGL;
 
 namespace JAngine.Rendering;
 
 /// <summary>
 /// A window used for drawing to the screen and as a context to a renderer.
 /// </summary>
-public sealed class Window : IDisposable, IEquatable<Window>
+public sealed class Window : IDisposable
 {
     private static readonly Glfw.Window ShareContext;
     private static readonly HashSet<Window> Windows = new();
@@ -28,6 +30,7 @@ public sealed class Window : IDisposable, IEquatable<Window>
     }
 
     private readonly Glfw.Window _handle;
+    private readonly Thread _renderingThread;
     
     /// <summary>
     /// Initialize a new instance of the <see cref="Window"/> class.
@@ -37,6 +40,8 @@ public sealed class Window : IDisposable, IEquatable<Window>
     public Window(string title, int width, int height)
     {
         _handle = Glfw.CreateWindow(width, height, title, Glfw.Monitor.Null, ShareContext);
+        _renderingThread = new Thread(RenderThread);
+        _renderingThread.Start();
         Windows.Add(this);
     }
 
@@ -52,30 +57,33 @@ public sealed class Window : IDisposable, IEquatable<Window>
         }
     }
 
+    private void RenderThread()
+    {
+        Glfw.MakeContextCurrent(_handle);
+        Renderer.ClearColor(1, 0, 1, 1);
+        while (IsOpen)
+        {
+            Renderer.Clear();
+            
+            Glfw.SwapBuffers(_handle);
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets whether this window is open.
+    /// False indicates the window should close as soon as possible or is already closed.
+    /// True indicates the window will open as soon as possible or is already opened.
+    /// </summary>
+    public bool IsOpen
+    {
+        get => Glfw.WindowShouldClose(_handle);
+        set => Glfw.WindowSetShouldClose(_handle, value);
+    }
+
     /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
         Glfw.DestroyWindow(_handle);
         Windows.Remove(this);
-    }
-
-    /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
-    public bool Equals(Window? other)
-    {
-        if (ReferenceEquals(null, other)) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return _handle.Equals(other._handle);
-    }
-
-    /// <inheritdoc cref="object.Equals(object?)"/>
-    public override bool Equals(object? obj)
-    {
-        return ReferenceEquals(this, obj) || obj is Window other && Equals(other);
-    }
-
-    /// <inheritdoc cref="object.GetHashCode"/>
-    public override int GetHashCode()
-    {
-        return _handle.GetHashCode();
     }
 }
