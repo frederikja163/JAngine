@@ -15,5 +15,5 @@ internal static unsafe class Gl
     internal static readonly delegate* unmanaged<float, float, float, float, void> ClearColor =
         (delegate* unmanaged<float, float, float, float, void>)Glfw.GetProcAddress("glClearColor");
     internal static readonly delegate* unmanaged<ClearBufferMask, void> Clear =
-        (delegate* unmanaged<ClearBufferMask, void>)Glfw.GetProcAddress("glClear22222222222");
+        (delegate* unmanaged<ClearBufferMask, void>)Glfw.GetProcAddress("glClear");
 }

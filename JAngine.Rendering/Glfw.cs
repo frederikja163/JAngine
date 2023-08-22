@@ -1,11 +1,29 @@
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace JAngine.Rendering;
 
-
-internal static class Glfw
+public static class Glfw
 {
     private const string DllName = "glfw";
+
+    static Glfw()
+    {
+        NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), (name, assembly, path) =>
+        {
+            if (name != DllName)
+            {
+                // If more rendering dlls are needed at some point this function needs to be refactored to support that.
+                throw new Exception();
+            }
+            if (OperatingSystem.IsWindows())
+            {
+                return NativeLibrary.Load("glfw3", assembly, path);
+            }
+
+            return NativeLibrary.Load("glfw", assembly, path);
+        });
+    }
     
     // Add new functions and enums from: https://www.glfw.org/docs/latest/modules.html
     [StructLayout(LayoutKind.Sequential)]

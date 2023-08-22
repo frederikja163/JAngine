@@ -9,25 +9,7 @@ namespace JAngine.Rendering;
 /// </summary>
 public sealed class Window : IDisposable
 {
-    private static readonly Glfw.Window ShareContext;
     private static readonly HashSet<Window> Windows = new();
-
-    static Window()
-    {
-        Glfw.GetVersion(out int major, out int minor, out int rev);
-        Log.Info($"Glfw version {major}.{minor}.{rev}");
-        if (!Glfw.Init())
-        {
-            throw new Exception("Failed to initialize Glfw");
-        }
-        
-        Glfw.WindowHint(Glfw.Hint.ContextVersionMajor, 4);
-        Glfw.WindowHint(Glfw.Hint.ContextVersionMinor, 6);
-        Glfw.WindowHint(Glfw.Hint.OpenglProfile, Glfw.OpenGL.CoreProfile);
-        Glfw.WindowHint(Glfw.Hint.Visible, false);
-        ShareContext = Glfw.CreateWindow(0, 0, "__share_context__", Glfw.Monitor.Null, Glfw.Window.Null);
-        Glfw.WindowHint(Glfw.Hint.Visible, true);
-    }
 
     private readonly Glfw.Window _handle;
     private readonly Thread _renderingThread;
@@ -39,7 +21,7 @@ public sealed class Window : IDisposable
     /// TODO: Use some create new window object and allow restoring old window size and other settings from a file.
     public Window(string title, int width, int height)
     {
-        _handle = Glfw.CreateWindow(width, height, title, Glfw.Monitor.Null, ShareContext);
+        _handle = Glfw.CreateWindow(width, height, title, Glfw.Monitor.Null, Renderer.ShareContext);
         _renderingThread = new Thread(RenderThread);
         _renderingThread.Start();
         Windows.Add(this);
@@ -76,8 +58,8 @@ public sealed class Window : IDisposable
     /// </summary>
     public bool IsOpen
     {
-        get => Glfw.WindowShouldClose(_handle);
-        set => Glfw.WindowSetShouldClose(_handle, value);
+        get => !Glfw.WindowShouldClose(_handle);
+        set => Glfw.WindowSetShouldClose(_handle, !value);
     }
 
     /// <inheritdoc cref="IDisposable.Dispose"/>
