@@ -1,7 +1,3 @@
-using System.Numerics;
-using JAngine.Core;
-using JAngine.Rendering.OpenGL;
-
 namespace JAngine.Rendering;
 
 /// <summary>

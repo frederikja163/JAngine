@@ -1,4 +1,3 @@
-using System.Numerics;
 using JAngine.Core;
 using JAngine.Rendering.OpenGL;
 

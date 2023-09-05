@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace JAngine.Rendering.OpenGL;
 
 internal static unsafe class Gl
