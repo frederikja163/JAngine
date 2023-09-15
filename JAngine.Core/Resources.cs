@@ -17,6 +17,7 @@ public interface IResourceLoader<out T>
     public T Load(Stream stream);
 }
 
+// Handles resource loading across different types of resources.
 internal static class Resource
 {
     private static readonly Dictionary<string, Assembly> ResourcePaths = new();
