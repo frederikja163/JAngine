@@ -22,4 +22,11 @@ public class ResourceTests
         int loadedValue = Resource<int>.Load(path);
         Assert.That(loadedValue, Is.EqualTo(expected));
     }
+
+    [Test]
+    public void TestCannotLoadException()
+    {
+        Assert.Throws<TypeInitializationException>(() => Resource<Thread>.Load("Test"));
+        Assert.Throws<FileNotFoundException>(() => Resource<int>.Load("Test"));
+    }
 }
