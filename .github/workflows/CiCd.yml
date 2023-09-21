@@ -45,6 +45,7 @@ jobs:
   release-test:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Publish JAngine.All
         uses: brandedoutcast/publish-nuget@v2
         with:
