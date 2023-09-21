@@ -17,33 +17,15 @@ jobs:
       - name: Build
         run: dotnet publish --configuration Release
       - name: Test
-        run: dotnet test
+        run: dotnet test --configuration Release
       - name: Upload binaries
         uses: actions/upload-artifact@v3
         with:
           retention-days: 7
-          name: JAngine-bin
+          name: JAngine
           path: JAngine.All/bin/Release/net7.0/publish/*
   
-  package:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '7.0.x'
-      - name: Pack
-        run: dotnet pack --configuration Release
-      - name: Upload
-        uses: actions/upload-artifact@v3
-        with:
-          retention-days: 7
-          name: JAngine-nupkg
-          path: ./**/*.nupkg
-  
   release-test:
-    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
