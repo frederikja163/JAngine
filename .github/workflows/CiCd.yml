@@ -37,17 +37,17 @@ jobs:
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           VERSION_FILE_PATH: Directory.Build.props
           VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
-      - name: Publish JAngine.All
-        uses: brandedoutcast/publish-nuget@v2
-        with:
-          PROJECT_FILE_PATH: JAngine.All/JAngine.All.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-          VERSION_FILE_PATH: Directory.Build.props
-          VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
       - name: Publish JAngine.Rendering
         uses: brandedoutcast/publish-nuget@v2
         with:
           PROJECT_FILE_PATH: JAngine.Rendering/JAngine.Rendering.csproj
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+          VERSION_FILE_PATH: Directory.Build.props
+          VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
+      - name: Publish JAngine.All
+        uses: brandedoutcast/publish-nuget@v2
+        with:
+          PROJECT_FILE_PATH: JAngine.All/JAngine.All.csproj
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           VERSION_FILE_PATH: Directory.Build.props
           VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
