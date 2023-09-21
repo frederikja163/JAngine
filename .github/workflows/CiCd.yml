@@ -24,12 +24,23 @@ jobs:
           retention-days: 7
           name: JAngine
           path: JAngine.All/bin/Release/net7.0/publish/*
-  
+    
   Cd:
     runs-on: ubuntu-latest
-#    needs: [Ci]
+    #    needs: [Ci]
     steps:
       - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+      - name: Dotnet pack
+        run: dotnet pack -c Release
+      - name: Move packages
+        run: mv **/*.nupkg ./
+      - name: Push packages
+        run: dotnet nuget push *.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
+        
       - name: Publish JAngine.Core
         uses: rohith/publish-nuget@v2
         with:
