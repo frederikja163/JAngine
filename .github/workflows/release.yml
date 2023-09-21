@@ -17,7 +17,7 @@ jobs:
           dotnet-version: '7.0.x'
           source-url: https://nuget.pkg.github.com/<owner>/index.json
         env:
-          NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - run: dotnet build --configuration Release JAngine.All
       - name: Create the package
         run: dotnet pack --configuration Release JAngine.All
