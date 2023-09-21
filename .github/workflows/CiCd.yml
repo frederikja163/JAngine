@@ -35,28 +35,10 @@ jobs:
         with:
           dotnet-version: '7.0.x'
       - name: Dotnet pack
-        run: dotnet pack -c Release
+        run: |
+          dotnet pack -c Release JAngine.All
+          dotnet pack -c Release JAngine.Rendering
+          dotnet pack -c Release JAngine.Core
+          
       - name: Push packages
         run: dotnet nuget push **/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
-        
-      - name: Publish JAngine.Core
-        uses: rohith/publish-nuget@v2
-        with:
-          PROJECT_FILE_PATH: JAngine.Core/JAngine.Core.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-          VERSION_FILE_PATH: Directory.Build.props
-          VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
-      - name: Publish JAngine.Rendering
-        uses: rohith/publish-nuget@v2
-        with:
-          PROJECT_FILE_PATH: JAngine.Rendering/JAngine.Rendering.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-          VERSION_FILE_PATH: Directory.Build.props
-          VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
-      - name: Publish JAngine.All
-        uses: rohith/publish-nuget@v2
-        with:
-          PROJECT_FILE_PATH: JAngine.All/JAngine.All.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-          VERSION_FILE_PATH: Directory.Build.props
-          VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
