@@ -1,4 +1,4 @@
-name: dotnet package
+name: CI/CD
 
 on:
   push:
@@ -44,6 +44,7 @@ jobs:
           
   release:
     if: github.event_name == 'release'
+    needs: [ package ]
     runs-on: ubuntu-latest
     steps:
       - name: Setup .NET Core
