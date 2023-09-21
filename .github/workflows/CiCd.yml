@@ -17,7 +17,7 @@ jobs:
       - name: Build
         run: dotnet publish --configuration Release
       - name: Test
-        run: dotnet test --configuration Release
+        run: dotnet test
       - name: Upload binaries
         uses: actions/upload-artifact@v3
         with:
