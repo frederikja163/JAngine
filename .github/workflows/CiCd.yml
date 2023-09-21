@@ -36,9 +36,8 @@ jobs:
           dotnet-version: '7.0.x'
       - name: Dotnet pack
         run: |
-          dotnet pack -c Release JAngine.All
-          dotnet pack -c Release JAngine.Rendering
           dotnet pack -c Release JAngine.Core
-          
+          dotnet pack -c Release JAngine.Rendering
+          dotnet pack -c Release JAngine.All
       - name: Push packages
         run: dotnet nuget push **/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
