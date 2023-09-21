@@ -30,17 +30,17 @@ jobs:
 #    needs: [Ci]
     steps:
       - uses: actions/checkout@v4
-      - name: Publish JAngine.All
-        uses: brandedoutcast/publish-nuget@v2
-        with:
-          PROJECT_FILE_PATH: JAngine.All/JAngine.All.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-          VERSION_FILE_PATH: Directory.Build.props
-          VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
       - name: Publish JAngine.Core
         uses: brandedoutcast/publish-nuget@v2
         with:
           PROJECT_FILE_PATH: JAngine.Core/JAngine.Core.csproj
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+          VERSION_FILE_PATH: Directory.Build.props
+          VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
+      - name: Publish JAngine.All
+        uses: brandedoutcast/publish-nuget@v2
+        with:
+          PROJECT_FILE_PATH: JAngine.All/JAngine.All.csproj
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           VERSION_FILE_PATH: Directory.Build.props
           VERSION_REGEX: ^\s*<Version>(.*)<\/Version>\s*$
