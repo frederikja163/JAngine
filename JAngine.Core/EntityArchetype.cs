@@ -34,7 +34,7 @@ internal sealed class EntityArchetype
         }
 
         Dictionary<Type, object> existingComponentsByType =
-            existingComponents?.OfType<object>().ToDictionary(o => o.GetType(), o => o) ??
+            existingComponents?.OfType<object>().ToDictionary(o => o.GetType(), o => o, TypeComparer.Default) ??
             new Dictionary<Type, object>();
         foreach ((Type componentType, Dictionary<Guid, object> components) in _componentTypes)
         {
@@ -46,13 +46,15 @@ internal sealed class EntityArchetype
                     RemoveEntity(existingEntity);
                     throw new Exception($"Component of type {componentType.FullName} failed to initialize.");
                 }
+                existingComponentsByType.Add(componentType, component);
             }
 
             while (!components.TryAdd(existingEntity.Id, component))
             {
-                existingEntity .Id= Guid.NewGuid();
+                throw new Exception("Duplicate component types or entity guid.");
             }
         }
+        _entities.Add(existingEntity);
 
         return existingEntity;
     }
@@ -65,9 +67,10 @@ internal sealed class EntityArchetype
             if (components.TryGetValue(entity.Id, out object? component))
             {
                 components.Remove(entity.Id);
-                removedComponents.Add(entity);
+                removedComponents.Add(component);
             }
         }
+        _entities.Remove(entity);
         return removedComponents;
     }
 

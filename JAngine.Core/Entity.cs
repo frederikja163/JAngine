@@ -24,24 +24,35 @@ public sealed class Entity
         return Archetype.TryGetComponent(this, out component);
     }
 
+    public void AddComponent<T>(T value)
+    {
+        SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
+        newComponentTypes.Add(typeof(T));
+        SetArchetype(newComponentTypes, value);
+    }
+    
     public void AddComponent<T>()
     {
-        SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes);
+        SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
         newComponentTypes.Add(typeof(T));
         SetArchetype(newComponentTypes);
     }
 
     public void RemoveComponent<T>()
     {
-        SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes);
+        SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
         newComponentTypes.Remove(typeof(T));
         SetArchetype(newComponentTypes);
     }
 
-    private void SetArchetype(SortedSet<Type> newComponentTypes)
+    private void SetArchetype(SortedSet<Type> newComponentTypes, object? value = null)
     {
-        Archetype.RemoveEntity(this);
+        List<object> componentValues = Archetype.RemoveEntity(this);
+        if (value is not null)
+        {
+            componentValues.Add(value);
+        }
         Archetype = World.GetOrCreateArchetype(newComponentTypes);
-        Archetype.AddEntity(this);
+        Archetype.AddEntity(this, componentValues);
     }
 }
