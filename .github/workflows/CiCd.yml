@@ -37,7 +37,7 @@ jobs:
       - name: Dotnet pack
         run: dotnet pack -c Release
       - name: Move packages
-        run: mv "**/*.nupkg" "./"
+        run: mv "*.nupkg" "./"
       - name: Push packages
         run: dotnet nuget push *.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
         
