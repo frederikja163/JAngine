@@ -49,17 +49,17 @@ jobs:
       - name: Publish JAngine.All
         uses: brandedoutcast/publish-nuget@v2
         with:
-          PROJECT_FILE_PATH: JAngine.All
+          PROJECT_FILE_PATH: JAngine.All/JAngine.All.csproj
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
       - name: Publish JAngine.Core
         uses: brandedoutcast/publish-nuget@v2
         with:
-          PROJECT_FILE_PATH: JAngine.Core
+          PROJECT_FILE_PATH: JAngine.Core/JAngine.Core.csproj
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
       - name: Publish JAngine.Rendering
         uses: brandedoutcast/publish-nuget@v2
         with:
-          PROJECT_FILE_PATH: JAngine.Rendering
+          PROJECT_FILE_PATH: JAngine.Rendering/JAngine.Rendering.csproj
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           
   release:
