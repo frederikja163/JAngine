@@ -41,6 +41,28 @@ jobs:
           retention-days: 7
           name: JAngine-nupkg
           path: ./**/*.nupkg
+  
+  release-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish JAngine.All
+        id: publish_nuget
+        uses: brandedoutcast/publish-nuget@v2
+        with:
+          PROJECT_FILE_PATH: JAngine.All
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+      - name: Publish JAngine.Core
+        id: publish_nuget
+        uses: brandedoutcast/publish-nuget@v2
+        with:
+          PROJECT_FILE_PATH: JAngine.Core
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+      - name: Publish JAngine.Rendering
+        id: publish_nuget
+        uses: brandedoutcast/publish-nuget@v2
+        with:
+          PROJECT_FILE_PATH: JAngine.Rendering
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           
   release:
     if: github.event_name == 'release'
@@ -54,8 +76,5 @@ jobs:
           name: JAngine-nupkg
           path: ./
       - name: Publish NuGet package
-        shell: pwsh
-        run: |
-          foreach($file in (Get-ChildItem "./" -Recurse -Include *.nupkg)) {
-              dotnet nuget push $file --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
-          }
+        run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
+#          dotnet nuget add source --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/FrederikJA163/index.json"
