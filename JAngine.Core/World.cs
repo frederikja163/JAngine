@@ -41,15 +41,15 @@ public sealed class World
     /// <returns>The newly created entity.</returns>
     public Entity CreateEntity(IEnumerable components)
     {
-        SortedSet<Type> componentTypes = new SortedSet<Type>(components.OfType<object>().Select(c => c.GetType()));
-        EntityArchetype archetype = GetOrCreateArchetype(componentTypes);
-        archetype.AddEntity()
+        return CreateEntity(components.OfType<object>().ToArray());
     }
 
     /// <inheritdoc cref="CreateEntity(System.Collections.IEnumerable)"/>
     public Entity CreateEntity(params object[] components)
     {
-        return CreateEntity((IEnumerable<object>)components);
+        SortedSet<Type> componentTypes = new SortedSet<Type>(components.OfType<ValueType>().Select(c => c.GetType()));
+        EntityArchetype archetype = GetOrCreateArchetype(componentTypes);
+        archetype.AddEntity(null, components);
     }
 
     /// <summary>
