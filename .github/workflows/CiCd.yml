@@ -46,19 +46,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Publish JAngine.All
-        id: publish_nuget
         uses: brandedoutcast/publish-nuget@v2
         with:
           PROJECT_FILE_PATH: JAngine.All
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
       - name: Publish JAngine.Core
-        id: publish_nuget
         uses: brandedoutcast/publish-nuget@v2
         with:
           PROJECT_FILE_PATH: JAngine.Core
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
       - name: Publish JAngine.Rendering
-        id: publish_nuget
         uses: brandedoutcast/publish-nuget@v2
         with:
           PROJECT_FILE_PATH: JAngine.Rendering
