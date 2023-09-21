@@ -4,5 +4,6 @@
         <RepositoryUrl>https://github.com/frederikja163/JAngine.Core</RepositoryUrl>
         <Description>3D Game Engine for C# written in C# using OpenTK bindings for OpenGL.</Description>
         <PackageLicenseExpression>MIT-0</PackageLicenseExpression>
+        <Version>V1.1.0</Version>
     </PropertyGroup>
 </Project>
