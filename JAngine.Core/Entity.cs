@@ -17,13 +17,24 @@ public sealed class Entity
 
     internal EntityArchetype Archetype { get; set; }
 
+    /// <summary>
+    /// Gets the world this entity is part of.
+    /// </summary>
     public World World => Archetype.World;
     
+    /// <summary>
+    /// Tries to get a component from this entity.
+    /// </summary>
+    /// <param name="component">The found component if any. Will only be null if return-value is false.</param>
+    /// <typeparam name="T">The type of component to look for.</typeparam>
+    /// <returns>True if a component was found; false if this type of component does not exist on this entity.</returns>
     public bool TryGetComponent<T>([NotNullWhen(true)] out T? component)
     {
         return Archetype.TryGetComponent(this, out component);
     }
 
+    /// <inheritdoc cref="AddComponent{T}()"/>
+    /// <param name="value">The value of the new component.</param>
     public void AddComponent<T>(T value)
     {
         SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
@@ -31,6 +42,10 @@ public sealed class Entity
         SetArchetype(newComponentTypes, value);
     }
     
+    /// <summary>
+    /// Add a component to this entity, moving its archetype.
+    /// </summary>
+    /// <typeparam name="T">The type of the new component.</typeparam>
     public void AddComponent<T>()
     {
         SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
@@ -38,6 +53,10 @@ public sealed class Entity
         SetArchetype(newComponentTypes);
     }
 
+    /// <summary>
+    /// Remove a component from this entity, moving its archetype.
+    /// </summary>
+    /// <typeparam name="T">The type of the new component.</typepaAddram>
     public void RemoveComponent<T>()
     {
         SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
