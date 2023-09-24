@@ -19,7 +19,10 @@ public sealed class Window : IDisposable
     /// TODO: Use some create new window object and allow restoring old window size and other settings from a file.
     public Window(string title, int width, int height)
     {
-        _handle = Glfw.CreateWindow(width, height, title, Glfw.Monitor.Null, Renderer.ShareContext);
+        Glfw.Window shareContext = Renderer.ShareContext;
+        
+        Glfw.WindowHint(Glfw.Hint.Visible, true);
+        _handle = Glfw.CreateWindow(width, height, title, Glfw.Monitor.Null, shareContext);
         _renderingThread = new Thread(RenderThread);
         _renderingThread.Start();
         Windows.Add(this);
@@ -39,28 +42,18 @@ public sealed class Window : IDisposable
 
     private void RenderThread()
     {
-        Glfw.MakeContextCurrent(_handle);
-        
-        uint vertexShader = Gl.CreateShader(Gl.ShaderType.VertexShader); 
-        Gl.ShaderSource(vertexShader, $@"
-#version 330 core
+        using RenderThreadBinding binding = new RenderThreadBinding(_handle);
+        binding.Bind();
 
+        ShaderStage vertexShader = new ShaderStage($@"
+#version 330 core
 in vec2 vPosition;
 
 void main(){{
     gl_Position = vec4(vPosition, 0, 1);
 }}
-");
-        Gl.CompileShader(vertexShader);
-        Gl.GetShader(vertexShader, Gl.ShaderParameterName.InfoLogLength, out int logLength);
-        if (logLength != 0)
-        {
-            Gl.GetShaderInfoLog(vertexShader, logLength, out string infoLog);
-            throw new Exception(infoLog);
-        }
-
-        uint fragmentShader = Gl.CreateShader(Gl.ShaderType.FragmentShader); 
-        Gl.ShaderSource(fragmentShader, $@"
+", Gl.ShaderType.VertexShader);
+        ShaderStage fragmentShader = new ShaderStage($@"
 #version 330 core
 
 out vec4 Color;
@@ -68,30 +61,10 @@ out vec4 Color;
 void main(){{
     Color = vec4(1, 1, 1, 1);
 }}
-");
-        Gl.CompileShader(fragmentShader);
-        Gl.GetShader(fragmentShader, Gl.ShaderParameterName.InfoLogLength, out logLength);
-        if (logLength != 0)
-        {
-            Gl.GetShaderInfoLog(fragmentShader, logLength, out string infoLog);
-            throw new Exception(infoLog);
-        }
-
-        uint program = Gl.CreateProgram();
-        Gl.AttachShader(program, vertexShader);
-        Gl.AttachShader(program, fragmentShader);
-        Gl.LinkProgram(program);
-        Gl.GetProgram(program, Gl.ProgramProperty.InfoLogLength, out logLength);
-        if (logLength != 0)
-        {
-            Gl.GetProgramInfoLog(program, logLength, out string infoLog);
-            throw new Exception(infoLog);
-        }
-        
-        Gl.DetachShader(program, vertexShader);
-        Gl.DeleteShader(vertexShader);
-        Gl.DetachShader(program, fragmentShader);
-        Gl.DeleteShader(fragmentShader);
+", Gl.ShaderType.FragmentShader);
+        using Shader shader = new Shader(vertexShader, fragmentShader);
+        vertexShader.Dispose();
+        fragmentShader.Dispose();
         
         uint vbo = Gl.CreateBuffer();
         Gl.NamedBufferStorage<float>(vbo, new float[] {0, 0, 1, 1, 0, 1}, Gl.BufferStorageMask.DynamicStorageBit);
@@ -111,7 +84,7 @@ void main(){{
             Renderer.Clear();
             
             Gl.BindVertexArray(vao);
-            Gl.UseProgram(program);
+            Gl.UseProgram(shader.Handle);
             Gl.DrawElementsInstanced(Gl.PrimitiveType.Triangles, 3, Gl.DrawElementsType.UnsignedInt, 0, 1);
             
             Glfw.SwapBuffers(_handle);
