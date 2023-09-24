@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace JAngine.Rendering.OpenGL;
 // https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/main/xml/gl.xml
 using Enum = System.UInt32;
@@ -37,14 +39,41 @@ internal static unsafe class Gl
         StencilBuffer = 0x00000400,
     }
 
-    internal enum BufferStorageMask : Bitfield
+    internal enum DrawElementsType : Bitfield
     {
-        DynamicStorageBit = 0x100,
-        MapReadBit = 0x0001,
-        MapWriteBit = 0x0002,
-        MapPersistentBit = 0x0040,
-        MapCoherentBit = 0x0080,
-        ClientStorageBit = 0x200,
+        UnsignedByte = 0x1401,
+        UnsignedShort = 0x1403,
+        UnsignedInt = 0x1405,
+    }
+
+    internal enum PrimitiveType : Bitfield
+    {
+        Triangles = 0x0004,
+        TriangleStrip = 0x0005,
+        TriangleFan = 0x0006,
+        // More types exist here, but those should never be used.
+    }
+
+    internal enum ProgramProperty : Bitfield
+    {
+        DeleteStatus = 0x8B80,
+        LinkStatus = 0x8B82,
+        ValidateStatus = 0x8B83,
+        InfoLogLength = 0x8B84,
+        AttachedShaders = 0x8B85,
+        ActiveAtomicCounterBuffers = 0x92D9,
+        ActiveAttributes = 0x8B89,
+        ActiveAttributeMaxLength = 0x8B8A,
+        ActiveUniforms = 0x8B86,
+        ActiveUniformMaxLength = 0x8B87,
+        ProgramBinaryLength = 0x8741,
+        ComputeWorkGroupSize = 0x8267,
+        TransformFeedbackMode = 0x8C7F,
+        TransformFeedbackVaryings = 0x8C83,
+        TransformFeedbackVaryingMaxLength = 0x8C76,
+        GeometryVerticesOut = 0x8916,
+        GeometryInputType = 0x8917,
+        GeometryOutputType = 0x8918,
     }
 
     internal enum ShaderType : Bitfield
@@ -55,6 +84,25 @@ internal static unsafe class Gl
         TessEvaluationShader = 0x8E87,
         GeometryShader = 0x8DD9,
         FragmentShader = 0x8B30,
+    }
+
+    internal enum ShaderParameterName : Bitfield
+    {
+        ShaderType = 0x8B4F,
+        DeleteStatus = 0x8B80,
+        CompileStatus = 0x8B81,
+        InfoLogLength = 0x8B84,
+        ShaderSourceLength = 0x8B84,
+    }
+
+    internal enum BufferStorageMask : Bitfield
+    {
+        DynamicStorageBit = 0x100,
+        MapReadBit = 0x0001,
+        MapWriteBit = 0x0002,
+        MapPersistentBit = 0x0040,
+        MapCoherentBit = 0x0080,
+        ClientStorageBit = 0x200,
     }
 
     internal enum VertexAttribType : Enum
@@ -74,57 +122,255 @@ internal static unsafe class Gl
         // GL_UNSIGNED_INT_10F_11F_11F_REV
     }
     
-    internal static readonly delegate* unmanaged<float, float, float, float, void> ClearColor =
+    private static readonly delegate* unmanaged<float, float, float, float, void> ClearColorPtr =
         (delegate* unmanaged<float, float, float, float, void>)Glfw.GetProcAddress("glClearColor");
-    internal static readonly delegate* unmanaged<ClearBufferMask, void> Clear =
+    private static readonly delegate* unmanaged<ClearBufferMask, void> ClearPtr =
         (delegate* unmanaged<ClearBufferMask, void>)Glfw.GetProcAddress("glClear");
+    private static readonly delegate* unmanaged<PrimitiveType, SizeI, DrawElementsType, void*, SizeI, void> DrawElementsInstancedPtr =
+        (delegate* unmanaged<PrimitiveType, SizeI, DrawElementsType, void*, SizeI, void>)Glfw.GetProcAddress("glDrawElementsInstanced");
 
-    internal static readonly delegate* unmanaged<Uint> CreateProgram =
+    private static readonly delegate* unmanaged<Uint> CreateProgramPtr =
         (delegate* unmanaged<Uint>)Glfw.GetProcAddress("glCreateProgram");
-    internal static readonly delegate* unmanaged<Uint, void> DeleteProgram =
+    private static readonly delegate* unmanaged<Uint, void> DeleteProgramPtr =
         (delegate* unmanaged<Uint, void>)Glfw.GetProcAddress("glDeleteProgram");
-    internal static readonly delegate* unmanaged<ShaderType, Int> CreateShader =
-        (delegate* unmanaged<ShaderType, Int>)Glfw.GetProcAddress("glCreateShader");
-    internal static readonly delegate* unmanaged<Uint, void> DeleteShader =
-        (delegate* unmanaged<Uint, void>)Glfw.GetProcAddress("glDeleteShader");
-    internal static readonly delegate* unmanaged<Int, SizeI, Char**, Int*> ShaderSource =
-        (delegate* unmanaged<Int, SizeI, Char**, Int*>)Glfw.GetProcAddress("glShaderSource");
-    internal static readonly delegate* unmanaged<Int, void> CompilerShader =
-        (delegate* unmanaged<Int, void>)Glfw.GetProcAddress("glCompileShader");
-    internal static readonly delegate* unmanaged<Uint, SizeI, SizeI*, Char*> GetShaderInfoLog =
-        (delegate* unmanaged<Uint, SizeI, SizeI*, Char*>)Glfw.GetProcAddress("glGetShaderInfoLog");
-    internal static readonly delegate* unmanaged<Uint, Uint, void> AttachShader =
+    private static readonly delegate* unmanaged<Uint, void> UseProgramPtr =
+        (delegate* unmanaged<Uint, void>)Glfw.GetProcAddress("glUseProgram");
+    private static readonly delegate* unmanaged<Uint, Uint, void> AttachShaderPtr =
         (delegate* unmanaged<Uint, Uint, void>)Glfw.GetProcAddress("glAttachShader");
-    internal static readonly delegate* unmanaged<Uint, void> LinkProgram =
-        (delegate* unmanaged<Uint, void>)Glfw.GetProcAddress("glLinkProgram");
-    internal static readonly delegate* unmanaged<Uint, Uint, void> DetachShader =
+    private static readonly delegate* unmanaged<Uint, Uint, void> DetachShaderPtr =
         (delegate* unmanaged<Uint, Uint, void>)Glfw.GetProcAddress("glDetachShader");
+    private static readonly delegate* unmanaged<Uint, void> LinkProgramPtr =
+        (delegate* unmanaged<Uint, void>)Glfw.GetProcAddress("glLinkProgram");
+    private static readonly delegate* unmanaged<Uint, ProgramProperty, Int*, void> GetProgramivPtr =
+        (delegate* unmanaged<Uint, ProgramProperty, Int*, void>)Glfw.GetProcAddress("glGetProgramiv");
+    private static readonly delegate* unmanaged<Uint, SizeI, SizeI*, Char*, void> GetProgramInfoLogPtr =
+        (delegate* unmanaged<Uint, SizeI, SizeI*, Char*, void>)Glfw.GetProcAddress("glGetProgramInfoLog");
     
-    internal static readonly delegate* unmanaged<SizeI, Uint*, void> CreateBuffers =
+    private static readonly delegate* unmanaged<ShaderType, Uint> CreateShaderPtr =
+        (delegate* unmanaged<ShaderType, Uint>)Glfw.GetProcAddress("glCreateShader");
+    private static readonly delegate* unmanaged<Uint, void> DeleteShaderPtr =
+        (delegate* unmanaged<Uint, void>)Glfw.GetProcAddress("glDeleteShader");
+    private static readonly delegate* unmanaged<Uint, SizeI, Char**, Int*, void> ShaderSourcePtr =
+        (delegate* unmanaged<Uint, SizeI, Char**, Int*, void>)Glfw.GetProcAddress("glShaderSource");
+    private static readonly delegate* unmanaged<Uint, void> CompilerShaderPtr =
+        (delegate* unmanaged<Uint, void>)Glfw.GetProcAddress("glCompileShader");
+    private static readonly delegate* unmanaged<Uint, ShaderParameterName, Int*, void> GetShaderivPtr =
+        (delegate* unmanaged<Uint, ShaderParameterName, Int*, void>)Glfw.GetProcAddress("glGetShaderiv");
+    private static readonly delegate* unmanaged<Uint, SizeI, SizeI*, Char*, void> GetShaderInfoLogPtr =
+        (delegate* unmanaged<Uint, SizeI, SizeI*, Char*, void>)Glfw.GetProcAddress("glGetShaderInfoLog");
+    
+    private static readonly delegate* unmanaged<SizeI, Uint*, void> CreateBuffersPtr =
         (delegate* unmanaged<SizeI, Uint*, void>)Glfw.GetProcAddress("glCreateBuffers");
-    internal static readonly delegate* unmanaged<SizeI, Uint*, void> DeleteBuffers =
+    private static readonly delegate* unmanaged<SizeI, Uint*, void> DeleteBuffersPtr =
         (delegate* unmanaged<SizeI, Uint*, void>)Glfw.GetProcAddress("glDeleteBuffers");
-    internal static readonly delegate* unmanaged<Uint, SizeIPtr, void*, Bitfield> BufferStorage =
-        (delegate* unmanaged<Uint, SizeIPtr, void*, Bitfield>)Glfw.GetProcAddress("glBufferStorage");
+    private static readonly delegate* unmanaged<Uint, SizeIPtr, void*, BufferStorageMask, void> NamedBufferStoragePtr =
+        (delegate* unmanaged<Uint, SizeIPtr, void*, BufferStorageMask, void>)Glfw.GetProcAddress("glNamedBufferStorage");
     
-    internal static readonly delegate* unmanaged<SizeI, Uint*, void> CreateVertexArrays =
+    private static readonly delegate* unmanaged<SizeI, Uint*, void> CreateVertexArraysPtr =
         (delegate* unmanaged<SizeI, Uint*, void>)Glfw.GetProcAddress("glCreateVertexArrays");
-    internal static readonly delegate* unmanaged<SizeI, Uint*, void> DeleteVertexArrays =
+    private static readonly delegate* unmanaged<SizeI, Uint*, void> DeleteVertexArraysPtr =
         (delegate* unmanaged<SizeI, Uint*, void>)Glfw.GetProcAddress("glDeleteVertexArrays");
-    internal static readonly delegate* unmanaged<SizeI, Uint, void> VertexArrayElementBuffer =
-        (delegate* unmanaged<SizeI, Uint, void>)Glfw.GetProcAddress("glVertexArrayElementBuffer");
-    internal static readonly delegate* unmanaged<Uint, Uint, Uint, IntPtr, SizeI, void> VertexArrayVertexBuffer =
+    private static readonly delegate* unmanaged<Uint, void> BindVertexArrayPtr =
+        (delegate* unmanaged<Uint, void>)Glfw.GetProcAddress("glBindVertexArray");
+    private static readonly delegate* unmanaged<Uint, Uint, void> VertexArrayElementBufferPtr =
+        (delegate* unmanaged<Uint, Uint, void>)Glfw.GetProcAddress("glVertexArrayElementBuffer");
+    private static readonly delegate* unmanaged<Uint, Uint, Uint, IntPtr, SizeI, void> VertexArrayVertexBufferPtr =
         (delegate* unmanaged<Uint, Uint, Uint, IntPtr, SizeI, void>)Glfw.GetProcAddress("glVertexArrayVertexBuffer");
-    internal static readonly delegate* unmanaged<Uint, Uint, Uint, void> VertexArrayAttribBinding =
+    private static readonly delegate* unmanaged<Uint, Uint, Uint, void> VertexArrayAttribBindingPtr =
         (delegate* unmanaged<Uint, Uint, Uint, void>)Glfw.GetProcAddress("glVertexArrayAttribBinding");
-    internal static readonly delegate* unmanaged<Uint, void> EnableVertexArrayAttrib =
-        (delegate* unmanaged<Uint, void>)Glfw.GetProcAddress("glEnableVertexArrayAttrib");
-    internal static readonly delegate* unmanaged<Uint, void> DisableVertexArrayAttrib =
-        (delegate* unmanaged<Uint, void>)Glfw.GetProcAddress("glDisableVertexArrayAttrib");
-    internal static readonly delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Boolean, Uint, void> VertexArrayAttribFormat =
+    private static readonly delegate* unmanaged<Uint, Uint, void> EnableVertexArrayAttribPtr =
+        (delegate* unmanaged<Uint, Uint, void>)Glfw.GetProcAddress("glEnableVertexArrayAttrib");
+    private static readonly delegate* unmanaged<Uint, Uint, void> DisableVertexArrayAttribPtr =
+        (delegate* unmanaged<Uint, Uint, void>)Glfw.GetProcAddress("glDisableVertexArrayAttrib");
+    private static readonly delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Boolean, Uint, void> VertexArrayAttribFormatPtr =
         (delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Boolean, Uint, void>)Glfw.GetProcAddress("glVertexArrayAttribFormat");
-    internal static readonly delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Uint, void> VertexArrayAttribIFormat =
+    private static readonly delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Uint, void> VertexArrayAttribIFormatPtr =
         (delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Uint, void>)Glfw.GetProcAddress("glVertexArrayAttribIFormat");
-    internal static readonly delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Uint, void> VertexArrayAttribLFormat =
+    private static readonly delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Uint, void> VertexArrayAttribLFormatPtr =
         (delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Uint, void>)Glfw.GetProcAddress("glVertexArrayAttribLFormat");
+
+    internal static void ClearColor(float r, float g, float b, float a)
+    {
+        ClearColorPtr(r, g, b, a);
+    }
+
+    internal static void Clear(ClearBufferMask clearMask)
+    {
+        ClearPtr(clearMask);
+    }
+
+    internal static void DrawElementsInstanced(PrimitiveType mode, SizeI count, DrawElementsType type, uint offset,
+        int instanceCount)
+    {
+        DrawElementsInstancedPtr(mode, count, type, (void*)offset, instanceCount);
+    }
+    
+    internal static uint CreateProgram()
+    {
+        return CreateProgramPtr();
+    }
+
+    internal static void DeleteProgram(uint program)
+    {
+        DeleteProgramPtr(program);
+    }
+
+    internal static void UseProgram(uint program)
+    {
+        UseProgramPtr(program);
+    }
+    
+    internal static void AttachShader(uint program, uint shader)
+    {
+        AttachShaderPtr(program, shader);
+    }
+
+    internal static void DetachShader(uint program, uint shader)
+    {
+        DetachShaderPtr(program, shader);
+    }
+
+    internal static void LinkProgram(uint program)
+    {
+        LinkProgramPtr(program);
+    }
+
+    internal static void GetProgram(uint program, ProgramProperty pname, out int value)
+    {
+        int paramValue = 0;
+        GetProgramivPtr(program, pname, &paramValue);
+        value = paramValue;
+    }
+    
+    internal static void GetProgramInfoLog(uint program, int maxLength, out string infoLog)
+    {
+        nint infoLogPtr =  Marshal.AllocCoTaskMem(maxLength);
+        int length = 0;
+        GetProgramInfoLogPtr(program, maxLength, &length, (byte*)infoLogPtr);
+        infoLog = Marshal.PtrToStringAnsi(infoLogPtr, length);
+        Marshal.FreeCoTaskMem(infoLogPtr);
+    }
+
+    internal static uint CreateShader(ShaderType shaderType)
+    {
+        return CreateShaderPtr(shaderType);
+    }
+
+    internal static void DeleteShader(uint shader)
+    {
+        DeleteShaderPtr(shader);
+    }
+
+    internal static void ShaderSource(uint shader, string shaderSource)
+    {
+        nint shaderSourcePtr = Marshal.StringToCoTaskMemAnsi(shaderSource);
+        int length = shaderSource.Length;
+        ShaderSourcePtr(shader, 1, (Char**)&shaderSourcePtr, &length);
+        Marshal.FreeCoTaskMem(shaderSourcePtr);
+    }
+
+    internal static void CompileShader(uint shader)
+    {
+        CompilerShaderPtr(shader);
+    }
+
+    internal static void GetShader(uint shader, ShaderParameterName pname, out int value)
+    {
+        int paramValue = 0;
+        GetShaderivPtr(shader, pname, &paramValue);
+        value = paramValue;
+    }
+
+    internal static void GetShaderInfoLog(uint shader, int maxLength, out string infoLog)
+    {
+        nint infoLogPtr =  Marshal.AllocCoTaskMem(maxLength);
+        int length = 0;
+        GetShaderInfoLogPtr(shader, maxLength, &length, (byte*)infoLogPtr);
+        infoLog = Marshal.PtrToStringAnsi(infoLogPtr, length);
+        Marshal.FreeCoTaskMem(infoLogPtr);
+    }
+    
+    internal static uint CreateBuffer()
+    {
+        uint buffer = 0;
+        CreateBuffersPtr(1, &buffer);
+        return buffer;
+    }
+    
+    internal static void DeleteBuffer(uint buffer)
+    {
+        DeleteBuffersPtr(1, &buffer);
+    }
+
+    internal static void NamedBufferStorage<T>(uint buffer, Span<T> data, BufferStorageMask flags)
+        where T : unmanaged
+    {
+        fixed (T* dataPtr = &data.GetPinnableReference())
+        {
+            NamedBufferStoragePtr(buffer, data.Length * sizeof(T), dataPtr, flags);
+        }
+    }
+    
+    internal static void NamedBufferStorage(uint buffer, int length, BufferStorageMask flags)
+    {
+        NamedBufferStoragePtr(buffer, length, (void*)IntPtr.Zero, flags);
+    }
+
+    internal static uint CreateVertexArray()
+    {
+        uint vertexArray = 0;
+        CreateVertexArraysPtr(1, &vertexArray);
+        return vertexArray;
+    }
+
+    internal static void DeleteVertexArray(uint vertexArray)
+    {
+        DeleteVertexArraysPtr(1, &vertexArray);
+    }
+    
+    internal static void BindVertexArray(uint vao)
+    {
+        BindVertexArrayPtr(vao);
+    }
+
+    internal static void VertexArrayElementBuffer(uint vao, uint buffer)
+    {
+        VertexArrayElementBufferPtr(vao, buffer);
+    }
+
+    internal static void VertexArrayVertexBuffer(uint vao, uint bindingIndex, uint buffer, nint offset, int stride)
+    {
+        VertexArrayVertexBufferPtr(vao, bindingIndex, buffer, offset, stride);
+    }
+
+    internal static void VertexArrayAttribBinding(uint vao, uint attribIndex, uint bindingIndex)
+    {
+        VertexArrayAttribBindingPtr(vao, attribIndex, bindingIndex);
+    }
+
+    internal static void EnableVertexArrayAttrib(uint vao, uint index)
+    {
+        EnableVertexArrayAttribPtr(vao, index);
+    }
+    
+    internal static void DisableVertexArrayAttrib(uint vao, uint index)
+    {
+        DisableVertexArrayAttribPtr(vao, index);
+    }
+
+    internal static void VertexArrayAttribFormat(uint vao, uint attribIndex, int size, VertexAttribType type,
+        bool normalized, uint relativeOffset)
+    {
+        VertexArrayAttribFormatPtr(vao, attribIndex, size, type, normalized, relativeOffset);
+    }
+    
+    internal static void VertexArrayAttribIFormat(uint vao, uint attribIndex, int size, VertexAttribType type, uint relativeOffset)
+    {
+        VertexArrayAttribIFormatPtr(vao, attribIndex, size, type, relativeOffset);
+    }
+    
+    internal static void VertexArrayAttribLFormat(uint vao, uint attribIndex, int size, VertexAttribType type, uint relativeOffset)
+    {
+        VertexArrayAttribLFormatPtr(vao, attribIndex, size, type, relativeOffset);
+    }
 }
