@@ -2,72 +2,97 @@ using JAngine.Core;
 
 namespace JAngine.Rendering.OpenGL;
 
-internal sealed class ShaderStage : IDisposable
+internal sealed class ShaderStage : IGlObject, IDisposable
 {
-    internal uint Handle { get; private set; }
+    private readonly Gl.ShaderType _type;
+    private readonly string _source;
 
-    internal ShaderStage(string source, Gl.ShaderType type)
+    internal ShaderStage(Window window, Gl.ShaderType type, string source)
     {
-        using (Renderer.EnsureRenderThread())
-        {
-            Handle = Gl.CreateShader(type);
-            Gl.ShaderSource(Handle, source);
-            Gl.CompileShader(Handle);
-            Gl.GetShader(Handle, Gl.ShaderParameterName.InfoLogLength, out int logLength);
-            if (logLength != 0)
-            {
-                Gl.GetShaderInfoLog(Handle, logLength, out string infoLog);
-                throw new Exception(infoLog);
-            }
-        }
+        Window = window;
+        _type = type;
+        _source = source;
+        Window.QueueUpdate(this, CreateEvent.Singleton);
     }
+    internal Window Window { get; }
+    Window IGlObject.Window => Window;
+    internal uint Handle { get; private set; }
+    uint IGlObject.Handle => Handle;
 
     public void Dispose()
     {
-        using (Renderer.EnsureRenderThread())
+        Window.QueueUpdate(this, DisposeEvent.Singleton);
+    }
+
+    void IGlObject.DispatchEvent(IGlEvent glEvent)
+    {
+        switch (glEvent)
         {
-            Gl.DeleteShader(Handle);
-            Handle = 0;
+            case CreateEvent:
+                Handle = Gl.CreateShader(_type);
+                Gl.ShaderSource(Handle, _source);
+                Gl.CompileShader(Handle);
+                Gl.GetShader(Handle, Gl.ShaderParameterName.InfoLogLength, out int logLength);
+                if (logLength != 0)
+                {
+                    Gl.GetShaderInfoLog(Handle, logLength, out string infoLog);
+                    throw new Exception(infoLog);
+                }
+                break;
+            case DisposeEvent:
+                Gl.DeleteShader(Handle);
+                Handle = 0;
+                break;
         }
     }
 }
 
-internal sealed class Shader : IDisposable
+internal sealed class Shader : IGlObject, IDisposable
 {
+    private readonly ShaderStage[] _stages;
+    internal Window Window { get; }
+    Window IGlObject.Window => Window;
     internal uint Handle { get; private set; }
+    uint IGlObject.Handle => Handle;
 
-    internal Shader(params ShaderStage[] stages)
+    internal Shader(Window window, params ShaderStage[] stages)
     {
-        using (Renderer.EnsureRenderThread())
-        {
-            Handle = Gl.CreateProgram();
-
-            foreach (ShaderStage stage in stages)
-            {
-                Gl.AttachShader(Handle, stage.Handle);
-            }
-            
-            Gl.LinkProgram(Handle);
-            Gl.GetProgram(Handle, Gl.ProgramProperty.InfoLogLength, out int logLength);
-            if (logLength != 0)
-            {
-                Gl.GetProgramInfoLog(Handle, logLength, out string infoLog);
-                throw new Exception(infoLog);
-            }
-            
-            foreach (ShaderStage stage in stages)
-            {
-                Gl.DetachShader(Handle, stage.Handle);
-            }
-        }
+        Window = window;
+        _stages = stages;
+        Window.QueueUpdate(this, CreateEvent.Singleton);
     }
 
     public void Dispose()
     {
-        using (Renderer.EnsureRenderThread())
+        Window.QueueUpdate(this, DisposeEvent.Singleton);
+    }
+
+    void IGlObject.DispatchEvent(IGlEvent glEvent)
+    {
+        switch (glEvent)
         {
-            Gl.DeleteProgram(Handle);
-            Handle = 0;
+            case CreateEvent:
+                Handle = Gl.CreateProgram();
+                foreach (ShaderStage stage in _stages)
+                {
+                    Gl.AttachShader(Handle, stage.Handle);
+                }
+                Gl.LinkProgram(Handle);
+                Gl.GetProgram(Handle, Gl.ProgramProperty.InfoLogLength, out int logLength);
+                if (logLength != 0)
+                {
+                    Gl.GetProgramInfoLog(Handle, logLength, out string infoLog);
+                    throw new Exception(infoLog);
+                }
+                foreach (ShaderStage stage in _stages)
+                {
+                    Gl.DetachShader(Handle, stage.Handle);
+                }
+                break;
+            case DisposeEvent:
+                Gl.DeleteProgram(Handle);
+                Handle = 0;
+                break;
         }
     }
 }
