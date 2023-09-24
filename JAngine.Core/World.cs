@@ -7,9 +7,19 @@ namespace JAngine.Core;
 /// </summary>
 public sealed class World
 {
+    private static ICollection<ISystem> _systems = Assemblies.CreateInstances<ISystem>().ToList();
+    public static event Action<World>? WorldCreated;
+
     private readonly Dictionary<SortedSet<Type>, EntityArchetype> _archetypes = new();
 
-
+    /// <summary>
+    /// Creates a new world.
+    /// </summary>
+    public World()
+    {
+        WorldCreated?.Invoke(this);
+    }
+    
     internal EntityArchetype GetOrCreateArchetype(SortedSet<Type> types)
     {
         if (!_archetypes.TryGetValue(types, out EntityArchetype? archetype))
