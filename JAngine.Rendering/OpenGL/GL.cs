@@ -54,6 +54,19 @@ internal static unsafe class Gl
         // More types exist here, but those should never be used.
     }
 
+    internal enum BufferUsage : Bitfield
+    {
+        StreamDraw = 0x88E0,
+        StreamRead = 0x88E1,
+        StreamCopy = 0x88E2,
+        StaticDraw = 0x88E4,
+        StaticRead = 0x88E5,
+        StaticCopy = 0x88E6,
+        DynamicDraw = 0x88E8,
+        DynamicRead = 0x88E9,
+        DynamicCopy = 0x88EA,
+    }
+
     internal enum ProgramProperty : Bitfield
     {
         DeleteStatus = 0x8B80,
@@ -165,6 +178,10 @@ internal static unsafe class Gl
         (delegate* unmanaged<SizeI, Uint*, void>)Glfw.GetProcAddress("glDeleteBuffers");
     private static readonly delegate* unmanaged<Uint, SizeIPtr, void*, BufferStorageMask, void> NamedBufferStoragePtr =
         (delegate* unmanaged<Uint, SizeIPtr, void*, BufferStorageMask, void>)Glfw.GetProcAddress("glNamedBufferStorage");
+    private static readonly delegate* unmanaged<Uint, SizeIPtr, void*, BufferUsage, void> NamedBufferDataPtr =
+        (delegate* unmanaged<Uint, SizeIPtr, void*, BufferUsage, void>)Glfw.GetProcAddress("glNamedBufferData");
+    private static readonly delegate* unmanaged<Uint, IntPtr, SizeIPtr, void*, void> NamedBufferSubDataPtr =
+        (delegate* unmanaged<Uint, IntPtr, SizeIPtr, void*, void>)Glfw.GetProcAddress("glNamedBufferSubData");
     
     private static readonly delegate* unmanaged<SizeI, Uint*, void> CreateVertexArraysPtr =
         (delegate* unmanaged<SizeI, Uint*, void>)Glfw.GetProcAddress("glCreateVertexArrays");
@@ -302,7 +319,7 @@ internal static unsafe class Gl
         DeleteBuffersPtr(1, &buffer);
     }
 
-    internal static void NamedBufferStorage<T>(uint buffer, Span<T> data, BufferStorageMask flags)
+    internal static void NamedBufferStorage<T>(uint buffer, ReadOnlySpan<T> data, BufferStorageMask flags)
         where T : unmanaged
     {
         fixed (T* dataPtr = &data.GetPinnableReference())
@@ -314,6 +331,29 @@ internal static unsafe class Gl
     internal static void NamedBufferStorage(uint buffer, int length, BufferStorageMask flags)
     {
         NamedBufferStoragePtr(buffer, length, (void*)IntPtr.Zero, flags);
+    }
+    
+    internal static void NamedBufferData<T>(uint buffer, ReadOnlySpan<T> data, BufferUsage flags)
+        where T : unmanaged
+    {
+        fixed (T* dataPtr = &data.GetPinnableReference())
+        {
+            NamedBufferDataPtr(buffer, data.Length * sizeof(T), dataPtr, flags);
+        }
+    }
+    
+    internal static void NamedBufferData(uint buffer, int length, BufferUsage flags)
+    {
+        NamedBufferDataPtr(buffer, length, (void*)IntPtr.Zero, flags);
+    }
+
+    internal static void NamedBufferSubData<T>(uint buffer, nint offset, nint size, ReadOnlySpan<T> data)
+        where T : unmanaged
+    {
+        fixed (T* dataPtr = &data.GetPinnableReference())
+        {
+            NamedBufferSubDataPtr(buffer, offset, size, dataPtr);
+        }
     }
 
     internal static uint CreateVertexArray()
