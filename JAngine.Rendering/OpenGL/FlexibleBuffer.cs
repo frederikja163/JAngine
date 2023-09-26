@@ -101,7 +101,7 @@ internal sealed class FlexibleBuffer<T> : IBuffer<T>
                 Gl.NamedBufferStorage<T>(Handle, _data, _mask);
                 break;
             case UpdateDataEvent:
-                Gl.NamedBufferSubData<T>(Handle, nint.Zero, (nint)Capacity, _data);
+                Gl.NamedBufferSubData<T>(Handle, nint.Zero * sizeof(T), (nint)Capacity * sizeof(T), _data);
                 break;
             case DisposeEvent:
                 Gl.DeleteBuffer(Handle);

@@ -8,7 +8,9 @@ internal sealed class FixedBuffer<T> : IBuffer<T>
 {
     private readonly Gl.BufferStorageMask _mask;
     private readonly T[] _data;
-    private readonly List<int> _indicesToUpdate = new List<int>();
+    private bool _isUpdating = true;
+    private int _firstUpdateIndex = -1;
+    private int _lastUpdateIndex = -1;
 
     internal FixedBuffer(Window window, Gl.BufferStorageMask mask, params T[] data)
     {
@@ -46,36 +48,31 @@ internal sealed class FixedBuffer<T> : IBuffer<T>
 
     public void SetSubData(int offset, params T[] data)
     {
-        lock (_data)
-        {
-            Array.Copy(data, 0, _data, offset, data.Length);
-        }
+        Array.Copy(data, 0, _data, offset, data.Length);
         EnsureCapacity(offset + data.Length);
-        lock (_indicesToUpdate)
+        int lastIndex = offset + data.Length;
+        if (Count < lastIndex)
         {
-            if (Count < offset + data.Length)
-            {
-                Count = offset + data.Length;
-            }
-            _indicesToUpdate.AddRange(Enumerable.Range(offset, data.Length));
-            if (_indicesToUpdate.Count == data.Length)
-            {
-                Window.QueueUpdate(this, UpdateDataEvent.Singleton);
-            }
+            Count = lastIndex;
+        }
+
+        _firstUpdateIndex = Math.Min(_firstUpdateIndex, offset);
+        _lastUpdateIndex = Math.Max(_lastUpdateIndex, lastIndex);
+        if (!_isUpdating)
+        {
+            _isUpdating = true;
+            Window.QueueUpdate(this, UpdateDataEvent.Singleton);
         }
     }
 
     public int FindIndex(T value)
     {
-        lock (_data)
+        for (var i = 0; i < _data.Length; i++)
         {
-            for (var i = 0; i < _data.Length; i++)
+            T data = _data[i];
+            if (data.Equals(value))
             {
-                T data = _data[i];
-                if (data.Equals(value))
-                {
-                    return i;
-                }
+                return i;
             }
         }
 
@@ -90,8 +87,7 @@ internal sealed class FixedBuffer<T> : IBuffer<T>
     int IBuffer<T>.Capacity => _data.Length;
 
     public int Count { get; private set; }
-    public bool IsReadOnly { get; } = false;
-    
+
     unsafe void IGlObject.DispatchEvent(IGlEvent glEvent)
     {
         switch (glEvent)
@@ -99,32 +95,14 @@ internal sealed class FixedBuffer<T> : IBuffer<T>
             case CreateEvent:
                 Handle = Gl.CreateBuffer();
                 Gl.NamedBufferStorage<T>(Handle, _data, _mask);
+                (_firstUpdateIndex, _lastUpdateIndex) = (_data.Length, 0);
+                _isUpdating = false;
                 break;
             case UpdateDataEvent:
-                List<int> sortedIndices;
-                lock (_indicesToUpdate)
-                {
-                    if (_indicesToUpdate.Count == 0)
-                    {
-                        return;
-                    }
-                    sortedIndices = _indicesToUpdate.Order().ToList();
-                    _indicesToUpdate.Clear();
-                }
-                ReadOnlySpan<T> data = new ReadOnlySpan<T>(_data);
-                int length = 1;
-                int lastIndex = sortedIndices.First();
-                foreach (int index in sortedIndices.Skip(1))
-                {
-                    if (lastIndex + 1 != index)
-                    {
-                        data.Slice(lastIndex - length, length);
-                        Gl.NamedBufferSubData<T>(Handle, (IntPtr)lastIndex - length, (IntPtr)length * sizeof(T), data.Slice(lastIndex - 1, length));
-                        length = 0;
-                    }
-                    lastIndex = index;
-                    length += 1;
-                }
+                Gl.NamedBufferSubData<T>(Handle, (IntPtr)_firstUpdateIndex * sizeof(T),
+                    (IntPtr)(_firstUpdateIndex - _lastUpdateIndex) * sizeof(T), ref _data[_firstUpdateIndex]);
+                (_firstUpdateIndex, _lastUpdateIndex) = (_data.Length, 0);
+                _isUpdating = false;
                 break;
             case DisposeEvent:
                 Gl.DeleteBuffer(Handle);
@@ -139,10 +117,7 @@ internal sealed class FixedBuffer<T> : IBuffer<T>
 
     public IEnumerator<T> GetEnumerator()
     {
-        foreach (T data in _data)
-        {
-            yield return data;
-        }
+        return _data.ToList().GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()

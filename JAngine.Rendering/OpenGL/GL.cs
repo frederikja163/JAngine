@@ -355,6 +355,15 @@ internal static unsafe class Gl
             NamedBufferSubDataPtr(buffer, offset, size, dataPtr);
         }
     }
+    
+    internal static void NamedBufferSubData<T>(uint buffer, nint offset, nint size, ref T data)
+        where T : unmanaged
+    {
+        fixed (T* dataPtr = &data)
+        {
+            NamedBufferSubDataPtr(buffer, offset, size, dataPtr);
+        }
+    }
 
     internal static uint CreateVertexArray()
     {

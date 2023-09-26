@@ -17,3 +17,4 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("JAngine.Rendering")]
 [assembly: InternalsVisibleTo("JAngine.All")]
 [assembly: InternalsVisibleTo("JAngine.Tests")]
+[assembly: InternalsVisibleTo("Sandbox")]
