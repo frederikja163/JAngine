@@ -7,17 +7,17 @@ internal sealed class VertexArray : IGlObject, IDisposable
 {
     private record AttributeUpdateEvent (IGlObject Buffer, uint AttribIndex, int Stride, int Size, Gl.VertexAttribType Type) : IGlEvent;
     
-    private readonly FixedBuffer<uint> _ebo;
+    private readonly Buffer<uint> _ebo;
     private readonly Dictionary<IGlObject, uint> _attributeBuffers = new();
     
-    public VertexArray(Window window, FixedBuffer<uint> ebo)
+    public VertexArray(Window window, Buffer<uint> ebo)
     {
         _ebo = ebo;
         Window = window;
         Window.QueueUpdate(this, CreateEvent.Singleton);
     }
 
-    internal void AddAttribute<T>(FixedBuffer<T> fixedBuffer, uint attribIndex, int stride, int size, Gl.VertexAttribType type) where T : unmanaged
+    internal void AddAttribute<T>(Buffer<T> fixedBuffer, uint attribIndex, int stride, int size, Gl.VertexAttribType type) where T : unmanaged
     {
         Window.QueueUpdate(this, new AttributeUpdateEvent(fixedBuffer, attribIndex, stride, size, type));
     }

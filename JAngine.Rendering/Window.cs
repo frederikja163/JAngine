@@ -78,10 +78,10 @@ void main(){{
         vertexShader.Dispose();
         fragmentShader.Dispose();
 
-        FixedBuffer<float> vbo = new FixedBuffer<float>(this, Gl.BufferStorageMask.DynamicStorageBit, 8);
+        Buffer<float> vbo = new Buffer<float>(this, Gl.BufferUsage.DynamicDraw, 8);
         vbo.SetSubData(0, 0, 0, 0, 1, 1, 1);
         vbo.SetSubData(6, 1, 0);
-        FixedBuffer<uint> ebo = new FixedBuffer<uint>(this, Gl.BufferStorageMask.DynamicStorageBit, 0, 1, 2, 0, 2, 3);
+        Buffer<uint> ebo = new Buffer<uint>(this, Gl.BufferUsage.DynamicDraw, 0, 1, 2, 0, 2, 3);
         VertexArray vao = new VertexArray(this, ebo);
         vao.AddAttribute(vbo, 0, sizeof(float) * 2, 2, Gl.VertexAttribType.Float);
         

@@ -3,38 +3,47 @@ using System.Drawing;
 
 namespace JAngine.Rendering.OpenGL;
 
-internal sealed class FixedBuffer<T> : IBuffer<T>
+internal sealed class Buffer<T> : IBuffer<T>
     where T : unmanaged
 {
-    private readonly Gl.BufferStorageMask _mask;
-    private readonly T[] _data;
+    private readonly Gl.BufferUsage _mask;
+    private T[] _data;
     private bool _isUpdating = true;
     private int _firstUpdateIndex = -1;
     private int _lastUpdateIndex = -1;
 
-    internal FixedBuffer(Window window, Gl.BufferStorageMask mask, params T[] data)
+    internal Buffer(Window window, Gl.BufferUsage mask, params T[] data)
     {
         Window = window;
         _mask = mask;
         _data = data;
         Count = _data.Length;
         Window.QueueUpdate(this, CreateEvent.Singleton);
+        Window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
     }
 
-    internal FixedBuffer(Window window, Gl.BufferStorageMask mask, int count)
+    internal Buffer(Window window, Gl.BufferUsage mask, int count)
     {
         Window = window;
         _mask = mask;
         _data = new T[count];
         Count = 0;
         Window.QueueUpdate(this, CreateEvent.Singleton);
+        Window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
     }
 
     public void EnsureCapacity(int size)
     {
         if (size > Capacity)
         {
-            throw new InvalidOperationException("Cannot resize a fixed sized buffer.");
+            int capacity = Capacity;
+            while (size > Capacity)
+            {
+                capacity *= 2;
+            }
+            _isUpdating = true;
+            _data = new T[capacity];
+            Window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
         }
     }
 
@@ -94,7 +103,9 @@ internal sealed class FixedBuffer<T> : IBuffer<T>
         {
             case CreateEvent:
                 Handle = Gl.CreateBuffer();
-                Gl.NamedBufferStorage<T>(Handle, _data, _mask);
+                break;
+            case UpdateCapacityEvent:
+                Gl.NamedBufferData<T>(Handle, _data, _mask);
                 (_firstUpdateIndex, _lastUpdateIndex) = (_data.Length, 0);
                 _isUpdating = false;
                 break;

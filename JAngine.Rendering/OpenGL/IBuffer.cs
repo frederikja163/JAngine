@@ -21,3 +21,12 @@ internal sealed class UpdateDataEvent : IGlEvent
         
     }
 }
+internal sealed class UpdateCapacityEvent : IGlEvent
+{
+    internal static UpdateCapacityEvent Singleton { get; } = new UpdateCapacityEvent();
+
+    private UpdateCapacityEvent()
+    {
+        
+    }
+}
