@@ -9,8 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\JAngine.Core\JAngine.Core.csproj" />
-      <ProjectReference Include="..\JAngine.Rendering\JAngine.Rendering.csproj" />
+      <ProjectReference Include="..\JAngine\JAngine.csproj" />
     </ItemGroup>
 
 </Project>

@@ -14,7 +14,4 @@ using System.Runtime.CompilerServices;
 // TODO: Versioning, take a look at: https://devtut.github.io/csharp/assemblyinfo-cs-examples.html#assemblyversion
 [assembly: AssemblyVersion("1.0.0.0")] 
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: InternalsVisibleTo("JAngine.Rendering")]
-[assembly: InternalsVisibleTo("JAngine.All")]
 [assembly: InternalsVisibleTo("JAngine.Tests")]
-[assembly: InternalsVisibleTo("Sandbox")]

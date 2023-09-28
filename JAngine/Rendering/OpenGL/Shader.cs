@@ -1,4 +1,4 @@
-using JAngine.Core;
+using JAngine;
 
 namespace JAngine.Rendering.OpenGL;
 

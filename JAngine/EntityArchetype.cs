@@ -2,7 +2,7 @@ using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices.ComTypes;
 
-namespace JAngine.Core;
+namespace JAngine;
 
 internal sealed class EntityArchetype
 {

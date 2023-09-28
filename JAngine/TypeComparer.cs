@@ -1,4 +1,4 @@
-namespace JAngine.Core;
+namespace JAngine;
 
 internal sealed class TypeComparer : IComparer<Type>, IEqualityComparer<Type>
 {

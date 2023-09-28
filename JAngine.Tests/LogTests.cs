@@ -1,6 +1,4 @@
-using JAngine.Core;
 using NUnit.Framework;
-using ILogger = JAngine.Core.ILogger;
 
 namespace JAngine.Tests;
 

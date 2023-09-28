@@ -1,4 +1,4 @@
-using JAngine.Core;
+using JAngine;
 using NUnit.Framework;
 
 namespace JAngine.Tests;
@@ -22,7 +22,7 @@ public class AssembliesTest
     }
     
     [TestCase("JAngine.Tests")]
-    [TestCase("JAngine.Core")]
+    [TestCase("JAngine")]
     public void IncludesAssembly(string name)
     {
         Assert.True(Assemblies.AllAssemblies().Any(ass => ass.FullName?.StartsWith(name) ?? false));

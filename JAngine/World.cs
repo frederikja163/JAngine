@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace JAngine.Core;
+namespace JAngine;
 
 /// <summary>
 /// A world containing entities, can also compute changes to said entities using systems.

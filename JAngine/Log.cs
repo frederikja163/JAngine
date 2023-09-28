@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace JAngine.Core;
+namespace JAngine;
 
 /// <summary>
 /// Specifies how severe a log message is in various levels from debug to error.

@@ -1,4 +1,4 @@
-using JAngine.Core;
+using JAngine;
 using NUnit.Framework;
 
 namespace JAngine.Tests;

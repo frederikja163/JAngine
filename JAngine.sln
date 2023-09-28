@@ -17,11 +17,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{6B65
 		.github\workflows\build.yml = .github\workflows\CiCd.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JAngine.Core", "JAngine.Core\JAngine.Core.csproj", "{899FE438-BEF4-46B1-BB78-BF0BBD4E610B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JAngine", "JAngine\JAngine.csproj", "{899FE438-BEF4-46B1-BB78-BF0BBD4E610B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox\Sandbox.csproj", "{591E4A93-6C93-4F13-A7E4-D6AAB743BB84}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JAngine.Rendering", "JAngine.Rendering\JAngine.Rendering.csproj", "{4124517B-F1A8-40DB-8B08-CD634214C701}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JAngine.All", "JAngine.All\JAngine.All.csproj", "{ECCD7277-E6B6-424A-BFBA-DD60B157321A}"
 EndProject
@@ -41,10 +39,6 @@ Global
 		{591E4A93-6C93-4F13-A7E4-D6AAB743BB84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{591E4A93-6C93-4F13-A7E4-D6AAB743BB84}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{591E4A93-6C93-4F13-A7E4-D6AAB743BB84}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4124517B-F1A8-40DB-8B08-CD634214C701}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4124517B-F1A8-40DB-8B08-CD634214C701}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4124517B-F1A8-40DB-8B08-CD634214C701}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4124517B-F1A8-40DB-8B08-CD634214C701}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ECCD7277-E6B6-424A-BFBA-DD60B157321A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ECCD7277-E6B6-424A-BFBA-DD60B157321A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECCD7277-E6B6-424A-BFBA-DD60B157321A}.Release|Any CPU.ActiveCfg = Release|Any CPU

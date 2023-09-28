@@ -1,7 +1,7 @@
 using System.Diagnostics.Contracts;
 using System.Reflection;
 
-namespace JAngine.Core;
+namespace JAngine;
 
 internal static class Assemblies
 {

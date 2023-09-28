@@ -21,6 +21,16 @@ internal sealed class Buffer<T> : IBuffer<T>
         Window.QueueUpdate(this, CreateEvent.Singleton);
         Window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
     }
+    
+    internal Buffer(Window window, params T[] data)
+    {
+        Window = window;
+        _mask = Gl.BufferUsage.DynamicDraw;
+        _data = data;
+        Count = _data.Length;
+        Window.QueueUpdate(this, CreateEvent.Singleton);
+        Window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
+    }
 
     internal Buffer(Window window, Gl.BufferUsage mask, int count)
     {

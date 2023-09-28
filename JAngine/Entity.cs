@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace JAngine.Core;
+namespace JAngine;
 
 /// <summary>
 /// An entity in the world containing different components. To create an entity see <see cref="World.CreateEntity(System.Collections.Generic.IEnumerable{object})"/>
