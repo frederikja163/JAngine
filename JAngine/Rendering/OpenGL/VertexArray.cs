@@ -3,57 +3,70 @@ using System.Drawing;
 namespace JAngine.Rendering.OpenGL;
 
 
-internal sealed class VertexArray : IGlObject, IDisposable
+public sealed class VertexArray : IGlObject, IDisposable
 {
     private record AttributeUpdateEvent (IGlObject Buffer, uint AttribIndex, int Stride, int Size, Gl.VertexAttribType Type) : IGlEvent;
     
-    private readonly Buffer<uint> _ebo;
+    private readonly Window _window;
+    private uint _handle;
+    private readonly IBuffer<uint> _ebo;
     private readonly Dictionary<IGlObject, uint> _attributeBuffers = new();
     
-    public VertexArray(Window window, Buffer<uint> ebo)
+    public VertexArray(Window window, IBuffer<uint> ebo)
     {
         _ebo = ebo;
-        Window = window;
-        Window.QueueUpdate(this, CreateEvent.Singleton);
+        _window = window;
+        _window.QueueUpdate(this, CreateEvent.Singleton);
     }
 
-    internal void AddAttribute<T>(Buffer<T> fixedBuffer, uint attribIndex, int stride, int size, Gl.VertexAttribType type) where T : unmanaged
+    public void AddAttribute<T>(IBuffer<T> buffer, uint attribIndex, int stride, int size)
+        where T : unmanaged
     {
-        Window.QueueUpdate(this, new AttributeUpdateEvent(fixedBuffer, attribIndex, stride, size, type));
+        AddAttribute(buffer, attribIndex, stride, size, Gl.VertexAttribType.Float);
     }
 
-    internal Window Window { get; }
-    Window IGlObject.Window => Window;
-    internal uint Handle { get; private set; }
-    uint IGlObject.Handle => Handle;
+    private void AddAttribute<T>(IBuffer<T> fixedBuffer, uint attribIndex, int stride, int size, Gl.VertexAttribType type)
+        where T : unmanaged
+    {
+        _window.QueueUpdate(this, new AttributeUpdateEvent(fixedBuffer, attribIndex, stride, size, type));
+    }
+
+    Window IGlObject.Window => _window;
+    uint IGlObject.Handle => _handle;
     
     void IGlObject.DispatchEvent(IGlEvent glEvent)
     {
         switch (glEvent)
         {
             case CreateEvent:
-                Handle = Gl.CreateVertexArray();
-                Gl.VertexArrayElementBuffer(Handle, _ebo.Handle);
+                _handle = Gl.CreateVertexArray();
+                Gl.VertexArrayElementBuffer(_handle, _ebo.Handle);
                 break;
             case AttributeUpdateEvent attrib:
                 if (!_attributeBuffers.TryGetValue(attrib.Buffer, out uint bindingIndex))
                 {
                     bindingIndex = (uint)_attributeBuffers.Count;
-                    Gl.VertexArrayVertexBuffer(Handle, bindingIndex, attrib.Buffer.Handle, IntPtr.Zero, attrib.Stride);
+                    _attributeBuffers.Add(attrib.Buffer, bindingIndex);
+                    Gl.VertexArrayVertexBuffer(_handle, bindingIndex, attrib.Buffer.Handle, IntPtr.Zero, attrib.Stride);
                 }
-                Gl.EnableVertexArrayAttrib(Handle, attrib.AttribIndex);
-                Gl.VertexArrayAttribBinding(Handle, attrib.AttribIndex, bindingIndex);
-                Gl.VertexArrayAttribFormat(Handle, attrib.AttribIndex, attrib.Size, attrib.Type, false, 0);
+                Gl.EnableVertexArrayAttrib(_handle, attrib.AttribIndex);
+                Gl.VertexArrayAttribBinding(_handle, attrib.AttribIndex, bindingIndex);
+                Gl.VertexArrayAttribFormat(_handle, attrib.AttribIndex, attrib.Size, attrib.Type, false, 0);
                 break;
             case DisposeEvent:
-                Gl.DeleteVertexArray(Handle);
-                Handle = 0;
+                Gl.DeleteVertexArray(_handle);
+                _handle = 0;
                 break;
         }
     }
 
+    internal void Bind()
+    {
+        Gl.BindVertexArray(_handle);
+    }
+
     public void Dispose()
     {
-        Window.QueueUpdate(this, DisposeEvent.Singleton);
+        _window.QueueUpdate(this, DisposeEvent.Singleton);
     }
 }

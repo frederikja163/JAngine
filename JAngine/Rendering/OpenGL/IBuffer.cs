@@ -1,6 +1,6 @@
 namespace JAngine.Rendering.OpenGL;
 
-internal interface IBuffer<T> : IGlObject, IDisposable, IEnumerable<T>
+public interface IBuffer<T> : IGlObject, IDisposable, IEnumerable<T>
     where T : unmanaged
 {
     int Capacity { get; }

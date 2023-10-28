@@ -22,7 +22,7 @@ public interface IResourceLoader<out T>
 // Handles resource loading across different types of resources.
 internal static class Resource
 {
-    private static readonly Dictionary<string, Assembly> ResourcePaths = new();
+    private static readonly Dictionary<string, Assembly> s_resourcePaths = new();
 
     static Resource()
     {
@@ -30,7 +30,7 @@ internal static class Resource
         {
             foreach (string name in assembly.GetManifestResourceNames())
             {
-                ResourcePaths.Add(name, assembly);
+                s_resourcePaths.Add(name, assembly);
             }
         }
     }
@@ -38,7 +38,7 @@ internal static class Resource
     internal static Stream GetPath(string path)
     {
         string p = path.Replace(Path.DirectorySeparatorChar, '.');
-        if (ResourcePaths.TryGetValue(p, out Assembly? assembly))
+        if (s_resourcePaths.TryGetValue(p, out Assembly? assembly))
         {
             return assembly.GetManifestResourceStream(p) ?? throw new UnreachableException();
         }
@@ -58,29 +58,30 @@ internal static class Resource
 /// <typeparam name="T">The type of resource to provide utility for.</typeparam>
 public static class Resource<T>
 {
-    private static readonly IResourceLoader<T> ResourceLoader;
+    private static readonly IResourceLoader<T> s_resourceLoader;
     
     static Resource()
     {
         try
         {
-            ResourceLoader = Assemblies.CreateInstances<IResourceLoader<T>>().First();
+            s_resourceLoader = Assemblies.CreateInstances<IResourceLoader<T>>().First();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             throw new InvalidOperationException(
-                $"No resource loader found for {typeof(T).FullName}. Create a class implementing {nameof(IResourceLoader<T>)}<{typeof(T).FullName}> to fix this.");
+                $"No resource loader found for {typeof(T).FullName}. Create a class implementing {nameof(IResourceLoader<T>)}<{typeof(T).FullName}> to fix this.", ex);
         }
     }
     
     /// <summary>
     /// Load a resource from path. Either as an embedded resource or as a path from the file system.
     /// </summary>
+    /// <param name="window">The window the resource belongs to.</param>
     /// <param name="path">The path to load resources from.</param>
     /// <returns>The loaded resource.</returns>
     public static T Load(Window window, string path)
     {
         using Stream stream = Resource.GetPath(path);
-        return ResourceLoader.Load(window, Path.GetExtension(path), stream);
+        return s_resourceLoader.Load(window, Path.GetExtension(path), stream);
     }
 }

@@ -53,7 +53,7 @@ public sealed class Mesh : Mesh<Vertex3D, Instance3D>
     {
         public override int GetHashCode()
         {
-            return PosIndex << 20 + TexCoordIndex << 10 + NormalIndex;
+            return PosIndex * 2 + TexCoordIndex * 3 + NormalIndex * 5;
         }
     }
     

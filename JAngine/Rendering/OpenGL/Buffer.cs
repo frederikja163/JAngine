@@ -3,10 +3,12 @@ using System.Drawing;
 
 namespace JAngine.Rendering.OpenGL;
 
-internal sealed class Buffer<T> : IBuffer<T>
+public sealed class Buffer<T> : IBuffer<T>
     where T : unmanaged
 {
     private readonly Gl.BufferUsage _mask;
+    private readonly Window _window;
+    private uint _handle;
     private T[] _data;
     private bool _isUpdating = true;
     private int _firstUpdateIndex = -1;
@@ -14,32 +16,31 @@ internal sealed class Buffer<T> : IBuffer<T>
 
     internal Buffer(Window window, Gl.BufferUsage mask, params T[] data)
     {
-        Window = window;
+        _window = window;
         _mask = mask;
         _data = data;
         Count = _data.Length;
-        Window.QueueUpdate(this, CreateEvent.Singleton);
-        Window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
+        _window.QueueUpdate(this, CreateEvent.Singleton);
+        _window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
     }
     
-    internal Buffer(Window window, params T[] data)
+    public Buffer(Window window, params T[] data) : this(window, Gl.BufferUsage.DynamicDraw, data)
     {
-        Window = window;
-        _mask = Gl.BufferUsage.DynamicDraw;
-        _data = data;
-        Count = _data.Length;
-        Window.QueueUpdate(this, CreateEvent.Singleton);
-        Window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
     }
 
     internal Buffer(Window window, Gl.BufferUsage mask, int count)
     {
-        Window = window;
+        _window = window;
         _mask = mask;
         _data = new T[count];
         Count = 0;
-        Window.QueueUpdate(this, CreateEvent.Singleton);
-        Window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
+        _window.QueueUpdate(this, CreateEvent.Singleton);
+        _window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
+    }
+
+    public Buffer(Window window, int count) : this(window, Gl.BufferUsage.DynamicDraw, count)
+    {
+        
     }
 
     public void EnsureCapacity(int size)
@@ -53,7 +54,7 @@ internal sealed class Buffer<T> : IBuffer<T>
             }
             _isUpdating = true;
             _data = new T[capacity];
-            Window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
+            _window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
         }
     }
 
@@ -80,7 +81,7 @@ internal sealed class Buffer<T> : IBuffer<T>
         if (!_isUpdating)
         {
             _isUpdating = true;
-            Window.QueueUpdate(this, UpdateDataEvent.Singleton);
+            _window.QueueUpdate(this, UpdateDataEvent.Singleton);
         }
     }
 
@@ -98,10 +99,8 @@ internal sealed class Buffer<T> : IBuffer<T>
         return -1;
     }
 
-    internal Window Window { get; }
-    Window IGlObject.Window => Window;
-    internal uint Handle { get; private set; }
-    uint IGlObject.Handle => Handle;
+    Window IGlObject.Window => _window;
+    uint IGlObject.Handle => _handle;
     private int Capacity => _data.Length;
     int IBuffer<T>.Capacity => _data.Length;
 
@@ -112,28 +111,28 @@ internal sealed class Buffer<T> : IBuffer<T>
         switch (glEvent)
         {
             case CreateEvent:
-                Handle = Gl.CreateBuffer();
+                _handle = Gl.CreateBuffer();
                 break;
             case UpdateCapacityEvent:
-                Gl.NamedBufferData<T>(Handle, _data, _mask);
+                Gl.NamedBufferData<T>(_handle, _data, _mask);
                 (_firstUpdateIndex, _lastUpdateIndex) = (_data.Length, 0);
                 _isUpdating = false;
                 break;
             case UpdateDataEvent:
-                Gl.NamedBufferSubData<T>(Handle, (IntPtr)_firstUpdateIndex * sizeof(T),
+                Gl.NamedBufferSubData<T>(_handle, (IntPtr)_firstUpdateIndex * sizeof(T),
                     (IntPtr)(_firstUpdateIndex - _lastUpdateIndex) * sizeof(T), ref _data[_firstUpdateIndex]);
                 (_firstUpdateIndex, _lastUpdateIndex) = (_data.Length, 0);
                 _isUpdating = false;
                 break;
             case DisposeEvent:
-                Gl.DeleteBuffer(Handle);
+                Gl.DeleteBuffer(_handle);
                 break;
         }
     }
     
     public void Dispose()
     {
-        Window.QueueUpdate(this, DisposeEvent.Singleton);
+        _window.QueueUpdate(this, DisposeEvent.Singleton);
     }
 
     public IEnumerator<T> GetEnumerator()
@@ -144,5 +143,20 @@ internal sealed class Buffer<T> : IBuffer<T>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    private bool Equals(Buffer<T> other)
+    {
+        return _window.Equals(other._window) && _handle == other._handle;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is Buffer<T> other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(_window, _handle);
     }
 }

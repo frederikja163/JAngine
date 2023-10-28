@@ -24,7 +24,7 @@ public enum Severity
 /// </summary>
 public class LogMessage
 {
-    private static readonly int SeverityFieldSize = Severity.Warning.ToString().Length;
+    private static readonly int s_severityFieldSize = Severity.Warning.ToString().Length;
     
     internal LogMessage(DateTime time, Severity severity, StackFrame? frame, params object?[] data)
     {
@@ -51,7 +51,7 @@ public class LogMessage
     {
         // TODO: Simulate some form of tab here instead of just splitting with " | ".
         string time = Time.ToString("yyyy/MM/dd HH:mm:ss.fff");
-        string severity = Severity + new string(' ', SeverityFieldSize - Severity.ToString().Length);
+        string severity = Severity + new string(' ', s_severityFieldSize - Severity.ToString().Length);
         string origin = Frame is not null && Frame.GetMethod() is { } method
             ? (method.DeclaringType is not null ? method.DeclaringType.FullName + "." : "")
               + $"{method.Name}"
@@ -157,8 +157,8 @@ public sealed class FileLogger : ILogger
 
         string path = $"Logs/{time}.txt";
         FileStream fileStream = File.Open(path, FileMode.CreateNew, FileAccess.Write);
-        StreamWriter = new StreamWriter(fileStream);
-        StreamWriter.AutoFlush = true;
+        s_streamWriter = new StreamWriter(fileStream);
+        s_streamWriter.AutoFlush = true;
 
         // Create Latest.txt
         if (File.Exists("Logs/Latest.txt"))
@@ -180,7 +180,7 @@ public sealed class FileLogger : ILogger
         }
     }
 
-    private static readonly StreamWriter StreamWriter;
+    private static readonly StreamWriter s_streamWriter;
     /// <summary>
     /// Enables or disables this logger.
     /// </summary>
@@ -194,7 +194,7 @@ public sealed class FileLogger : ILogger
     {
         if (Enabled && message.Severity >= MinimumSeverity)
         {
-            StreamWriter.WriteLine(message.ToString());
+            s_streamWriter.WriteLine(message.ToString());
         }
     }
 }
@@ -204,17 +204,17 @@ public sealed class FileLogger : ILogger
 /// </summary>
 public static class Log
 {
-    private static readonly IReadOnlyList<ILogger> Handlers;
+    private static readonly IReadOnlyList<ILogger> s_handlers;
     static Log()
     {
-        Handlers = Assemblies.CreateInstances<ILogger>().ToList();
+        s_handlers = Assemblies.CreateInstances<ILogger>().ToList();
         
         Log.Info("Logger initialized.");
     }
 
     private static void LogMessage(LogMessage message)
     {
-        foreach (ILogger handler in Handlers)
+        foreach (ILogger handler in s_handlers)
         {
             handler.HandleMessage(message);
         }

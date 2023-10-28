@@ -7,7 +7,7 @@ namespace JAngine;
 /// </summary>
 public sealed class World
 {
-    private static ICollection<ISystem> _systems = Assemblies.CreateInstances<ISystem>().ToList();
+    private static ICollection<ISystem> s_systems = Assemblies.CreateInstances<ISystem>().ToList();
     public static event Action<World>? WorldCreated;
 
     private readonly Dictionary<SortedSet<Type>, EntityArchetype> _archetypes = new();
@@ -63,45 +63,55 @@ public sealed class World
     }
 
     /// <inheritdoc cref="CreateEntity(System.Collections.IEnumerable)"/>
-    /// <param name="component1">The value of the first component if any.</param>
+    /// <param name="component1">The value of the first component.</param>
     /// <typeparam name="T1">The type of the first component.</typeparam>
-    public Entity CreateEntity<T1>(T1? component1 = default)
+    public Entity CreateEntity<T1>(T1 component1)
+        where T1 : notnull
     {
         return CreateEntity(new object[] { component1 });
     }
     
     /// <inheritdoc cref="CreateEntity(System.Collections.IEnumerable)"/>
-    /// <param name="component1">The value of the first component if any.</param>
-    /// <param name="component2">The value of the second component if any.</param>
+    /// <param name="component1">The value of the first component.</param>
+    /// <param name="component2">The value of the second component.</param>
     /// <typeparam name="T1">The type of the first component.</typeparam>
     /// <typeparam name="T2">The type of the second component.</typeparam>
-    public Entity CreateEntity<T1, T2>(T1? component1 = default, T2? component2 = default)
+    public Entity CreateEntity<T1, T2>(T1 component1, T2 component2)
+        where T1 : notnull
+        where T2 : notnull
     {
         return CreateEntity(new object[] { component1, component2 });
     }
     
     /// <inheritdoc cref="CreateEntity(System.Collections.IEnumerable)"/>
-    /// <param name="component1">The value of the first component if any.</param>
-    /// <param name="component2">The value of the second component if any.</param>
-    /// <param name="component3">The value of the third component if any.</param>
+    /// <param name="component1">The value of the first component.</param>
+    /// <param name="component2">The value of the second component.</param>
+    /// <param name="component3">The value of the third component.</param>
     /// <typeparam name="T1">The type of the first component.</typeparam>
     /// <typeparam name="T2">The type of the second component.</typeparam>
     /// <typeparam name="T3">The type of the third component.</typeparam>
-    public Entity CreateEntity<T1, T2, T3>(T1? component1 = default, T2? component2 = default, T3? component3 = default)
+    public Entity CreateEntity<T1, T2, T3>(T1 component1, T2 component2, T3 component3)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
     {
         return CreateEntity(new object[] { component1, component2, component3 });
     }
 
     /// <inheritdoc cref="CreateEntity(System.Collections.IEnumerable)"/>
-    /// <param name="component1">The value of the first component if any.</param>
-    /// <param name="component2">The value of the second component if any.</param>
-    /// <param name="component3">The value of the third component if any.</param>
-    /// <param name="component4">The value of the fourth component if any.</param>
+    /// <param name="component1">The value of the first component.</param>
+    /// <param name="component2">The value of the second component.</param>
+    /// <param name="component3">The value of the third component.</param>
+    /// <param name="component4">The value of the fourth component.</param>
     /// <typeparam name="T1">The type of the first component.</typeparam>
     /// <typeparam name="T2">The type of the second component.</typeparam>
     /// <typeparam name="T3">The type of the third component.</typeparam>
     /// <typeparam name="T4">The type of the fourth component.</typeparam>
-    public Entity CreateEntity<T1, T2, T3, T4>(T1? component1 = default, T2? component2 = default, T3? component3 = default, T4? component4 = default)
+    public Entity CreateEntity<T1, T2, T3, T4>(T1 component1, T2 component2, T3 component3, T4 component4)
+        where T1 : notnull
+        where T2 : notnull
+        where T3 : notnull
+        where T4 : notnull
     {
         return CreateEntity(new object[] { component1, component2, component3, component4 });
     }

@@ -2,7 +2,7 @@ using JAngine;
 
 namespace JAngine.Rendering.OpenGL;
 
-internal sealed class ShaderStage : IGlObject, IDisposable
+public abstract class ShaderStage : IGlObject, IDisposable
 {
     private readonly Gl.ShaderType _type;
     private readonly string _source;
@@ -14,6 +14,7 @@ internal sealed class ShaderStage : IGlObject, IDisposable
         _source = source;
         Window.QueueUpdate(this, CreateEvent.Singleton);
     }
+    
     internal Window Window { get; }
     Window IGlObject.Window => Window;
     internal uint Handle { get; private set; }
@@ -36,7 +37,7 @@ internal sealed class ShaderStage : IGlObject, IDisposable
                 if (logLength != 0)
                 {
                     Gl.GetShaderInfoLog(Handle, logLength, out string infoLog);
-                    throw new Exception(infoLog);
+                    throw new Exception($"{_type} failed to compile: {infoLog}");
                 }
                 break;
             case DisposeEvent:
@@ -47,7 +48,54 @@ internal sealed class ShaderStage : IGlObject, IDisposable
     }
 }
 
-internal sealed class Shader : IGlObject, IDisposable
+internal sealed class ShaderStageLoaderBase : IResourceLoader<ShaderStage>, IResourceLoader<VertexShader>, IResourceLoader<FragmentShader>
+{
+    ShaderStage IResourceLoader<ShaderStage>.Load(Window window, string fileExtension, Stream stream)
+    {
+        switch (fileExtension.ToLower())
+        {
+            case ".vertex":
+            case ".vert":
+                return ((IResourceLoader<VertexShader>)this).Load(window, fileExtension, stream);
+            case ".frag":
+            case ".fragment":
+                return ((IResourceLoader<FragmentShader>)this).Load(window, fileExtension, stream);
+            default:
+                throw new Exception(
+                    $"Could not resolve shader type {fileExtension}, either load as a specific type or change the name of the file.");
+        }
+    }
+
+    VertexShader IResourceLoader<VertexShader>.Load(Window window, string fileExtension, Stream stream)
+    {
+        StreamReader reader = new StreamReader(stream);
+        string src = reader.ReadToEnd();
+        return new VertexShader(window, src);
+    }
+
+    FragmentShader IResourceLoader<FragmentShader>.Load(Window window, string fileExtension, Stream stream)
+    {
+        StreamReader reader = new StreamReader(stream);
+        string src = reader.ReadToEnd();
+        return new FragmentShader(window, src);
+    }
+}
+
+public sealed class VertexShader : ShaderStage
+{
+    public VertexShader(Window window, string source) : base(window, Gl.ShaderType.VertexShader, source)
+    {
+    }
+}
+
+public sealed class FragmentShader : ShaderStage
+{
+    public FragmentShader(Window window, string source) : base(window, Gl.ShaderType.FragmentShader, source)
+    {
+    }
+}
+
+public sealed class Shader : IGlObject, IDisposable
 {
     private readonly ShaderStage[] _stages;
     internal Window Window { get; }
@@ -55,7 +103,7 @@ internal sealed class Shader : IGlObject, IDisposable
     internal uint Handle { get; private set; }
     uint IGlObject.Handle => Handle;
 
-    internal Shader(Window window, params ShaderStage[] stages)
+    public Shader(Window window, params ShaderStage[] stages)
     {
         Window = window;
         _stages = stages;
@@ -94,5 +142,10 @@ internal sealed class Shader : IGlObject, IDisposable
                 Handle = 0;
                 break;
         }
+    }
+
+    internal void Bind()
+    {
+        Gl.UseProgram(Handle);
     }
 }

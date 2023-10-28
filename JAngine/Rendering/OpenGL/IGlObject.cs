@@ -5,7 +5,7 @@ internal interface IGlEvent
     
 }
 
-internal interface IGlObject
+public interface IGlObject
 {
     internal uint Handle { get; }
     internal Window Window { get; }

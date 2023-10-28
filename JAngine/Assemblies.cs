@@ -6,12 +6,12 @@ namespace JAngine;
 
 internal static class Assemblies
 {
-    private static readonly List<Assembly> _assemblies;
+    private static readonly List<Assembly> s_assemblies;
     
     static Assemblies()
     {
         // TODO: Watch for new .dll files here as well.
-        _assemblies = Directory.GetFiles("./", "*.dll", SearchOption.AllDirectories)
+        s_assemblies = Directory.GetFiles("./", "*.dll", SearchOption.AllDirectories)
             .Select(Assembly.LoadFrom)
             .CatchExceptions()
             .ToList();
@@ -20,7 +20,7 @@ internal static class Assemblies
     [Pure]
     public static IEnumerable<Assembly> AllAssemblies()
     {
-        foreach (Assembly assembly in _assemblies)
+        foreach (Assembly assembly in s_assemblies)
         {
             yield return assembly;
         }
@@ -29,7 +29,7 @@ internal static class Assemblies
     [Pure]
     public static IEnumerable<TypeInfo> AllTypes()
     {
-        return _assemblies.SelectMany(a => a.DefinedTypes);
+        return s_assemblies.SelectMany(a => a.DefinedTypes);
     }
 
     public static IEnumerable<T> CreateInstances<T>()
@@ -37,6 +37,7 @@ internal static class Assemblies
         return Assemblies.AllTypes()
             .Where(t => t.IsAssignableTo(typeof(T)))
             .Select(CreateInstanceOrNull)
+            .Where(i => i is not null)
             .OfType<T>();
 
         static T? CreateInstanceOrNull(TypeInfo typeInfo)

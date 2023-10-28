@@ -1,10 +1,26 @@
 ﻿using System.Diagnostics;
+using JAngine;
 using JAngine.Rendering;
 using JAngine.Rendering.OpenGL;
 
 try
 {
     using Window window = new Window("Test", 100, 100);
+
+    ShaderStage vertexShader = Resource<VertexShader>.Load(window, "Sandbox.shader.vert");
+    ShaderStage fragmentShader = Resource<FragmentShader>.Load(window, "Sandbox.shader.frag");
+    using Shader shader = new Shader(window, vertexShader, fragmentShader);
+    vertexShader.Dispose();
+    fragmentShader.Dispose();
+
+    Buffer<float> vbo = new Buffer<float>(window, 8);
+    vbo.SetSubData(0, 0, 0, 0, 1, 1, 1);
+    vbo.SetSubData(6, 1, 0);
+    Buffer<uint> ebo = new Buffer<uint>(window, 0, 1, 2, 0, 2, 3);
+    VertexArray vao = new VertexArray(window, ebo);
+    vao.AddAttribute(vbo, 0, sizeof(float) * 2, 2);
+    using Renderable renderable = new Renderable(window, vao, shader);
+    
     Window.Run();
 }
 catch (Exception e)

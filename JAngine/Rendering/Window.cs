@@ -8,10 +8,11 @@ namespace JAngine.Rendering;
 /// </summary>
 public sealed class Window : IDisposable
 {
-    private static readonly HashSet<Window> Windows = new();
+    private static readonly HashSet<Window> s_windows = new();
 
     private readonly List<(IGlObject, IGlEvent)> _updateableObjects = new List<(IGlObject, IGlEvent)>();
     private readonly Glfw.Window _handle;
+    private HashSet<IRenderable> _renderables = new HashSet<IRenderable>();
     private readonly Thread _renderingThread;
 
     static Window()
@@ -38,7 +39,7 @@ public sealed class Window : IDisposable
         _handle = Glfw.CreateWindow(width, height, title, Glfw.Monitor.Null, Glfw.Window.Null);
         _renderingThread = new Thread(RenderThread);
         _renderingThread.Start();
-        Windows.Add(this);
+        s_windows.Add(this);
     }
 
     /// <summary>
@@ -47,7 +48,7 @@ public sealed class Window : IDisposable
     /// </summary>
     public static void Run()
     {
-        while (Windows.Any())
+        while (s_windows.Any())
         {
             Glfw.PollEvents();
         }
@@ -57,34 +58,6 @@ public sealed class Window : IDisposable
     {
         Glfw.MakeContextCurrent(_handle);
 
-        ShaderStage vertexShader = new ShaderStage(this, Gl.ShaderType.VertexShader, $@"
-#version 330 core
-in vec2 vPosition;
-
-void main(){{
-    gl_Position = vec4(vPosition, 0, 1);
-}}
-");
-        ShaderStage fragmentShader = new ShaderStage(this, Gl.ShaderType.FragmentShader, $@"
-#version 330 core
-
-out vec4 Color;
-
-void main(){{
-    Color = vec4(1, 1, 1, 1);
-}}
-");
-        using Shader shader = new Shader(this, vertexShader, fragmentShader);
-        vertexShader.Dispose();
-        fragmentShader.Dispose();
-
-        Buffer<float> vbo = new Buffer<float>(this, Gl.BufferUsage.DynamicDraw, 8);
-        vbo.SetSubData(0, 0, 0, 0, 1, 1, 1);
-        vbo.SetSubData(6, 1, 0);
-        Buffer<uint> ebo = new Buffer<uint>(this, Gl.BufferUsage.DynamicDraw, 0, 1, 2, 0, 2, 3);
-        VertexArray vao = new VertexArray(this, ebo);
-        vao.AddAttribute(vbo, 0, sizeof(float) * 2, 2, Gl.VertexAttribType.Float);
-        
         Gl.ClearColor(1, 0, 1, 1);
         while (IsOpen)
         {
@@ -100,10 +73,13 @@ void main(){{
             {
                 glObject.DispatchEvent(glEvent);
             }
-            
-            Gl.BindVertexArray(vao.Handle);
-            Gl.UseProgram(shader.Handle);
-            Gl.DrawElementsInstanced(Gl.PrimitiveType.Triangles, 6, Gl.DrawElementsType.UnsignedInt, 0, 1);
+
+            foreach (IRenderable renderable in _renderables)
+            {
+                renderable.Vao.Bind();
+                renderable.Shader.Bind();
+                Gl.DrawElementsInstanced(Gl.PrimitiveType.Triangles, 6, Gl.DrawElementsType.UnsignedInt, 0, 1);
+            }
             
             Glfw.SwapBuffers(_handle);
         }
@@ -128,10 +104,20 @@ void main(){{
         }
     }
 
+    internal void AddRenderable(IRenderable renderable)
+    {
+        _renderables.Add(renderable);
+    }
+
+    internal void RemoveRenderable(IRenderable renderable)
+    {
+        _renderables.Remove(renderable);
+    }
+
     /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
         Glfw.DestroyWindow(_handle);
-        Windows.Remove(this);
+        s_windows.Remove(this);
     }
 }

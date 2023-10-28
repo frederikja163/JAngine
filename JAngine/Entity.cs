@@ -56,7 +56,7 @@ public sealed class Entity
     /// <summary>
     /// Remove a component from this entity, moving its archetype.
     /// </summary>
-    /// <typeparam name="T">The type of the new component.</typepaAddram>
+    /// <typeparam name="T">The type of the new component.</typeparam>
     public void RemoveComponent<T>()
     {
         SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
