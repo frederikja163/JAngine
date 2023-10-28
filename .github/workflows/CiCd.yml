@@ -1,0 +1,41 @@
+name: CI/CD
+
+on:
+  push:
+  release:
+    types: [created]
+
+jobs:
+  Ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+      - name: Build
+        run: dotnet publish --configuration Release
+      - name: Upload binaries
+        uses: actions/upload-artifact@v3
+        with:
+          retention-days: 7
+          name: JAngine
+          path: JAngine.All/bin/Release/net7.0/publish/*
+    
+  Cd:
+    runs-on: ubuntu-latest
+    needs: [Ci]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+      - name: Dotnet pack
+        run: |
+          dotnet pack -c Release JAngine.Core
+          dotnet pack -c Release JAngine.Rendering
+          dotnet pack -c Release JAngine.All
+      - name: Push packages
+        run: dotnet nuget push **/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate

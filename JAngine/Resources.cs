@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Reflection;
-using System.Xml.Serialization;
+using JAngine.Rendering;
 
-namespace JAngine.Core;
+namespace JAngine;
 
 /// <summary>
 /// Provides the ability to load resources of a specific kind.
@@ -13,11 +13,13 @@ public interface IResourceLoader<out T>
     /// <summary>
     /// Loads a single resource of the specified type from a stream.
     /// </summary>
+    /// <param name="fileExtension">The file extension of the loaded file, will be empty string if theres no extension.</param>
     /// <param name="stream">The stream to load the resource from.</param>
     /// <returns>The loaded resource.</returns>
-    public T Load(Stream stream);
+    public T Load(Window window, string fileExtension, Stream stream);
 }
 
+// Handles resource loading across different types of resources.
 internal static class Resource
 {
     private static readonly Dictionary<string, Assembly> ResourcePaths = new();
@@ -76,9 +78,9 @@ public static class Resource<T>
     /// </summary>
     /// <param name="path">The path to load resources from.</param>
     /// <returns>The loaded resource.</returns>
-    public static T Load(string path)
+    public static T Load(Window window, string path)
     {
         using Stream stream = Resource.GetPath(path);
-        return ResourceLoader.Load(stream);
+        return ResourceLoader.Load(window, Path.GetExtension(path), stream);
     }
 }

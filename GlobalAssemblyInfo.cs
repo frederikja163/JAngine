@@ -1,6 +1,5 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 [assembly: AssemblyProduct("JAngine")]
 [assembly: AssemblyCompany("FrederikJA")]
@@ -15,6 +14,4 @@ using System.Runtime.InteropServices;
 // TODO: Versioning, take a look at: https://devtut.github.io/csharp/assemblyinfo-cs-examples.html#assemblyversion
 [assembly: AssemblyVersion("1.0.0.0")] 
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: InternalsVisibleTo("JAngine.Rendering")]
-[assembly: InternalsVisibleTo("JAngine.All")]
 [assembly: InternalsVisibleTo("JAngine.Tests")]

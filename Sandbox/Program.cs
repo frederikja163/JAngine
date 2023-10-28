@@ -1,4 +1,6 @@
-﻿using JAngine.Rendering;
+﻿using System.Diagnostics;
+using JAngine.Rendering;
+using JAngine.Rendering.OpenGL;
 
 try
 {
