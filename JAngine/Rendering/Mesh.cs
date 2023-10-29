@@ -62,7 +62,7 @@ public sealed class Mesh : Mesh<Vertex3D, Instance3D>
         using Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read);
         using StreamReader reader = new StreamReader(stream);
         List<Vector3> normals = new List<Vector3>();
-        List<Vector2> texcoords = new List<Vector2>();
+        List<Vector2> texCoords = new List<Vector2>();
         List<Vector3> positions = new List<Vector3>();
         List<Vertex3D> vertices = new List<Vertex3D>();
         // This dictionary is used to deduplicate vertices,
@@ -80,7 +80,7 @@ public sealed class Mesh : Mesh<Vertex3D, Instance3D>
                     normals.Add(new Vector3(float.Parse(tokens[1]), float.Parse(tokens[2]), float.Parse(tokens[3])));
                     continue;
                 case "vt":
-                    texcoords.Add(new Vector2(float.Parse(tokens[1]), float.Parse(tokens[2])));
+                    texCoords.Add(new Vector2(float.Parse(tokens[1]), float.Parse(tokens[2])));
                     continue;
                 case "v":
                     positions.Add(new Vector3(float.Parse(tokens[1]), float.Parse(tokens[2]), float.Parse(tokens[3])));
@@ -101,7 +101,7 @@ public sealed class Mesh : Mesh<Vertex3D, Instance3D>
                             index = vertices.Count;
                             vertexIndices.Add(vertexIndex, index);
                             vertices.Add(new Vertex3D(positions[vertexIndex.PosIndex - 1],
-                                texcoords[vertexIndex.TexCoordIndex - 1],
+                                texCoords[vertexIndex.TexCoordIndex - 1],
                                 normals[vertexIndex.NormalIndex - 1]));
                         }
                         face.Add(index);

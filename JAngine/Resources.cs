@@ -19,8 +19,11 @@ public interface IResourceLoader<out T>
     public T Load(Window window, string fileExtension, Stream stream);
 }
 
-// Handles resource loading across different types of resources.
-internal static class Resource
+/// <summary>
+/// Utility for a single type of resource.
+/// </summary>
+/// <typeparam name="T">The type of resource to provide utility for.</typeparam>
+public static class Resource
 {
     private static readonly Dictionary<string, Assembly> s_resourcePaths = new();
 
@@ -50,13 +53,21 @@ internal static class Resource
 
         throw new FileNotFoundException($"Couldn't find resource {path}");
     }
+    
+    /// <summary>
+    /// Load a resource from path. Either as an embedded resource or as a path from the file system.
+    /// </summary>
+    /// <param name="window">The window the resource belongs to.</param>
+    /// <param name="path">The path to load resources from.</param>
+    /// <returns>The loaded resource.</returns>
+    public static T Load<T>(Window window, string path)
+    {
+        return Resource<T>.Load(window, path);
+    }
 }
 
-/// <summary>
-/// Utility for a single type of resource.
-/// </summary>
-/// <typeparam name="T">The type of resource to provide utility for.</typeparam>
-public static class Resource<T>
+// Handles resource loading for a single resource type.
+internal static class Resource<T>
 {
     private static readonly IResourceLoader<T> s_resourceLoader;
     
@@ -73,13 +84,7 @@ public static class Resource<T>
         }
     }
     
-    /// <summary>
-    /// Load a resource from path. Either as an embedded resource or as a path from the file system.
-    /// </summary>
-    /// <param name="window">The window the resource belongs to.</param>
-    /// <param name="path">The path to load resources from.</param>
-    /// <returns>The loaded resource.</returns>
-    public static T Load(Window window, string path)
+    internal static T Load(Window window, string path)
     {
         using Stream stream = Resource.GetPath(path);
         return s_resourceLoader.Load(window, Path.GetExtension(path), stream);

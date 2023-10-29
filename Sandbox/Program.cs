@@ -7,8 +7,8 @@ try
 {
     using Window window = new Window("Test", 100, 100);
 
-    ShaderStage vertexShader = Resource<VertexShader>.Load(window, "Sandbox.shader.vert");
-    ShaderStage fragmentShader = Resource<FragmentShader>.Load(window, "Sandbox.shader.frag");
+    ShaderStage vertexShader = Resource.Load<ShaderStage>(window, "Sandbox.shader.vert");
+    ShaderStage fragmentShader = Resource.Load<ShaderStage>(window, "Sandbox.shader.frag");
     using Shader shader = new Shader(window, vertexShader, fragmentShader);
     vertexShader.Dispose();
     fragmentShader.Dispose();
