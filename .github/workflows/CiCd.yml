@@ -3,8 +3,7 @@ name: CI/CD
 on:
   push:
   release:
-    types:
-      - published
+    types: [created]
 
 jobs:
   Ci:
@@ -27,7 +26,7 @@ jobs:
   Cd:
     runs-on: ubuntu-latest
     needs: [Ci]
-    if: github.event_name == 'release'
+    if: contains(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
