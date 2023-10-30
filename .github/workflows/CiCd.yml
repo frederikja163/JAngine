@@ -21,7 +21,7 @@ jobs:
         with:
           retention-days: 7
           name: JAngine
-          path: JAngine.All/bin/Release/net7.0/publish/*
+          path: JAngine/bin/Release/net7.0/publish/*
     
   Cd:
     runs-on: ubuntu-latest
