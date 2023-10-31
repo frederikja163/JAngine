@@ -76,9 +76,7 @@ public sealed class Window : IDisposable
 
             foreach (IRenderable renderable in _renderables)
             {
-                renderable.Vao.Bind();
-                renderable.Shader.Bind();
-                Gl.DrawElementsInstanced(Gl.PrimitiveType.Triangles, 6, Gl.DrawElementsType.UnsignedInt, 0, 1);
+                renderable.Render();
             }
             
             Glfw.SwapBuffers(_handle);
@@ -104,12 +102,14 @@ public sealed class Window : IDisposable
         }
     }
 
-    internal void AddRenderable(IRenderable renderable)
+    public IRenderable AttachRender(VertexArray vao, Shader shader)
     {
+        IRenderable renderable = new Renderable(vao, shader);
         _renderables.Add(renderable);
+        return renderable;
     }
 
-    internal void RemoveRenderable(IRenderable renderable)
+    public void DetachRender(IRenderable renderable)
     {
         _renderables.Remove(renderable);
     }

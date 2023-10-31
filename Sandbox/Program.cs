@@ -19,7 +19,7 @@ try
     Buffer<uint> ebo = new Buffer<uint>(window, 0, 1, 2, 0, 2, 3);
     VertexArray vao = new VertexArray(window, ebo);
     vao.AddAttribute(vbo, 0, sizeof(float) * 2, 2);
-    using Renderable renderable = new Renderable(window, vao, shader);
+    window.AttachRender(vao, shader);
     
     Window.Run();
 }

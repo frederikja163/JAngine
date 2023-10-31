@@ -18,7 +18,7 @@ public sealed class VertexArray : IGlObject, IDisposable
         _window = window;
         _window.QueueUpdate(this, CreateEvent.Singleton);
     }
-
+    
     public void AddAttribute<T>(IBuffer<T> buffer, uint attribIndex, int stride, int size)
         where T : unmanaged
     {

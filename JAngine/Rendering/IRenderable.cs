@@ -2,31 +2,26 @@
 
 namespace JAngine.Rendering;
 
-public interface IRenderable : IDisposable
+public interface IRenderable
 {
-    internal Window Window { get; }
-    internal VertexArray Vao { get; }
-    internal Shader Shader { get; }
+    internal void Render();
 }
 
-public sealed class Renderable : IRenderable
+internal sealed class Renderable : IRenderable
 {
-    private readonly Window _window;
-    
-    public Renderable(Window window, VertexArray vao, Shader shader)
+    private readonly VertexArray _vao;
+    private readonly Shader _shader;
+
+    public Renderable(VertexArray vao, Shader shader)
     {
-        _window = window;
-        Vao = vao;
-        Shader = shader;
-        _window.AddRenderable(this);
+        _vao = vao;
+        _shader = shader;
     }
 
-    public void Dispose()
+    void IRenderable.Render()
     {
-        _window.RemoveRenderable(this);
+        _vao.Bind();
+        _shader.Bind();
+        Gl.DrawElementsInstanced(Gl.PrimitiveType.Triangles, 6, Gl.DrawElementsType.UnsignedInt, 0, 1);
     }
-
-    Window IRenderable.Window => _window;
-    public VertexArray Vao { get; set; }
-    public Shader Shader { get; set; }
 }
