@@ -13,12 +13,12 @@ try
     vertexShader.Dispose();
     fragmentShader.Dispose();
 
-    Buffer<float> vbo = new Buffer<float>(window, 8);
+    Buffer<float> vbo = new Buffer<float>(window, 4);
     vbo.SetSubData(0, 0, 0, 0, 1, 1, 1);
     vbo.SetSubData(6, 1, 0);
     Buffer<uint> ebo = new Buffer<uint>(window, 0, 1, 2, 0, 2, 3);
-    VertexArray vao = new VertexArray(window, ebo);
-    vao.AddAttribute(vbo, 0, sizeof(float) * 2, 2);
+    VertexArray vao = new VertexArray(window, shader, ebo);
+    vao.BindBuffer(vbo).AddAttribute("Position", 2);
     window.AttachRender(vao, shader);
     
     Window.Run();

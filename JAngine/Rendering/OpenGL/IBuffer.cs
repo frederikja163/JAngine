@@ -14,12 +14,15 @@ public interface IBuffer<T> : IGlObject, IDisposable, IEnumerable<T>
 
 internal sealed class UpdateDataEvent : IGlEvent
 {
-    internal static UpdateDataEvent Singleton { get; } = new UpdateDataEvent();
+    internal static UpdateDataEvent Default { get; } = new UpdateDataEvent(false);
+    internal static UpdateDataEvent SkipInstance { get; } = new UpdateDataEvent(true);
 
-    private UpdateDataEvent()
+    private UpdateDataEvent(bool skip)
     {
-        
+        Skip = skip;
     }
+    
+    internal bool Skip { get; }
 }
 internal sealed class UpdateCapacityEvent : IGlEvent
 {

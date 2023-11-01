@@ -10,7 +10,8 @@ public sealed class Window : IDisposable
 {
     private static readonly HashSet<Window> s_windows = new();
 
-    private readonly List<(IGlObject, IGlEvent)> _updateableObjects = new List<(IGlObject, IGlEvent)>();
+    private readonly List<(IGlObject, IGlEvent)> _updateQueue = new();
+    private readonly Dictionary<(IGlObject, Type), int> _uniqueUpdates = new();
     private readonly Glfw.Window _handle;
     private HashSet<IRenderable> _renderables = new HashSet<IRenderable>();
     private readonly Thread _renderingThread;
@@ -64,10 +65,11 @@ public sealed class Window : IDisposable
             Gl.Clear(Gl.ClearBufferMask.ColorBuffer);
             
             List<(IGlObject, IGlEvent)> objects;
-            lock (_updateableObjects)
+            lock (_updateQueue)
             {
-                objects = _updateableObjects.ToList();
-                _updateableObjects.Clear();
+                objects = _updateQueue.ToList();
+                _updateQueue.Clear();
+                _uniqueUpdates.Clear();
             }
             foreach ((IGlObject glObject, IGlEvent glEvent) in objects)
             {
@@ -96,10 +98,37 @@ public sealed class Window : IDisposable
 
     internal void QueueUpdate(IGlObject glObject, IGlEvent glEvent)
     {
-        lock (_updateableObjects)
+        lock (_updateQueue)
         {
-            _updateableObjects.Add((glObject, glEvent));
+            _updateQueue.Add((glObject, glEvent));
         }
+    }
+
+    internal void QueueUpdateUnique(IGlObject glObject, IGlEvent glEvent)
+    {
+        lock (_updateQueue)
+        {
+            if (_uniqueUpdates.ContainsKey((glObject, glEvent.GetType())))
+            {
+                return;
+            }
+
+            _uniqueUpdates.Add((glObject, glEvent.GetType()), _updateQueue.Count);
+            _updateQueue.Add((glObject, glEvent));
+        }
+    }
+
+    internal bool ReplaceUpdateUnique(IGlObject glObject, IGlEvent glEvent)
+    {
+        lock (_updateQueue)
+        {
+            if (!_uniqueUpdates.TryGetValue((glObject, glEvent.GetType()), out int index))
+            {
+                return false;
+            }
+            _updateQueue[index] = (glObject, glEvent);
+        }
+        return true;
     }
 
     public IRenderable AttachRender(VertexArray vao, Shader shader)

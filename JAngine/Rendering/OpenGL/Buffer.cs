@@ -10,7 +10,6 @@ public sealed class Buffer<T> : IBuffer<T>
     private readonly Window _window;
     private uint _handle;
     private T[] _data;
-    private bool _isUpdating = true;
     private int _firstUpdateIndex = -1;
     private int _lastUpdateIndex = -1;
 
@@ -21,7 +20,8 @@ public sealed class Buffer<T> : IBuffer<T>
         _data = data;
         Count = _data.Length;
         _window.QueueUpdate(this, CreateEvent.Singleton);
-        _window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
+        _window.QueueUpdateUnique(this, UpdateCapacityEvent.Singleton);
+        _window.QueueUpdateUnique(this, UpdateDataEvent.SkipInstance);
     }
     
     public Buffer(Window window, params T[] data) : this(window, Gl.BufferUsage.DynamicDraw, data)
@@ -35,7 +35,8 @@ public sealed class Buffer<T> : IBuffer<T>
         _data = new T[count];
         Count = 0;
         _window.QueueUpdate(this, CreateEvent.Singleton);
-        _window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
+        _window.QueueUpdateUnique(this, UpdateCapacityEvent.Singleton);
+        _window.QueueUpdateUnique(this, UpdateDataEvent.SkipInstance);
     }
 
     public Buffer(Window window, int count) : this(window, Gl.BufferUsage.DynamicDraw, count)
@@ -48,13 +49,16 @@ public sealed class Buffer<T> : IBuffer<T>
         if (size > Capacity)
         {
             int capacity = Capacity;
-            while (size > Capacity)
+            while (size > capacity)
             {
                 capacity *= 2;
             }
-            _isUpdating = true;
             _data = new T[capacity];
-            _window.QueueUpdate(this, UpdateCapacityEvent.Singleton);
+            if (!_window.ReplaceUpdateUnique(this, UpdateDataEvent.SkipInstance))
+            {
+                _window.QueueUpdateUnique(this, UpdateDataEvent.SkipInstance);
+            }
+            _window.QueueUpdateUnique(this, UpdateCapacityEvent.Singleton);
         }
     }
 
@@ -68,8 +72,8 @@ public sealed class Buffer<T> : IBuffer<T>
 
     public void SetSubData(int offset, params T[] data)
     {
-        Array.Copy(data, 0, _data, offset, data.Length);
         EnsureCapacity(offset + data.Length);
+        Array.Copy(data, 0, _data, offset, data.Length);
         int lastIndex = offset + data.Length;
         if (Count < lastIndex)
         {
@@ -78,11 +82,7 @@ public sealed class Buffer<T> : IBuffer<T>
 
         _firstUpdateIndex = Math.Min(_firstUpdateIndex, offset);
         _lastUpdateIndex = Math.Max(_lastUpdateIndex, lastIndex);
-        if (!_isUpdating)
-        {
-            _isUpdating = true;
-            _window.QueueUpdate(this, UpdateDataEvent.Singleton);
-        }
+        _window.QueueUpdateUnique(this, UpdateDataEvent.Default);
     }
 
     public int FindIndex(T value)
@@ -115,14 +115,17 @@ public sealed class Buffer<T> : IBuffer<T>
                 break;
             case UpdateCapacityEvent:
                 Gl.NamedBufferData<T>(_handle, _data, _mask);
-                (_firstUpdateIndex, _lastUpdateIndex) = (_data.Length, 0);
-                _isUpdating = false;
+                (_firstUpdateIndex, _lastUpdateIndex) = (_data.Length - 1, 0);
                 break;
-            case UpdateDataEvent:
+            case UpdateDataEvent ev:
+                if (ev.Skip)
+                {
+                    return;
+                }
+                
                 Gl.NamedBufferSubData<T>(_handle, (IntPtr)_firstUpdateIndex * sizeof(T),
                     (IntPtr)(_firstUpdateIndex - _lastUpdateIndex) * sizeof(T), ref _data[_firstUpdateIndex]);
-                (_firstUpdateIndex, _lastUpdateIndex) = (_data.Length, 0);
-                _isUpdating = false;
+                (_firstUpdateIndex, _lastUpdateIndex) = (_data.Length - 1, 0);
                 break;
             case DisposeEvent:
                 Gl.DeleteBuffer(_handle);

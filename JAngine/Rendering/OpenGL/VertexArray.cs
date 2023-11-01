@@ -2,6 +2,45 @@ using System.Drawing;
 
 namespace JAngine.Rendering.OpenGL;
 
+public sealed class VertexArrayVertexBufferBinding : IGlEvent
+{
+    private readonly VertexArray _vao;
+    private readonly List<AttributeInformation> _attributes = new List<AttributeInformation>();
+
+    internal VertexArrayVertexBufferBinding(VertexArray vao, IGlObject buffer, uint index, int offset)
+    {
+        _vao = vao;
+        Buffer = buffer;
+        Index = index;
+        Offset = offset;
+    }
+
+    public VertexArrayVertexBufferBinding AddAttribute(string attributeName, int count)
+    {
+        lock (_attributes)
+        {
+            _attributes.Add(new AttributeInformation(attributeName, count, Gl.VertexAttribType.Float));
+        }
+        _vao.UpdateBinding(this);
+        return this;
+    }
+
+    internal IEnumerable<AttributeInformation> GetAttributes()
+    {
+        lock (_attributes)
+        {
+            foreach (AttributeInformation attribute in _attributes)
+            {
+                yield return attribute;
+            }
+        }
+    }
+    internal int Offset { get; }
+    internal IGlObject Buffer { get; }
+    internal uint Index { get; }
+}
+
+internal sealed record AttributeInformation(string Name, int Count, Gl.VertexAttribType Type);
 
 public sealed class VertexArray : IGlObject, IDisposable
 {
@@ -10,13 +49,36 @@ public sealed class VertexArray : IGlObject, IDisposable
     private readonly Window _window;
     private uint _handle;
     private readonly IBuffer<uint> _ebo;
-    private readonly Dictionary<IGlObject, uint> _attributeBuffers = new();
+    private readonly Shader _shader;
+    private readonly Dictionary<IGlObject, VertexArrayVertexBufferBinding> _attributeBuffers = new();
     
-    public VertexArray(Window window, IBuffer<uint> ebo)
+    public VertexArray(Window window, Shader shader, IBuffer<uint> ebo)
     {
         _ebo = ebo;
+        _shader = shader;
         _window = window;
         _window.QueueUpdate(this, CreateEvent.Singleton);
+    }
+
+    public VertexArrayVertexBufferBinding BindBuffer<T>(IBuffer<T> buffer, int offset = 0)
+        where T : unmanaged
+    {
+        lock (_attributeBuffers)
+        {
+            if (!_attributeBuffers.TryGetValue(buffer, out VertexArrayVertexBufferBinding? binding))
+            {
+                binding = new VertexArrayVertexBufferBinding(this, buffer, (uint)_attributeBuffers.Count, offset);
+                _attributeBuffers.Add(buffer, binding);
+            }
+            _window.QueueUpdateUnique(this, binding);
+
+            return binding;
+        }
+    }
+
+    internal void UpdateBinding(VertexArrayVertexBufferBinding binding)
+    {
+        _window.QueueUpdateUnique(this, binding);
     }
     
     public void AddAttribute<T>(IBuffer<T> buffer, uint attribIndex, int stride, int size)
@@ -42,16 +104,17 @@ public sealed class VertexArray : IGlObject, IDisposable
                 _handle = Gl.CreateVertexArray();
                 Gl.VertexArrayElementBuffer(_handle, _ebo.Handle);
                 break;
-            case AttributeUpdateEvent attrib:
-                if (!_attributeBuffers.TryGetValue(attrib.Buffer, out uint bindingIndex))
+            case VertexArrayVertexBufferBinding binding:
+                uint relativeOffset = 0;
+                foreach (AttributeInformation attribute in binding.GetAttributes())
                 {
-                    bindingIndex = (uint)_attributeBuffers.Count;
-                    _attributeBuffers.Add(attrib.Buffer, bindingIndex);
-                    Gl.VertexArrayVertexBuffer(_handle, bindingIndex, attrib.Buffer.Handle, IntPtr.Zero, attrib.Stride);
+                    // TODO: Get index from shader.
+                    Gl.EnableVertexArrayAttrib(_handle, 0);
+                    Gl.VertexArrayAttribBinding(_handle, 0, binding.Index);
+                    Gl.VertexArrayAttribFormat(_handle, 0, attribute.Count, attribute.Type, false, relativeOffset);
+                    relativeOffset += (uint)attribute.Count * sizeof(float);
                 }
-                Gl.EnableVertexArrayAttrib(_handle, attrib.AttribIndex);
-                Gl.VertexArrayAttribBinding(_handle, attrib.AttribIndex, bindingIndex);
-                Gl.VertexArrayAttribFormat(_handle, attrib.AttribIndex, attrib.Size, attrib.Type, false, 0);
+                Gl.VertexArrayVertexBuffer(_handle, binding.Index, binding.Buffer.Handle, binding.Offset, (int)relativeOffset);
                 break;
             case DisposeEvent:
                 Gl.DeleteVertexArray(_handle);
