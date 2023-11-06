@@ -5,7 +5,7 @@ namespace JAngine.Rendering.OpenGL;
 public sealed class VertexArrayVertexBufferBinding : IGlEvent
 {
     private readonly VertexArray _vao;
-    private readonly List<AttributeInformation> _attributes = new List<AttributeInformation>();
+    private readonly List<VertexArray.Attribute> _attributes = new List<VertexArray.Attribute>();
 
     internal VertexArrayVertexBufferBinding(VertexArray vao, IGlObject buffer, uint index, int offset)
     {
@@ -19,17 +19,17 @@ public sealed class VertexArrayVertexBufferBinding : IGlEvent
     {
         lock (_attributes)
         {
-            _attributes.Add(new AttributeInformation(attributeName, count, Gl.VertexAttribType.Float));
+            _attributes.Add(new VertexArray.Attribute(attributeName, count, Gl.VertexAttribType.Float));
         }
         _vao.UpdateBinding(this);
         return this;
     }
 
-    internal IEnumerable<AttributeInformation> GetAttributes()
+    internal IEnumerable<VertexArray.Attribute> GetAttributes()
     {
         lock (_attributes)
         {
-            foreach (AttributeInformation attribute in _attributes)
+            foreach (VertexArray.Attribute attribute in _attributes)
             {
                 yield return attribute;
             }
@@ -40,10 +40,10 @@ public sealed class VertexArrayVertexBufferBinding : IGlEvent
     internal uint Index { get; }
 }
 
-internal sealed record AttributeInformation(string Name, int Count, Gl.VertexAttribType Type);
 
 public sealed class VertexArray : IGlObject, IDisposable
 {
+    internal sealed record Attribute(string Name, int Count, Gl.VertexAttribType Type);
     private record AttributeUpdateEvent (IGlObject Buffer, uint AttribIndex, int Stride, int Size, Gl.VertexAttribType Type) : IGlEvent;
     
     private readonly Window _window;
@@ -106,12 +106,12 @@ public sealed class VertexArray : IGlObject, IDisposable
                 break;
             case VertexArrayVertexBufferBinding binding:
                 uint relativeOffset = 0;
-                foreach (AttributeInformation attribute in binding.GetAttributes())
+                foreach (Attribute attribute in binding.GetAttributes())
                 {
-                    // TODO: Get index from shader.
-                    Gl.EnableVertexArrayAttrib(_handle, 0);
-                    Gl.VertexArrayAttribBinding(_handle, 0, binding.Index);
-                    Gl.VertexArrayAttribFormat(_handle, 0, attribute.Count, attribute.Type, false, relativeOffset);
+                    uint location = (uint)_shader.GetAttribute(attribute.Name).Location;
+                    Gl.EnableVertexArrayAttrib(_handle, location);
+                    Gl.VertexArrayAttribBinding(_handle, location, binding.Index);
+                    Gl.VertexArrayAttribFormat(_handle, location, attribute.Count, attribute.Type, false, relativeOffset);
                     relativeOffset += (uint)attribute.Count * sizeof(float);
                 }
                 Gl.VertexArrayVertexBuffer(_handle, binding.Index, binding.Buffer.Handle, binding.Offset, (int)relativeOffset);

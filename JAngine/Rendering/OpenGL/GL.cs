@@ -89,6 +89,44 @@ internal static unsafe class Gl
         GeometryOutputType = 0x8918,
     }
 
+    internal enum AttributeType : Bitfield
+    {
+        Float = 0x1406,
+        FloatVec2 = 0x8B50,
+        FloatVec3 = 0x8B51,
+        FloatVec4 = 0x8B52,
+        FloatMat2 = 0x8B5A,
+        FloatMat3 = 0x8B5B,
+        FloatMat4 = 0x8B5C,
+        FloatMat2X3 = 0x8B65,
+        FloatMat2X4 = 0x8B66,
+        FloatMat3X2 = 0x8B67,
+        FloatMat3X4 = 0x8B68,
+        FloatMat4X2 = 0x8B69,
+        FloatMat4X3 = 0x8B6A,
+        Int = 0x1404,
+        IntVec2 = 0x8B53,
+        IntVec3 = 0x8B54,
+        IntVec4 = 0x8B55,
+        UInt = 0x1405,
+        UIntVec2 = 0x8DC6,
+        UIntVec3 = 0x8DC7,
+        UIntVec4 = 0x8DC8,
+        Double = 0x140A,
+        DoubleVec2 = 0x8FFC,
+        DoubleVec3 = 0x8FFD,
+        DoubleVec4 = 0x8FFE,
+        DoubleMat2 = 0x8F46,
+        DoubleMat3 = 0x8F47,
+        DoubleMat4 = 0x8F48,
+        DoubleMat2X3 = 0x8F49,
+        DoubleMat2X4 = 0x8F4A,
+        DoubleMat3X2 = 0x8F4B,
+        DoubleMat3X4 = 0x8F4C,
+        DoubleMat4X2 = 0x8F4D,
+        DoubleMat4X3 = 0x8F4E,
+    }
+
     internal enum ShaderType : Bitfield
     {
         ComputeShader = 0x91B9,
@@ -134,7 +172,7 @@ internal static unsafe class Gl
         // GL_UNSIGNED_INT_2_10_10_10_REV
         // GL_UNSIGNED_INT_10F_11F_11F_REV
     }
-    
+
     private static readonly delegate* unmanaged<float, float, float, float, void> ClearColorPtr =
         (delegate* unmanaged<float, float, float, float, void>)Glfw.GetProcAddress("glClearColor");
     private static readonly delegate* unmanaged<ClearBufferMask, void> ClearPtr =
@@ -158,6 +196,10 @@ internal static unsafe class Gl
         (delegate* unmanaged<Uint, ProgramProperty, Int*, void>)Glfw.GetProcAddress("glGetProgramiv");
     private static readonly delegate* unmanaged<Uint, SizeI, SizeI*, Char*, void> GetProgramInfoLogPtr =
         (delegate* unmanaged<Uint, SizeI, SizeI*, Char*, void>)Glfw.GetProcAddress("glGetProgramInfoLog");
+    private static readonly delegate* unmanaged<Uint, Uint, SizeI, SizeI*, Int*, AttributeType*, Char*, void> GetActiveAttribPtr =
+        (delegate* unmanaged<Uint, Uint, SizeI, SizeI*, Int*, AttributeType*, Char*, void>)Glfw.GetProcAddress("glGetActiveAttrib");
+    private static readonly delegate* unmanaged<Uint, Char*, Int> GetAttribLocationPtr =
+        (delegate* unmanaged<Uint, Char*, Int>)Glfw.GetProcAddress("glGetAttribLocation");
     
     private static readonly delegate* unmanaged<ShaderType, Uint> CreateShaderPtr =
         (delegate* unmanaged<ShaderType, Uint>)Glfw.GetProcAddress("glCreateShader");
@@ -266,6 +308,38 @@ internal static unsafe class Gl
         GetProgramInfoLogPtr(program, maxLength, &length, (byte*)infoLogPtr);
         infoLog = Marshal.PtrToStringAnsi(infoLogPtr, length);
         Marshal.FreeCoTaskMem(infoLogPtr);
+    }
+    
+    internal static void GetActiveAttrib(uint program, uint index, int bufSize, out int length, out int size, out AttributeType type, out string name)
+    {
+        nint namePtr = Marshal.AllocCoTaskMem(bufSize);
+        int lengthPtr = 0;
+        int sizePtr = 0;
+        AttributeType typePtr = 0;
+        GetActiveAttribPtr(program, index, bufSize, &lengthPtr, &sizePtr, &typePtr, (byte*)namePtr);
+        length = lengthPtr;
+        size = sizePtr;
+        type = typePtr;
+        name = Marshal.PtrToStringAnsi(namePtr, lengthPtr);
+        Marshal.FreeCoTaskMem(namePtr);
+    }
+    
+    internal static void GetActiveAttrib(uint program, uint index, int bufSize, int* lengthPtr, int* sizePtr, AttributeType* typePtr, byte* namePtr)
+    {
+        GetActiveAttribPtr(program, index, bufSize, lengthPtr, sizePtr, typePtr, namePtr);
+    }
+    
+    internal static int GetAttribLocation(uint program, string name)
+    {
+        nint namePtr = Marshal.StringToCoTaskMemAnsi(name);
+        int location = GetAttribLocationPtr(program, (byte*)namePtr);
+        Marshal.FreeCoTaskMem(namePtr);
+        return location;
+    }
+    
+    internal static int GetAttribLocation(uint program, byte* namePtr)
+    {
+        return GetAttribLocationPtr(program, namePtr);
     }
 
     internal static uint CreateShader(ShaderType shaderType)

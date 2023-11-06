@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using JAngine;
 
 namespace JAngine.Rendering.OpenGL;
@@ -97,6 +99,23 @@ public sealed class FragmentShader : ShaderStage
 
 public sealed class Shader : IGlObject, IDisposable
 {
+    internal sealed class Attribute
+    {
+        public Attribute(string name, int location, int size, Gl.AttributeType type)
+        {
+            Name = name;
+            Location = location;
+            Size = size;
+            Type = type;
+        }
+
+        internal string Name { get; }
+        internal int Location { get; }
+        internal int Size { get; }
+        internal Gl.AttributeType Type { get; }
+    }
+    
+    private Dictionary<string, Attribute> _attributes = new Dictionary<string, Attribute>();
     private readonly ShaderStage[] _stages;
     internal Window Window { get; }
     Window IGlObject.Window => Window;
@@ -136,12 +155,45 @@ public sealed class Shader : IGlObject, IDisposable
                 {
                     Gl.DetachShader(Handle, stage.Handle);
                 }
+
+                unsafe
+                {
+                    Gl.GetProgram(Handle, Gl.ProgramProperty.ActiveAttributes, out int attributeCount);
+                    Gl.GetProgram(Handle, Gl.ProgramProperty.ActiveAttributeMaxLength, out int maxLength); 
+                    nint namePtr = Marshal.AllocCoTaskMem(maxLength);
+                    for (uint i = 0; i < attributeCount; i++)
+                    {
+                        int size = 0;
+                        Gl.AttributeType type = 0;
+                        Gl.GetActiveAttrib(Handle, i, maxLength, null, &size, &type, (byte*)namePtr);
+                        int location = Gl.GetAttribLocation(Handle, (byte*)namePtr);
+                        string name = Marshal.PtrToStringAnsi(namePtr)!;
+                        
+                        _attributes.Add(name, new Attribute(name, location, size, type));
+                    }
+                    Marshal.FreeCoTaskMem(namePtr);
+                }
                 break;
             case DisposeEvent:
                 Gl.DeleteProgram(Handle);
                 Handle = 0;
                 break;
         }
+    }
+
+    internal bool TryGetAttribute(string name, [NotNullWhen(true)] out Attribute? attribute)
+    {
+        return _attributes.TryGetValue(name, out attribute);
+    }
+
+    internal Attribute GetAttribute(string name)
+    {
+        if (_attributes.TryGetValue(name, out Attribute? attribute))
+        {
+            return attribute;
+        }
+
+        throw new Exception($"Attribute with name {name} does not exist on this shader.");
     }
 
     internal void Bind()

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace JAngine;
@@ -61,6 +62,61 @@ public class LogMessage
         return $"{string.Join(" | ", time, severity, origin, message)}";
     }
 }
+
+public sealed class TimerRecord
+{
+    public TimerRecord(string name)
+    {
+        Name = name;
+        TotalTime = TimeSpan.Zero;
+        Runs = 0;
+    }
+
+    public string Name { get; init; }
+    public TimeSpan TotalTime { get; private set; }
+    public int Runs { get; private set; }
+
+    internal LogTimer StartTimer()
+    {
+        return new LogTimer(this);
+    }
+
+    internal void StopTimer(Stopwatch stopwatch)
+    {
+        Runs += 1;
+        TotalTime += stopwatch.Elapsed;
+        if (Runs > 100)
+        {
+            Runs = 0;
+            TotalTime = TimeSpan.Zero;
+        }
+    }
+
+    // TODO: Consider what other information could be useful to gather, maybe reset the timer etc.
+    public override string ToString()
+    {
+        string average = (TotalTime.TotalNanoseconds / Runs).ToString(CultureInfo.InvariantCulture);
+        return $"Timer {Name} has completed {Runs} runs, with an average of {average}ns";
+    }
+}
+
+public sealed class LogTimer : IDisposable
+{
+    private readonly TimerRecord _record;
+    private readonly Stopwatch _stopwatch;
+
+    internal LogTimer(TimerRecord record)
+    {
+        _record = record;
+        _stopwatch = Stopwatch.StartNew();
+    }
+
+    public void Dispose()
+    {
+        _stopwatch.Stop();
+        _record.StopTimer(_stopwatch);
+    }
+} 
 
 /// <summary>
 /// Provides the functionality of custom log messaGetFileLineNumberge handlers.
@@ -204,6 +260,7 @@ public sealed class FileLogger : ILogger
 /// </summary>
 public static class Log
 {
+    private static readonly Dictionary<string, TimerRecord> _timers = new Dictionary<string, TimerRecord>();
     private static readonly IReadOnlyList<ILogger> s_handlers;
     static Log()
     {
@@ -219,7 +276,30 @@ public static class Log
             handler.HandleMessage(message);
         }
     }
-     
+
+    // TODO: Make sure this has as little overhead as possible.
+    public static LogTimer Time(string timerName)
+    {
+        if (!_timers.TryGetValue(timerName, out TimerRecord? record))
+        {
+            record = new TimerRecord(timerName);
+            _timers.Add(timerName, record);
+        }
+
+        return record.StartTimer();
+    }
+
+    // TODO: Is this the best way to provide an interface to log whats in the timer?
+    public static void LogTimer(string timerName)
+    {
+        if (!_timers.TryGetValue(timerName, out TimerRecord? record))
+        {
+            record = new TimerRecord(timerName);
+            _timers.Add(timerName, record);
+        }
+        Info(record);
+    }
+    
     /// <summary>
     /// Sends a log message with a run-time specified message.
     /// </summary>

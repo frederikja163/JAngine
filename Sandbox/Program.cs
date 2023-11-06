@@ -18,7 +18,7 @@ try
     vbo.SetSubData(6, 1, 0);
     Buffer<uint> ebo = new Buffer<uint>(window, 0, 1, 2, 0, 2, 3);
     VertexArray vao = new VertexArray(window, shader, ebo);
-    vao.BindBuffer(vbo).AddAttribute("Position", 2);
+    vao.BindBuffer(vbo).AddAttribute("vPosition", 2);
     window.AttachRender(vao, shader);
     
     Window.Run();
