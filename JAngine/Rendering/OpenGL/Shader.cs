@@ -115,7 +115,24 @@ public sealed class Shader : IGlObject, IDisposable
         internal Gl.AttributeType Type { get; }
     }
     
+    internal sealed class Uniform
+    {
+        public Uniform(string name, int location, int size, Gl.UniformType type)
+        {
+            Name = name;
+            Location = location;
+            Size = size;
+            Type = type;
+        }
+
+        internal string Name { get; }
+        internal int Location { get; }
+        internal int Size { get; }
+        internal Gl.UniformType Type { get; }
+    }
+    
     private Dictionary<string, Attribute> _attributes = new Dictionary<string, Attribute>();
+    private Dictionary<string, Uniform> _uniforms = new Dictionary<string, Uniform>();
     private readonly ShaderStage[] _stages;
     internal Window Window { get; }
     Window IGlObject.Window => Window;
@@ -170,6 +187,23 @@ public sealed class Shader : IGlObject, IDisposable
                         string name = Marshal.PtrToStringAnsi(namePtr)!;
                         
                         _attributes.Add(name, new Attribute(name, location, size, type));
+                    }
+                    Marshal.FreeCoTaskMem(namePtr);
+                }
+                unsafe
+                {
+                    Gl.GetProgram(Handle, Gl.ProgramProperty.ActiveUniforms, out int uniformCount);
+                    Gl.GetProgram(Handle, Gl.ProgramProperty.ActiveUniformMaxLength, out int maxLength); 
+                    nint namePtr = Marshal.AllocCoTaskMem(maxLength);
+                    for (uint i = 0; i < uniformCount; i++)
+                    {
+                        int size = 0;
+                        Gl.UniformType type = 0;
+                        Gl.GetActiveUniform(Handle, i, maxLength, null, &size, &type, (byte*)namePtr);
+                        int location = Gl.GetUniformLocation(Handle, (byte*)namePtr);
+                        string name = Marshal.PtrToStringAnsi(namePtr)!;
+                        
+                        _uniforms.Add(name, new Uniform(name, location, size, type));
                     }
                     Marshal.FreeCoTaskMem(namePtr);
                 }

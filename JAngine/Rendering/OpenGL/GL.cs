@@ -126,6 +126,106 @@ internal static unsafe class Gl
         DoubleMat4X2 = 0x8F4D,
         DoubleMat4X3 = 0x8F4E,
     }
+    
+    internal enum UniformType : Bitfield
+    {
+        Float = 0x1406,
+        FloatVec2 = 0x8B50,
+        FloatVec3 = 0x8B51,
+        FloatVec4 = 0x8B52,
+        FloatMat2 = 0x8B5A,
+        FloatMat3 = 0x8B5B,
+        FloatMat4 = 0x8B5C,
+        FloatMat2X3 = 0x8B65,
+        FloatMat2X4 = 0x8B66,
+        FloatMat3X2 = 0x8B67,
+        FloatMat3X4 = 0x8B68,
+        FloatMat4X2 = 0x8B69,
+        FloatMat4X3 = 0x8B6A,
+        Int = 0x1404,
+        IntVec2 = 0x8B53,
+        IntVec3 = 0x8B54,
+        IntVec4 = 0x8B55,
+        UInt = 0x1405,
+        UIntVec2 = 0x8DC6,
+        UIntVec3 = 0x8DC7,
+        UIntVec4 = 0x8DC8,
+        Double = 0x140A,
+        DoubleVec2 = 0x8FFC,
+        DoubleVec3 = 0x8FFD,
+        DoubleVec4 = 0x8FFE,
+        DoubleMat2 = 0x8F46,
+        DoubleMat3 = 0x8F47,
+        DoubleMat4 = 0x8F48,
+        DoubleMat2X3 = 0x8F49,
+        DoubleMat2X4 = 0x8F4A,
+        DoubleMat3X2 = 0x8F4B,
+        DoubleMat3X4 = 0x8F4C,
+        DoubleMat4X2 = 0x8F4D,
+        DoubleMat4X3 = 0x8F4E,
+        Bool = 0x8B56,
+        BoolVec2 = 0x8B57,
+        BoolVec3 = 0x8B58,
+        BoolVec4 = 0x8B59,
+        Sampler1D = 0x8B5D,
+        Sampler2D = 0x8B5E,
+        Sampler3D = 0x8B5F,
+        SamplerCube = 0x8B60,
+        Sampler1DShadow = 0x8B61,
+        Sampler2DShadow = 0x8B62,
+        Sampler2DMultisample = 0x9108,
+        Sampler2DMultisampleArray = 0x910B,
+        SamplerCubeShadow = 0x8DC5,
+        SamplerBuffer = 0x9001,
+        Sampler2DRect = 0x8B63,
+        Sampler2DRectShadow = 0x8B64,
+        IntSampler1D = 0x8DC9,
+        IntSampler1DArray = 0x8DCE,
+        IntSampler2DArray = 0x8DCF,
+        IntSampler2DMultiSample = 0x9109,
+        IntSampler2DMultisampleArray = 0x910C,
+        IntSamplerBuffer = 0x8DD0,
+        IntSampler2DRect = 0x8DCD,
+        UIntSampler1D = 0x8DD1,
+        UIntSampler2D = 0x8DD2,
+        UIntSampler3D = 0x8DD3,
+        UIntSamplerCube = 0x8DD4,
+        UIntSampler1DArray = 0x8DD6,
+        UIntSampler2DArray = 0x8DD7,
+        UIntSampler2DMultisample = 0x910A,
+        UIntSampler2DMultisampleArray = 0x910D,
+        UIntSamplerBuffer = 0x8DD8,
+        UIntSampler2DRect = 0x8DD5,
+        Image1D = 0x904C,
+        Image2D = 0x904D,
+        Image3D = 0x904E,
+        Image2DRect = 0x904F,
+        ImageCube = 0x9050,
+        ImageBuffer = 0x9051,
+        Image1DArray = 0x9052,
+        Image2DArray = 0x9053,
+        Image2DMultisample = 0x9055,
+        Image2DMultisampleArray = 0x9056,
+        IntImage1D = 0x9057,
+        IntImage2D = 0x9058,
+        IntImage3D = 0x9059,
+        IntImageCube = 0x905A,
+        IntImage1DArray = 0x905B,
+        IntImage2DArray = 0x905C,
+        IntImage2DMultisample = 0x905D,
+        IntImage2DMultisampleArray = 0x9061,
+        UIntImage1D = 0x9062,
+        UIntImage2D = 0x9063,
+        UIntImage3D = 0x9064,
+        UIntImage2DRect = 0x9065,
+        UIntImageCube = 0x9066,
+        UIntImageBuffer = 0x9067,
+        UIntImage1DArray = 0x9068,
+        UIntImage2DArray = 0x9069,
+        UIntImage2DMultisample = 0x906B,
+        UIntImage2DMultisampleArray = 0x906C,
+        UIntAtomicCounter = 0x92DB,
+    }
 
     internal enum ShaderType : Bitfield
     {
@@ -200,6 +300,10 @@ internal static unsafe class Gl
         (delegate* unmanaged<Uint, Uint, SizeI, SizeI*, Int*, AttributeType*, Char*, void>)Glfw.GetProcAddress("glGetActiveAttrib");
     private static readonly delegate* unmanaged<Uint, Char*, Int> GetAttribLocationPtr =
         (delegate* unmanaged<Uint, Char*, Int>)Glfw.GetProcAddress("glGetAttribLocation");
+    private static readonly delegate* unmanaged<Uint, Uint, SizeI, SizeI*, Int*, UniformType*, Char*, void> GetActiveUniformPtr =
+        (delegate* unmanaged<Uint, Uint, SizeI, SizeI*, Int*, UniformType*, Char*, void>)Glfw.GetProcAddress("glGetActiveUniform");
+    private static readonly delegate* unmanaged<Uint, Char*, Int> GetUniformLocationPtr =
+        (delegate* unmanaged<Uint, Char*, Int>)Glfw.GetProcAddress("glGetUniformLocation");
     
     private static readonly delegate* unmanaged<ShaderType, Uint> CreateShaderPtr =
         (delegate* unmanaged<ShaderType, Uint>)Glfw.GetProcAddress("glCreateShader");
@@ -310,36 +414,24 @@ internal static unsafe class Gl
         Marshal.FreeCoTaskMem(infoLogPtr);
     }
     
-    internal static void GetActiveAttrib(uint program, uint index, int bufSize, out int length, out int size, out AttributeType type, out string name)
-    {
-        nint namePtr = Marshal.AllocCoTaskMem(bufSize);
-        int lengthPtr = 0;
-        int sizePtr = 0;
-        AttributeType typePtr = 0;
-        GetActiveAttribPtr(program, index, bufSize, &lengthPtr, &sizePtr, &typePtr, (byte*)namePtr);
-        length = lengthPtr;
-        size = sizePtr;
-        type = typePtr;
-        name = Marshal.PtrToStringAnsi(namePtr, lengthPtr);
-        Marshal.FreeCoTaskMem(namePtr);
-    }
-    
     internal static void GetActiveAttrib(uint program, uint index, int bufSize, int* lengthPtr, int* sizePtr, AttributeType* typePtr, byte* namePtr)
     {
         GetActiveAttribPtr(program, index, bufSize, lengthPtr, sizePtr, typePtr, namePtr);
     }
     
-    internal static int GetAttribLocation(uint program, string name)
-    {
-        nint namePtr = Marshal.StringToCoTaskMemAnsi(name);
-        int location = GetAttribLocationPtr(program, (byte*)namePtr);
-        Marshal.FreeCoTaskMem(namePtr);
-        return location;
-    }
-    
     internal static int GetAttribLocation(uint program, byte* namePtr)
     {
         return GetAttribLocationPtr(program, namePtr);
+    }
+    
+    internal static void GetActiveUniform(uint program, uint index, int bufSize, int* lengthPtr, int* sizePtr, UniformType* typePtr, byte* namePtr)
+    {
+        GetActiveUniformPtr(program, index, bufSize, lengthPtr, sizePtr, typePtr, namePtr);
+    }
+    
+    internal static int GetUniformLocation(uint program, byte* namePtr)
+    {
+        return GetUniformLocationPtr(program, namePtr);
     }
 
     internal static uint CreateShader(ShaderType shaderType)
