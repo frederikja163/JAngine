@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Drawing;
+using System.Reflection.Emit;
 
 namespace JAngine.Rendering.OpenGL;
 
@@ -13,9 +14,10 @@ public sealed class Buffer<T> : IBuffer<T>
     private int _firstUpdateIndex = -1;
     private int _lastUpdateIndex = -1;
 
-    internal Buffer(Window window, Gl.BufferUsage mask, params T[] data)
+    internal Buffer(Window window, string name, Gl.BufferUsage mask, params T[] data)
     {
         _window = window;
+        Name = name;
         _mask = mask;
         _data = data;
         Count = _data.Length;
@@ -24,13 +26,14 @@ public sealed class Buffer<T> : IBuffer<T>
         _window.QueueUpdateUnique(this, UpdateDataEvent.SkipInstance);
     }
     
-    public Buffer(Window window, params T[] data) : this(window, Gl.BufferUsage.DynamicDraw, data)
+    public Buffer(Window window, string name, params T[] data) : this(window, name, Gl.BufferUsage.DynamicDraw, data)
     {
     }
 
-    internal Buffer(Window window, Gl.BufferUsage mask, int count)
+    internal Buffer(Window window, string name, Gl.BufferUsage mask, int count)
     {
         _window = window;
+        Name = name;
         _mask = mask;
         _data = new T[count];
         Count = 0;
@@ -39,7 +42,7 @@ public sealed class Buffer<T> : IBuffer<T>
         _window.QueueUpdateUnique(this, UpdateDataEvent.SkipInstance);
     }
 
-    public Buffer(Window window, int count) : this(window, Gl.BufferUsage.DynamicDraw, count)
+    public Buffer(Window window, string name, int count) : this(window, name, Gl.BufferUsage.DynamicDraw, count)
     {
         
     }
@@ -99,6 +102,7 @@ public sealed class Buffer<T> : IBuffer<T>
         return -1;
     }
 
+    public string Name { get; }
     Window IGlObject.Window => _window;
     uint IGlObject.Handle => _handle;
     private int Capacity => _data.Length;
@@ -112,6 +116,7 @@ public sealed class Buffer<T> : IBuffer<T>
         {
             case CreateEvent:
                 _handle = Gl.CreateBuffer();
+                Gl.ObjectLabel(Gl.ObjectIdentifier.Buffer, _handle, Name);
                 break;
             case UpdateCapacityEvent:
                 Gl.NamedBufferData<T>(_handle, _data, _mask);

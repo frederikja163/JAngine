@@ -39,6 +39,14 @@ internal static unsafe class Gl
         StencilBuffer = 0x00000400,
     }
 
+    internal enum PrimitiveType : Bitfield
+    {
+        Triangles = 0x0004,
+        TriangleStrip = 0x0005,
+        TriangleFan = 0x0006,
+        // More types exist here, but those should never be used.
+    }
+    
     internal enum DrawElementsType : Bitfield
     {
         UnsignedByte = 0x1401,
@@ -46,12 +54,19 @@ internal static unsafe class Gl
         UnsignedInt = 0x1405,
     }
 
-    internal enum PrimitiveType : Bitfield
+    internal enum ObjectIdentifier : Bitfield
     {
-        Triangles = 0x0004,
-        TriangleStrip = 0x0005,
-        TriangleFan = 0x0006,
-        // More types exist here, but those should never be used.
+        Buffer = 0x82E0,
+        Shader = 0x82E1,
+        Program = 0x82E2,
+        VertexArray = 0x8074,
+        Query = 0x82E3,
+        ProgramPipeline = 0x82E4,
+        TransformFeedback = 0x8E22,
+        Sampler = 0x82E6,
+        Texture = 0x1702,
+        RenderBuffer = 0x8D41,
+        FrameBuffer = 0x8D40,
     }
 
     internal enum BufferUsage : Bitfield
@@ -279,7 +294,9 @@ internal static unsafe class Gl
         (delegate* unmanaged<ClearBufferMask, void>)Glfw.GetProcAddress("glClear");
     private static readonly delegate* unmanaged<PrimitiveType, SizeI, DrawElementsType, void*, SizeI, void> DrawElementsInstancedPtr =
         (delegate* unmanaged<PrimitiveType, SizeI, DrawElementsType, void*, SizeI, void>)Glfw.GetProcAddress("glDrawElementsInstanced");
-
+    private static readonly delegate* unmanaged<ObjectIdentifier, Uint, SizeI, Char*, void> ObjectLabelPtr =
+        (delegate* unmanaged<ObjectIdentifier, Uint, SizeI, Char*, void>)Glfw.GetProcAddress("glObjectLabel");
+    
     private static readonly delegate* unmanaged<Uint> CreateProgramPtr =
         (delegate* unmanaged<Uint>)Glfw.GetProcAddress("glCreateProgram");
     private static readonly delegate* unmanaged<Uint, void> DeleteProgramPtr =
@@ -366,6 +383,13 @@ internal static unsafe class Gl
         int instanceCount)
     {
         DrawElementsInstancedPtr(mode, count, type, (void*)offset, instanceCount);
+    }
+
+    internal static void ObjectLabel(ObjectIdentifier identifier, uint handle, string label)
+    {
+        nint labelPtr = Marshal.StringToCoTaskMemAnsi(label);
+        ObjectLabelPtr(identifier, handle, label.Length, (byte*)labelPtr);
+        Marshal.FreeCoTaskMem(labelPtr);
     }
     
     internal static uint CreateProgram()

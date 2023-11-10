@@ -13,10 +13,10 @@ public interface IResourceLoader<out T>
     /// <summary>
     /// Loads a single resource of the specified type from a stream.
     /// </summary>
-    /// <param name="fileExtension">The file extension of the loaded file, will be empty string if theres no extension.</param>
+    /// <param name="filePath">The file path of the loaded file.</param>
     /// <param name="stream">The stream to load the resource from.</param>
     /// <returns>The loaded resource.</returns>
-    public T Load(Window window, string fileExtension, Stream stream);
+    public T Load(Window window, string filePath, Stream stream);
 }
 
 /// <summary>
@@ -87,6 +87,6 @@ internal static class Resource<T>
     internal static T Load(Window window, string path)
     {
         using Stream stream = Resource.GetPath(path);
-        return s_resourceLoader.Load(window, Path.GetExtension(path), stream);
+        return s_resourceLoader.Load(window, path, stream);
     }
 }

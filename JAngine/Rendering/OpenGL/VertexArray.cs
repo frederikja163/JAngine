@@ -52,11 +52,12 @@ public sealed class VertexArray : IGlObject, IDisposable
     private readonly Shader _shader;
     private readonly Dictionary<IGlObject, VertexArrayVertexBufferBinding> _attributeBuffers = new();
     
-    public VertexArray(Window window, Shader shader, IBuffer<uint> ebo)
+    public VertexArray(Window window, string name, Shader shader, IBuffer<uint> ebo)
     {
+        _window = window;
+        Name = name;
         _ebo = ebo;
         _shader = shader;
-        _window = window;
         _window.QueueUpdate(this, CreateEvent.Singleton);
     }
 
@@ -93,6 +94,7 @@ public sealed class VertexArray : IGlObject, IDisposable
         _window.QueueUpdate(this, new AttributeUpdateEvent(fixedBuffer, attribIndex, stride, size, type));
     }
 
+    public string Name { get; }
     Window IGlObject.Window => _window;
     uint IGlObject.Handle => _handle;
     
@@ -102,6 +104,7 @@ public sealed class VertexArray : IGlObject, IDisposable
         {
             case CreateEvent:
                 _handle = Gl.CreateVertexArray();
+                Gl.ObjectLabel(Gl.ObjectIdentifier.VertexArray, _handle, Name);
                 Gl.VertexArrayElementBuffer(_handle, _ebo.Handle);
                 break;
             case VertexArrayVertexBufferBinding binding:

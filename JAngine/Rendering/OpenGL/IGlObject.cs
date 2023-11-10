@@ -8,6 +8,7 @@ internal interface IGlEvent
 public interface IGlObject
 {
     internal uint Handle { get; }
+    public string Name { get; }
     internal Window Window { get; }
     internal void DispatchEvent(IGlEvent glEvent);
 }

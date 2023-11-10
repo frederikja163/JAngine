@@ -9,14 +9,16 @@ public abstract class ShaderStage : IGlObject, IDisposable
     private readonly Gl.ShaderType _type;
     private readonly string _source;
 
-    internal ShaderStage(Window window, Gl.ShaderType type, string source)
+    internal ShaderStage(Window window, string name, Gl.ShaderType type, string source)
     {
         Window = window;
+        Name = name;
         _type = type;
         _source = source;
         Window.QueueUpdate(this, CreateEvent.Singleton);
     }
-    
+
+    public string Name { get; }
     internal Window Window { get; }
     Window IGlObject.Window => Window;
     internal uint Handle { get; private set; }
@@ -33,13 +35,14 @@ public abstract class ShaderStage : IGlObject, IDisposable
         {
             case CreateEvent:
                 Handle = Gl.CreateShader(_type);
+                Gl.ObjectLabel(Gl.ObjectIdentifier.Shader, Handle, Name);
                 Gl.ShaderSource(Handle, _source);
                 Gl.CompileShader(Handle);
                 Gl.GetShader(Handle, Gl.ShaderParameterName.InfoLogLength, out int logLength);
                 if (logLength != 0)
                 {
                     Gl.GetShaderInfoLog(Handle, logLength, out string infoLog);
-                    throw new Exception($"{_type} failed to compile: {infoLog}");
+                    throw new Exception($"{_type} {Name} failed to compile: {infoLog}");
                 }
                 break;
             case DisposeEvent:
@@ -52,47 +55,47 @@ public abstract class ShaderStage : IGlObject, IDisposable
 
 internal sealed class ShaderStageLoaderBase : IResourceLoader<ShaderStage>, IResourceLoader<VertexShader>, IResourceLoader<FragmentShader>
 {
-    ShaderStage IResourceLoader<ShaderStage>.Load(Window window, string fileExtension, Stream stream)
+    ShaderStage IResourceLoader<ShaderStage>.Load(Window window, string filePath, Stream stream)
     {
-        switch (fileExtension.ToLower())
+        switch (Path.GetExtension(filePath.ToLower()))
         {
             case ".vertex":
             case ".vert":
-                return ((IResourceLoader<VertexShader>)this).Load(window, fileExtension, stream);
+                return ((IResourceLoader<VertexShader>)this).Load(window, filePath, stream);
             case ".frag":
             case ".fragment":
-                return ((IResourceLoader<FragmentShader>)this).Load(window, fileExtension, stream);
+                return ((IResourceLoader<FragmentShader>)this).Load(window, filePath, stream);
             default:
                 throw new Exception(
-                    $"Could not resolve shader type {fileExtension}, either load as a specific type or change the name of the file.");
+                    $"Could not resolve type of shader {filePath}, either load as a specific type or change the name of the file.");
         }
     }
 
-    VertexShader IResourceLoader<VertexShader>.Load(Window window, string fileExtension, Stream stream)
+    VertexShader IResourceLoader<VertexShader>.Load(Window window, string filePath, Stream stream)
     {
         StreamReader reader = new StreamReader(stream);
         string src = reader.ReadToEnd();
-        return new VertexShader(window, src);
+        return new VertexShader(window, filePath, src);
     }
 
-    FragmentShader IResourceLoader<FragmentShader>.Load(Window window, string fileExtension, Stream stream)
+    FragmentShader IResourceLoader<FragmentShader>.Load(Window window, string filePath, Stream stream)
     {
         StreamReader reader = new StreamReader(stream);
         string src = reader.ReadToEnd();
-        return new FragmentShader(window, src);
+        return new FragmentShader(window, filePath, src);
     }
 }
 
 public sealed class VertexShader : ShaderStage
 {
-    public VertexShader(Window window, string source) : base(window, Gl.ShaderType.VertexShader, source)
+    public VertexShader(Window window, string name, string source) : base(window, name, Gl.ShaderType.VertexShader, source)
     {
     }
 }
 
 public sealed class FragmentShader : ShaderStage
 {
-    public FragmentShader(Window window, string source) : base(window, Gl.ShaderType.FragmentShader, source)
+    public FragmentShader(Window window, string name, string source) : base(window, name, Gl.ShaderType.FragmentShader, source)
     {
     }
 }
@@ -134,14 +137,16 @@ public sealed class Shader : IGlObject, IDisposable
     private Dictionary<string, Attribute> _attributes = new Dictionary<string, Attribute>();
     private Dictionary<string, Uniform> _uniforms = new Dictionary<string, Uniform>();
     private readonly ShaderStage[] _stages;
+    public string Name { get; }
     internal Window Window { get; }
     Window IGlObject.Window => Window;
     internal uint Handle { get; private set; }
     uint IGlObject.Handle => Handle;
 
-    public Shader(Window window, params ShaderStage[] stages)
+    public Shader(Window window, string name, params ShaderStage[] stages)
     {
         Window = window;
+        Name = name;
         _stages = stages;
         Window.QueueUpdate(this, CreateEvent.Singleton);
     }
@@ -157,6 +162,7 @@ public sealed class Shader : IGlObject, IDisposable
         {
             case CreateEvent:
                 Handle = Gl.CreateProgram();
+                Gl.ObjectLabel(Gl.ObjectIdentifier.Program, Handle, Name);
                 foreach (ShaderStage stage in _stages)
                 {
                     Gl.AttachShader(Handle, stage.Handle);
@@ -166,7 +172,7 @@ public sealed class Shader : IGlObject, IDisposable
                 if (logLength != 0)
                 {
                     Gl.GetProgramInfoLog(Handle, logLength, out string infoLog);
-                    throw new Exception(infoLog);
+                    throw new Exception($"Failed to link shader {Name}: {infoLog}");
                 }
                 foreach (ShaderStage stage in _stages)
                 {
@@ -227,7 +233,7 @@ public sealed class Shader : IGlObject, IDisposable
             return attribute;
         }
 
-        throw new Exception($"Attribute with name {name} does not exist on this shader.");
+        throw new Exception($"Attribute with name {name} does not exist on shader {Name}.");
     }
 
     internal void Bind()
