@@ -13,13 +13,13 @@ try
     vertexShader.Dispose();
     fragmentShader.Dispose();
 
-    Buffer<float> vbo = new Buffer<float>(window, "VBO", 4);
-    vbo.SetSubData(0, 0, 0, 0, 1, 1, 1);
-    vbo.SetSubData(6, 1, 0);
-    Buffer<uint> ebo = new Buffer<uint>(window, "EBO", 0, 1, 2, 0, 2, 3);
-    VertexArray vao = new VertexArray(window, "VAO", shader, ebo);
-    vao.BindBuffer(vbo).AddAttribute("vPosition", 2);
-    window.AttachRender(vao, shader);
+    new Mesh(window, "Square", new Vertex3D[]
+    {
+        new Vertex3D(0, 0, 0),
+        new Vertex3D(0, 2, 0),
+        new Vertex3D(1, 1, 0),
+        new Vertex3D(1, 0, 0),
+    }, new uint[] { 0, 1, 2, 0, 2, 3 }).BindToShader(shader);
     
     Window.Run();
 }

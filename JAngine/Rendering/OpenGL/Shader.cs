@@ -102,7 +102,7 @@ public sealed class FragmentShader : ShaderStage
 
 public sealed class Shader : IGlObject, IDisposable
 {
-    internal sealed class Attribute
+    internal sealed record Attribute
     {
         public Attribute(string name, int location, int size, Gl.AttributeType type)
         {
@@ -224,16 +224,6 @@ public sealed class Shader : IGlObject, IDisposable
     internal bool TryGetAttribute(string name, [NotNullWhen(true)] out Attribute? attribute)
     {
         return _attributes.TryGetValue(name, out attribute);
-    }
-
-    internal Attribute GetAttribute(string name)
-    {
-        if (_attributes.TryGetValue(name, out Attribute? attribute))
-        {
-            return attribute;
-        }
-
-        throw new Exception($"Attribute with name {name} does not exist on shader {Name}.");
     }
 
     internal void Bind()

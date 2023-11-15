@@ -2,101 +2,50 @@ using System.Drawing;
 
 namespace JAngine.Rendering.OpenGL;
 
-public sealed class VertexArrayVertexBufferBinding : IGlEvent
-{
-    private readonly VertexArray _vao;
-    private readonly List<VertexArray.Attribute> _attributes = new List<VertexArray.Attribute>();
-
-    internal VertexArrayVertexBufferBinding(VertexArray vao, IGlObject buffer, uint index, int offset)
-    {
-        _vao = vao;
-        Buffer = buffer;
-        Index = index;
-        Offset = offset;
-    }
-
-    public VertexArrayVertexBufferBinding AddAttribute(string attributeName, int count)
-    {
-        lock (_attributes)
-        {
-            _attributes.Add(new VertexArray.Attribute(attributeName, count, Gl.VertexAttribType.Float));
-        }
-        _vao.UpdateBinding(this);
-        return this;
-    }
-
-    internal IEnumerable<VertexArray.Attribute> GetAttributes()
-    {
-        lock (_attributes)
-        {
-            foreach (VertexArray.Attribute attribute in _attributes)
-            {
-                yield return attribute;
-            }
-        }
-    }
-    internal int Offset { get; }
-    internal IGlObject Buffer { get; }
-    internal uint Index { get; }
-}
-
-
 public sealed class VertexArray : IGlObject, IDisposable
 {
-    internal sealed record Attribute(string Name, int Count, Gl.VertexAttribType Type);
-    private record AttributeUpdateEvent (IGlObject Buffer, uint AttribIndex, int Stride, int Size, Gl.VertexAttribType Type) : IGlEvent;
-    
     private readonly Window _window;
     private uint _handle;
     private readonly IBuffer<uint> _ebo;
-    private readonly Shader _shader;
-    private readonly Dictionary<IGlObject, VertexArrayVertexBufferBinding> _attributeBuffers = new();
+    private readonly Dictionary<IGlObject, BufferBinding> _attributeBuffers = new();
     
     public VertexArray(Window window, string name, Shader shader, IBuffer<uint> ebo)
     {
         _window = window;
         Name = name;
         _ebo = ebo;
-        _shader = shader;
+        Shader = shader;
         _window.QueueUpdate(this, CreateEvent.Singleton);
+        _window.AttachVao(this);
     }
 
-    public VertexArrayVertexBufferBinding BindBuffer<T>(IBuffer<T> buffer, int offset = 0)
+    public string Name { get; }
+    public Shader Shader { get; }
+    Window IGlObject.Window => _window;
+    uint IGlObject.Handle => _handle;
+    internal int PointCount => _ebo.Count;
+
+    public BufferBinding BindBuffer<T>(IBuffer<T> buffer, int offset = 0)
         where T : unmanaged
     {
         lock (_attributeBuffers)
         {
-            if (!_attributeBuffers.TryGetValue(buffer, out VertexArrayVertexBufferBinding? binding))
+            if (!_attributeBuffers.TryGetValue(buffer, out BufferBinding? binding))
             {
-                binding = new VertexArrayVertexBufferBinding(this, buffer, (uint)_attributeBuffers.Count, offset);
+                binding = new BufferBinding(buffer, (uint)_attributeBuffers.Count, offset);
+                binding.OnChange += () => UpdateBinding(binding);
                 _attributeBuffers.Add(buffer, binding);
             }
-            _window.QueueUpdateUnique(this, binding);
+            UpdateBinding(binding);
 
             return binding;
         }
     }
 
-    internal void UpdateBinding(VertexArrayVertexBufferBinding binding)
+    private void UpdateBinding(BufferBinding binding)
     {
         _window.QueueUpdateUnique(this, binding);
     }
-    
-    public void AddAttribute<T>(IBuffer<T> buffer, uint attribIndex, int stride, int size)
-        where T : unmanaged
-    {
-        AddAttribute(buffer, attribIndex, stride, size, Gl.VertexAttribType.Float);
-    }
-
-    private void AddAttribute<T>(IBuffer<T> fixedBuffer, uint attribIndex, int stride, int size, Gl.VertexAttribType type)
-        where T : unmanaged
-    {
-        _window.QueueUpdate(this, new AttributeUpdateEvent(fixedBuffer, attribIndex, stride, size, type));
-    }
-
-    public string Name { get; }
-    Window IGlObject.Window => _window;
-    uint IGlObject.Handle => _handle;
     
     void IGlObject.DispatchEvent(IGlEvent glEvent)
     {
@@ -107,13 +56,20 @@ public sealed class VertexArray : IGlObject, IDisposable
                 Gl.ObjectLabel(Gl.ObjectIdentifier.VertexArray, _handle, Name);
                 Gl.VertexArrayElementBuffer(_handle, _ebo.Handle);
                 break;
-            case VertexArrayVertexBufferBinding binding:
+            case BufferBinding binding:
                 uint relativeOffset = 0;
-                foreach (Attribute attribute in binding.GetAttributes())
+                foreach (BufferBinding.Attribute attribute in binding.GetAttributes())
                 {
-                    uint location = (uint)_shader.GetAttribute(attribute.Name).Location;
+                    if (!Shader.TryGetAttribute(attribute.Name, out Shader.Attribute? shaderAttrib))
+                    {
+                        relativeOffset += (uint)attribute.Count * sizeof(float);
+                        continue;
+                    }
+
+                    uint location = (uint)shaderAttrib.Location;
                     Gl.EnableVertexArrayAttrib(_handle, location);
                     Gl.VertexArrayAttribBinding(_handle, location, binding.Index);
+                    Gl.VertexArrayBindingDivisor(_handle, binding.Index, attribute.Divisor);
                     Gl.VertexArrayAttribFormat(_handle, location, attribute.Count, attribute.Type, false, relativeOffset);
                     relativeOffset += (uint)attribute.Count * sizeof(float);
                 }
@@ -134,5 +90,6 @@ public sealed class VertexArray : IGlObject, IDisposable
     public void Dispose()
     {
         _window.QueueUpdate(this, DisposeEvent.Singleton);
+        _window.DetachVao(this);
     }
 }

@@ -13,7 +13,7 @@ public sealed class Window : IDisposable
     private readonly List<(IGlObject, IGlEvent)> _updateQueue = new();
     private readonly Dictionary<(IGlObject, Type), int> _uniqueUpdates = new();
     private readonly Glfw.Window _handle;
-    private HashSet<IRenderable> _renderables = new HashSet<IRenderable>();
+    private HashSet<VertexArray> _vaos = new HashSet<VertexArray>();
     private readonly Thread _renderingThread;
 
     static Window()
@@ -76,9 +76,11 @@ public sealed class Window : IDisposable
                 glObject.DispatchEvent(glEvent);
             }
 
-            foreach (IRenderable renderable in _renderables)
+            foreach (VertexArray vao in _vaos)
             {
-                renderable.Render();
+                vao.Bind();
+                vao.Shader.Bind();
+                Gl.DrawElementsInstanced(Gl.PrimitiveType.Triangles, vao.PointCount, Gl.DrawElementsType.UnsignedInt, 0, 1);
             }
             
             Glfw.SwapBuffers(_handle);
@@ -131,16 +133,14 @@ public sealed class Window : IDisposable
         return true;
     }
 
-    public IRenderable AttachRender(VertexArray vao, Shader shader)
+    internal void AttachVao(VertexArray vao)
     {
-        IRenderable renderable = new Renderable(vao, shader);
-        _renderables.Add(renderable);
-        return renderable;
+        _vaos.Add(vao);
     }
 
-    public void DetachRender(IRenderable renderable)
+    internal void DetachVao(VertexArray vao)
     {
-        _renderables.Remove(renderable);
+        _vaos.Remove(vao);
     }
 
     /// <inheritdoc cref="IDisposable.Dispose"/>

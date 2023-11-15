@@ -358,6 +358,8 @@ internal static unsafe class Gl
         (delegate* unmanaged<Uint, Uint, Uint, IntPtr, SizeI, void>)Glfw.GetProcAddress("glVertexArrayVertexBuffer");
     private static readonly delegate* unmanaged<Uint, Uint, Uint, void> VertexArrayAttribBindingPtr =
         (delegate* unmanaged<Uint, Uint, Uint, void>)Glfw.GetProcAddress("glVertexArrayAttribBinding");
+    private static readonly delegate* unmanaged<Uint, Uint, Uint, void> VertexArrayBindingDivisorPtr =
+        (delegate* unmanaged<Uint, Uint, Uint, void>)Glfw.GetProcAddress("glVertexArrayBindingDivisor");
     private static readonly delegate* unmanaged<Uint, Uint, void> EnableVertexArrayAttribPtr =
         (delegate* unmanaged<Uint, Uint, void>)Glfw.GetProcAddress("glEnableVertexArrayAttrib");
     private static readonly delegate* unmanaged<Uint, Uint, void> DisableVertexArrayAttribPtr =
@@ -585,6 +587,11 @@ internal static unsafe class Gl
     internal static void VertexArrayAttribBinding(uint vao, uint attribIndex, uint bindingIndex)
     {
         VertexArrayAttribBindingPtr(vao, attribIndex, bindingIndex);
+    }
+    
+    internal static void VertexArrayBindingDivisor(uint vao, uint bindingIndex, uint divisor)
+    {
+        VertexArrayBindingDivisorPtr(vao, bindingIndex, divisor);
     }
 
     internal static void EnableVertexArrayAttrib(uint vao, uint index)
