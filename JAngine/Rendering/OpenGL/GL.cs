@@ -15,14 +15,12 @@ using ClampX = System.Int32;
 using SizeI = System.Int32;
 using Float = System.Single;
 using ClampF = System.Single;
-using Double = System.Double;
 using ClampD = System.Double;
 using Char = System.Byte;
 using Half = System.UInt16;
 using Fixed = System.Int32;
 using IntPtr = System.IntPtr;
 using SizeIPtr = System.IntPtr;
-using Int64 = System.Int64;
 using Uint64 = System.UInt64;
 // Sync
 // Context

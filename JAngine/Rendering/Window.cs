@@ -1,4 +1,3 @@
-using JAngine;
 using JAngine.Rendering.OpenGL;
 
 namespace JAngine.Rendering;

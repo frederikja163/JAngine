@@ -13,9 +13,7 @@
 
     <ItemGroup>
       <None Remove="shader.frag" />
-      <EmbeddedResource Include="shader.frag" />
       <None Remove="shader.vert" />
-      <EmbeddedResource Include="shader.vert" />
     </ItemGroup>
 
 </Project>

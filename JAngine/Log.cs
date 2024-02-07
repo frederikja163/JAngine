@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using JAngine.Extensions;
 

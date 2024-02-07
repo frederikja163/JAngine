@@ -1,5 +1,6 @@
 ﻿
 using JAngine;
+using JAngine.ECS;
 
 var world = new World();
 

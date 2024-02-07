@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using JAngine;
+﻿using JAngine;
 using JAngine.Rendering;
 using JAngine.Rendering.OpenGL;
 
@@ -7,8 +6,8 @@ try
 {
     using Window window = new Window("Test", 100, 100);
 
-    ShaderStage vertexShader = Resource.Load<ShaderStage>(window, "Sandbox.shader.vert");
-    ShaderStage fragmentShader = Resource.Load<ShaderStage>(window, "Sandbox.shader.frag");
+    ShaderStage vertexShader = Resource.Load<ShaderStage>(window, "JAngine.Shaders.shader.vert");
+    ShaderStage fragmentShader = Resource.Load<ShaderStage>(window, "JAngine.Shaders.shader.frag");
     using Shader shader = new Shader(window, "Shader Program", vertexShader, fragmentShader);
     vertexShader.Dispose();
     fragmentShader.Dispose();

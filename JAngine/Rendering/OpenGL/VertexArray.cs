@@ -1,5 +1,3 @@
-using System.Drawing;
-
 namespace JAngine.Rendering.OpenGL;
 
 public sealed class VertexArray : IGlObject, IDisposable

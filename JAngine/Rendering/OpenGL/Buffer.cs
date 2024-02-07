@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Drawing;
-using System.Reflection.Emit;
 
 namespace JAngine.Rendering.OpenGL;
 
