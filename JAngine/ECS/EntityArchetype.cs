@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Runtime.InteropServices.ComTypes;
 
 namespace JAngine;
 
-internal sealed class EntityArchetype
+internal sealed class EntityArchetype : IEquatable<EntityArchetype>
 {
     private readonly Dictionary<Type, Dictionary<Guid, object>> _componentTypes = new();
     private readonly List<Entity> _entities = new List<Entity>();
@@ -106,5 +107,43 @@ internal sealed class EntityArchetype
         {
             yield return entity;
         }
+    }
+
+    public override int GetHashCode()
+    {
+        int hashcode = 0;
+        foreach (Type type in ComponentTypes)
+        {
+            hashcode = HashCode.Combine(hashcode, type);
+        }
+
+        hashcode = HashCode.Combine(hashcode, World);
+
+        return hashcode;
+    }
+
+    public bool IsSupersetOf(SortedSet<Type> types)
+    {
+        return ComponentTypes.IsSupersetOf(types);
+    }
+
+    public bool Equals(EntityArchetype? other)
+    {
+        if (ReferenceEquals(null, other))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return World.Equals(other.World) && ComponentTypes.SequenceEqual(other.ComponentTypes);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is EntityArchetype other && Equals(other);
     }
 }

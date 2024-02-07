@@ -1,6 +1,6 @@
 using System.Diagnostics.Contracts;
 using System.Reflection;
-using JAngine.Core;
+using JAngine.Extensions;
 
 namespace JAngine;
 

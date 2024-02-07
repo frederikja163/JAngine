@@ -71,7 +71,7 @@ public sealed class Entity
         {
             componentValues.Add(value);
         }
-        Archetype = World.GetOrCreateArchetype(newComponentTypes);
+        Archetype = World.GetExistingArchetype(newComponentTypes);
         Archetype.AddEntity(this, componentValues);
     }
 }

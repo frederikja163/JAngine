@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JAngine", "JAngine\JAngine.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox\Sandbox.csproj", "{591E4A93-6C93-4F13-A7E4-D6AAB743BB84}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmarks", "Benchmarks", "{F8737D6A-51F1-4616-97F7-DDF96534E36D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECS.Benchmarks", "ECS.Benchmarks\ECS.Benchmarks.csproj", "{E05A978A-BBB6-40AD-BCFB-0FD4BE5E111C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,12 +39,17 @@ Global
 		{591E4A93-6C93-4F13-A7E4-D6AAB743BB84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{591E4A93-6C93-4F13-A7E4-D6AAB743BB84}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{591E4A93-6C93-4F13-A7E4-D6AAB743BB84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E05A978A-BBB6-40AD-BCFB-0FD4BE5E111C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E05A978A-BBB6-40AD-BCFB-0FD4BE5E111C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E05A978A-BBB6-40AD-BCFB-0FD4BE5E111C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E05A978A-BBB6-40AD-BCFB-0FD4BE5E111C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6B65CBA4-682B-4C5D-A1C0-6F98222E898E} = {3ED60DA1-6C7B-49D1-91D8-8F8588A5F080}
+		{E05A978A-BBB6-40AD-BCFB-0FD4BE5E111C} = {F8737D6A-51F1-4616-97F7-DDF96534E36D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1F63FF2A-14B8-4D7C-BF95-5635F17BB4F2}

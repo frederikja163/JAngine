@@ -10,7 +10,7 @@ public sealed class World
     private static ICollection<ISystem> s_systems = Assemblies.CreateInstances<ISystem>().ToList();
     public static event Action<World>? WorldCreated;
 
-    private readonly Dictionary<SortedSet<Type>, EntityArchetype> _archetypes = new();
+    private readonly HashSet<EntityArchetype> _archetypes = new();
 
     /// <summary>
     /// Creates a new world.
@@ -20,12 +20,13 @@ public sealed class World
         WorldCreated?.Invoke(this);
     }
     
-    internal EntityArchetype GetOrCreateArchetype(SortedSet<Type> types)
+    internal EntityArchetype GetExistingArchetype(SortedSet<Type> types)
     {
-        if (!_archetypes.TryGetValue(types, out EntityArchetype? archetype))
+        EntityArchetype? key = new EntityArchetype(this, types);
+        if (!_archetypes.TryGetValue(key, out EntityArchetype? archetype))
         {
-            archetype = new EntityArchetype(this, types);
-            _archetypes.Add(types, archetype);
+            archetype = key;
+            _archetypes.Add(archetype);
         }
 
         return archetype;
@@ -33,9 +34,9 @@ public sealed class World
 
     private IEnumerable<EntityArchetype> GetAllMatchingArchetypes(SortedSet<Type> types)
     {
-        foreach ((SortedSet<Type> componentTypes, EntityArchetype archetype) in _archetypes)
+        foreach (EntityArchetype archetype in _archetypes)
         {
-            if (!componentTypes.IsSupersetOf(types))
+            if (!archetype.IsSupersetOf(types))
             {
                 continue;
             }
@@ -58,7 +59,7 @@ public sealed class World
     public Entity CreateEntity(params object[] components)
     {
         SortedSet<Type> componentTypes = new SortedSet<Type>(components.Select(c => c.GetType()), TypeComparer.Default);
-        EntityArchetype archetype = GetOrCreateArchetype(componentTypes);
+        EntityArchetype archetype = GetExistingArchetype(componentTypes);
         return archetype.AddEntity(null, components);
     }
 

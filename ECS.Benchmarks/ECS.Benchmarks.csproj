@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -9,13 +9,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\JAngine\JAngine.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="shader.frag" />
-      <EmbeddedResource Include="shader.frag" />
-      <None Remove="shader.vert" />
-      <EmbeddedResource Include="shader.vert" />
     </ItemGroup>
 
 </Project>

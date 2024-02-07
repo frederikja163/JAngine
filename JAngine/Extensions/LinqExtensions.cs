@@ -1,9 +1,9 @@
-﻿namespace JAngine.Core;
+﻿namespace JAngine.Extensions;
 
 internal static class LinqExtensions
 {
     // Source: https://stackoverflow.com/a/14741288
-    public static IEnumerable<T> CatchExceptions<T> (this IEnumerable<T> src, Action<Exception>? action = null)
+    internal static IEnumerable<T> CatchExceptions<T> (this IEnumerable<T> src, Action<Exception>? action = null)
     {
         using var enumerator = src.GetEnumerator();
         bool next = true;

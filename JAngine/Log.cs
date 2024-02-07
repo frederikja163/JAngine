@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using JAngine.Extensions;
 
 namespace JAngine;
 
@@ -63,9 +64,10 @@ public class LogMessage
     }
 }
 
-public sealed class TimerRecord
+internal sealed class TimerRecord
 {
-    public TimerRecord(string name)
+    // TODO: Consider collecting additional data to find outliers, mean etc. for each record.
+    internal TimerRecord(string name)
     {
         Name = name;
         TotalTime = TimeSpan.Zero;
@@ -76,50 +78,50 @@ public sealed class TimerRecord
     public TimeSpan TotalTime { get; private set; }
     public int Runs { get; private set; }
 
-    internal LogTimer StartTimer()
+    internal LogTimer Start(bool logAtEnd)
     {
-        return new LogTimer(this);
+        return new LogTimer(this, logAtEnd);
     }
 
-    internal void StopTimer(Stopwatch stopwatch)
+    internal void Stop(Stopwatch stopwatch)
     {
         Runs += 1;
         TotalTime += stopwatch.Elapsed;
-        if (Runs > 100)
-        {
-            Runs = 0;
-            TotalTime = TimeSpan.Zero;
-        }
     }
 
-    // TODO: Consider what other information could be useful to gather, maybe reset the timer etc.
-    public override string ToString()
+    internal void Reset()
     {
-        string average = (TotalTime.TotalNanoseconds / Runs).ToString(CultureInfo.InvariantCulture);
-        return $"Timer {Name} has completed {Runs} runs, with an average of {average}ns";
+        Runs = 0;
+        TotalTime = TimeSpan.Zero;
     }
 }
 
 public sealed class LogTimer : IDisposable
 {
     private readonly TimerRecord _record;
+    private readonly bool _logAtEnd;
     private readonly Stopwatch _stopwatch;
 
-    internal LogTimer(TimerRecord record)
+    internal LogTimer(TimerRecord record, bool logAtEnd)
     {
         _record = record;
+        _logAtEnd = logAtEnd;
         _stopwatch = Stopwatch.StartNew();
     }
 
     public void Dispose()
     {
         _stopwatch.Stop();
-        _record.StopTimer(_stopwatch);
+        _record.Stop(_stopwatch);
+        if (_logAtEnd)
+        {
+            Log.LogTimer(_record);
+        }
     }
 } 
 
 /// <summary>
-/// Provides the functionality of custom log messaGetFileLineNumberge handlers.
+/// Provides the functionality of custom log messageGetFileLineNumber handlers.
 /// </summary>
 public interface ILogger
 {
@@ -276,9 +278,9 @@ public static class Log
             handler.HandleMessage(message);
         }
     }
-
+    
     // TODO: Make sure this has as little overhead as possible.
-    public static LogTimer Time(string timerName)
+    public static LogTimer Time(string timerName, bool logAtEnd = true)
     {
         if (!_timers.TryGetValue(timerName, out TimerRecord? record))
         {
@@ -286,10 +288,14 @@ public static class Log
             _timers.Add(timerName, record);
         }
 
-        return record.StartTimer();
+        return record.Start(logAtEnd);
     }
 
-    // TODO: Is this the best way to provide an interface to log whats in the timer?
+    internal static void LogTimer(TimerRecord record)
+    {
+        Info($"Timer {record.Name} has completed {record.Runs} runs with {(record.TotalTime / record.Runs).ToStringFormatted()}/run and {record.TotalTime.ToStringFormatted()} total");
+    }
+
     public static void LogTimer(string timerName)
     {
         if (!_timers.TryGetValue(timerName, out TimerRecord? record))
@@ -297,7 +303,7 @@ public static class Log
             record = new TimerRecord(timerName);
             _timers.Add(timerName, record);
         }
-        Info(record);
+        LogTimer(record);
     }
     
     /// <summary>
