@@ -12,7 +12,7 @@ try
     vertexShader.Dispose();
     fragmentShader.Dispose();
 
-    new Mesh(window, "Square", new Vertex3D[]
+    new Mesh3D(window, "Square", new Vertex3D[]
     {
         new Vertex3D(0, 0, 0),
         new Vertex3D(0, 2, 0),

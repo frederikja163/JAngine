@@ -1,3 +1,4 @@
+using JAngine.ECS;
 using JAngine.Rendering.OpenGL;
 
 namespace JAngine.Rendering;
@@ -9,9 +10,10 @@ public sealed class Window : IDisposable
 {
     private static readonly HashSet<Window> s_windows = new();
 
+    private readonly Glfw.Window _handle;
     private readonly List<(IGlObject, IGlEvent)> _updateQueue = new();
     private readonly Dictionary<(IGlObject, Type), int> _uniqueUpdates = new();
-    private readonly Glfw.Window _handle;
+    private readonly List<World> _worlds = new List<World>();
     private HashSet<VertexArray> _vaos = new HashSet<VertexArray>();
     private readonly Thread _renderingThread;
 

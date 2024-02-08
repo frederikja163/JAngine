@@ -6,25 +6,39 @@ namespace JAngine.Rendering;
 
 public readonly struct Vertex3D
 {
-    public readonly Vector3 vPosition;
+    [ShaderAttribute("vPosition")]
+    public readonly Vector3 Position;
+    [ShaderAttribute("vTexCoord")]
     public readonly Vector2 TexCoord;
+    [ShaderAttribute("vNormal")]
     public readonly Vector3 Normal;
 
     public Vertex3D(Vector3 position, Vector2 texCoord, Vector3 normal)
     {
-        vPosition = position;
+        Position = position;
         TexCoord = texCoord;
         Normal = normal;
     }
 
     public Vertex3D(float x, float y, float z)
     {
-        vPosition = new Vector3(x, y, z);
+        Position = new Vector3(x, y, z);
     }
 }
 
 public readonly struct Instance3D
 {
+}
+
+[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+public sealed class ShaderAttributeAttribute : Attribute
+{
+    public string NameInShader { get; }
+
+    public ShaderAttributeAttribute(string nameInShader)
+    {
+        NameInShader = nameInShader;
+    }
 }
 
 public class Mesh<TVertex, TInstance> : IDisposable
@@ -79,7 +93,16 @@ public class Mesh<TVertex, TInstance> : IDisposable
                     throw new Exception(
                         $"Field of type {field.FieldType.Name} is not supported on vertex or instance fields.");
                 }
-                binding.AddAttribute(field.Name, tuple.count, divisor);
+
+                ShaderAttributeAttribute? attribute = field.GetCustomAttributes<ShaderAttributeAttribute>().FirstOrDefault();
+                if (attribute is not null)
+                {
+                    binding.AddAttribute(attribute.NameInShader, tuple.count, divisor);
+                }
+                else
+                {
+                    binding.AddAttribute(field.Name, tuple.count, divisor);
+                }
             }
         }
     }
@@ -96,7 +119,7 @@ public class Mesh<TVertex, TInstance> : IDisposable
     }
 }
 
-public sealed class Mesh : Mesh<Vertex3D, Instance3D>
+public sealed class Mesh3D : Mesh<Vertex3D, Instance3D>
 {
     private record VertexIndex(int PosIndex, int TexCoordIndex, int NormalIndex)
     {
@@ -106,7 +129,7 @@ public sealed class Mesh : Mesh<Vertex3D, Instance3D>
         }
     }
     
-    private static Mesh LoadObjFile(Window window, string path)
+    private static Mesh3D LoadObjFile(Window window, string path)
     {
         using Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read);
         using StreamReader reader = new StreamReader(stream);
@@ -169,10 +192,10 @@ public sealed class Mesh : Mesh<Vertex3D, Instance3D>
             .SelectMany(f => f)
             .Select(i => (uint)i)
             .ToArray();
-        return new Mesh(window, Path.GetFileNameWithoutExtension(path) + ".mesh", vertices.ToArray(), indices);
+        return new Mesh3D(window, Path.GetFileNameWithoutExtension(path) + ".mesh", vertices.ToArray(), indices);
     }
 
-    public Mesh(Window window, string name, Vertex3D[] vertices, uint[] indices) : base(window, name, vertices, indices)
+    public Mesh3D(Window window, string name, Vertex3D[] vertices, uint[] indices) : base(window, name, vertices, indices)
     {
     }
 }
