@@ -292,7 +292,8 @@ public static class Log
 
     internal static void LogTimer(TimerRecord record)
     {
-        Info($"Timer {record.Name} has completed {record.Runs} runs with {(record.TotalTime / record.Runs).ToStringFormatted()}/run and {record.TotalTime.ToStringFormatted()} total");
+        TimeSpan average = record.TotalTime / record.Runs;
+        Info($"Timer {record.Name} has completed {record.Runs} runs with {average.ToStringFormatted()}/run and {record.TotalTime.ToStringFormatted()} total");
     }
 
     public static void LogTimer(string timerName)

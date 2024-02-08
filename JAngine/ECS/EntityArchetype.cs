@@ -8,10 +8,9 @@ internal sealed class EntityArchetype : IEquatable<EntityArchetype>
     private readonly Dictionary<Type, Dictionary<Guid, object>> _componentTypes = new();
     private readonly List<Entity> _entities = new List<Entity>();
 
-    internal EntityArchetype(World world, SortedSet<Type> componentTypes)
+    internal EntityArchetype(World world, IEnumerable<Type> componentTypes)
     {
         World = world;
-        ComponentTypes = componentTypes;
         foreach (Type componentType in componentTypes)
         {
             _componentTypes.Add(componentType, new Dictionary<Guid, object>());
@@ -19,7 +18,6 @@ internal sealed class EntityArchetype : IEquatable<EntityArchetype>
     }
     
     internal World World { get; private init; }
-    internal SortedSet<Type> ComponentTypes { get; private init; }
 
     internal Entity AddEntity(Entity? existingEntity = null, IEnumerable? existingComponents = null)
     {
@@ -107,10 +105,18 @@ internal sealed class EntityArchetype : IEquatable<EntityArchetype>
         }
     }
 
+    internal IEnumerable<Type> GetComponentTypes()
+    {
+        foreach ((Type type, _) in _componentTypes)
+        {
+            yield return type;
+        }
+    }
+
     public override int GetHashCode()
     {
         int hashcode = 0;
-        foreach (Type type in ComponentTypes)
+        foreach ((Type type, _) in _componentTypes)
         {
             hashcode = HashCode.Combine(hashcode, type);
         }
@@ -120,9 +126,9 @@ internal sealed class EntityArchetype : IEquatable<EntityArchetype>
         return hashcode;
     }
 
-    public bool IsSupersetOf(SortedSet<Type> types)
+    public bool IsAssignableTo(IEnumerable<Type> types)
     {
-        return ComponentTypes.IsSupersetOf(types);
+        return types.All(t => GetComponentTypes().Any(t.IsAssignableFrom));
     }
 
     public bool Equals(EntityArchetype? other)
@@ -137,7 +143,8 @@ internal sealed class EntityArchetype : IEquatable<EntityArchetype>
             return true;
         }
 
-        return World.Equals(other.World) && ComponentTypes.SequenceEqual(other.ComponentTypes);
+        return World.Equals(other.World) &&
+               _componentTypes.Select(ct => ct.Key).SequenceEqual(other._componentTypes.Select(ct => ct.Key));
     }
 
     public override bool Equals(object? obj)

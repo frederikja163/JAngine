@@ -20,9 +20,9 @@ public sealed class World
         WorldCreated?.Invoke(this);
     }
     
-    internal EntityArchetype GetExistingArchetype(SortedSet<Type> types)
+    internal EntityArchetype GetExistingArchetype(IEnumerable<Type> types)
     {
-        EntityArchetype? key = new EntityArchetype(this, types);
+        EntityArchetype key = new EntityArchetype(this, types);
         if (!_archetypes.TryGetValue(key, out EntityArchetype? archetype))
         {
             archetype = key;
@@ -32,11 +32,12 @@ public sealed class World
         return archetype;
     }
 
-    private IEnumerable<EntityArchetype> GetAllMatchingArchetypes(SortedSet<Type> types)
+    private IEnumerable<EntityArchetype> GetAllMatchingArchetypes(IEnumerable<Type> types)
     {
+        List<Type> typeList = types.ToList();
         foreach (EntityArchetype archetype in _archetypes)
         {
-            if (!archetype.IsSupersetOf(types))
+            if (!archetype.IsAssignableTo(typeList))
             {
                 continue;
             }
@@ -58,8 +59,7 @@ public sealed class World
     /// <inheritdoc cref="CreateEntity(System.Collections.IEnumerable)"/>
     public Entity CreateEntity(params object[] components)
     {
-        SortedSet<Type> componentTypes = new SortedSet<Type>(components.Select(c => c.GetType()), TypeComparer.Default);
-        EntityArchetype archetype = GetExistingArchetype(componentTypes);
+        EntityArchetype archetype = GetExistingArchetype(components.Select(c => c.GetType()));
         return archetype.AddEntity(null, components);
     }
 
@@ -124,7 +124,7 @@ public sealed class World
     /// <returns>All components with the specified types.</returns>
     public IEnumerable<T1> GetComponents<T1>()
     {
-        return GetAllMatchingArchetypes(new SortedSet<Type>(TypeComparer.Default) { typeof(T1) })
+        return GetAllMatchingArchetypes(new List<Type>() { typeof(T1) })
             .SelectMany(e => e.GetAllComponentsOfType<T1>());
     }
 
@@ -136,7 +136,7 @@ public sealed class World
     /// <returns>All components with the specified types.</returns>
     public IEnumerable<(T1, T2)> GetComponents<T1, T2>()
     {
-        return GetAllMatchingArchetypes(new SortedSet<Type>(TypeComparer.Default) { typeof(T1), typeof(T2) })
+        return GetAllMatchingArchetypes(new List<Type>() { typeof(T1), typeof(T2) })
             .SelectMany(e => e.GetAllComponentsOfType<T1>()
                 .Zip(e.GetAllComponentsOfType<T2>(), (c1, c2) => (c1, c2)));
     }
@@ -150,7 +150,7 @@ public sealed class World
     /// <returns>All components with the specified types.</returns>
     public IEnumerable<(T1, T2, T3)> GetComponents<T1, T2, T3>()
     {
-        return GetAllMatchingArchetypes(new SortedSet<Type>(TypeComparer.Default) { typeof(T1), typeof(T2), typeof(T3) })
+        return GetAllMatchingArchetypes(new List<Type>() { typeof(T1), typeof(T2), typeof(T3) })
             .SelectMany(e => e.GetAllComponentsOfType<T1>()
                 .Zip(e.GetAllComponentsOfType<T2>(), (c1, c2) => (c1, c2))
                 .Zip(e.GetAllComponentsOfType<T3>(), (pair, c3) => (pair.c1, pair.c2, c3)));
@@ -166,7 +166,7 @@ public sealed class World
     /// <returns>All components with the specified types.</returns>
     public IEnumerable<(T1, T2, T3, T4)> GetComponents<T1, T2, T3, T4>()
     {
-        return GetAllMatchingArchetypes(new SortedSet<Type>(TypeComparer.Default) { typeof(T1), typeof(T2), typeof(T3) })
+        return GetAllMatchingArchetypes(new List<Type>() { typeof(T1), typeof(T2), typeof(T3) })
             .SelectMany(e => e.GetAllComponentsOfType<T1>()
                 .Zip(e.GetAllComponentsOfType<T2>(), (c1, c2) => (c1, c2))
                 .Zip(e.GetAllComponentsOfType<T3>(), (pair, c3) => (pair.c1, pair.c2, c3))
@@ -179,7 +179,7 @@ public sealed class World
     /// <returns>All entities existing within this world.</returns>
     public IEnumerable<Entity> GetEntities()
     {
-        return GetAllMatchingArchetypes(new SortedSet<Type>(TypeComparer.Default))
+        return GetAllMatchingArchetypes(new List<Type>())
             .SelectMany(e => e.GetEntities());
     }
     
@@ -190,7 +190,7 @@ public sealed class World
     /// <returns>All entities with the specified component types.</returns>
     public IEnumerable<Entity> GetEntities<T1>()
     {
-        return GetAllMatchingArchetypes(new SortedSet<Type>(TypeComparer.Default) { typeof(T1) })
+        return GetAllMatchingArchetypes(new List<Type>() { typeof(T1) })
             .SelectMany(e => e.GetEntities());
     }
 
@@ -202,10 +202,10 @@ public sealed class World
     /// <returns>All entities with the specified component types.</returns>
     public IEnumerable<Entity> GetEntities<T1, T2>()
     {
-        return GetAllMatchingArchetypes(new SortedSet<Type>(TypeComparer.Default) { typeof(T1), typeof(T2) })
+        return GetAllMatchingArchetypes(new List<Type>() { typeof(T1), typeof(T2) })
             .SelectMany(e => e.GetEntities());
     }
-    
+
     /// <summary>
     /// Gets the entities with the specified component types.
     /// </summary>
@@ -215,7 +215,7 @@ public sealed class World
     /// <returns>All entities with the specified component types.</returns>
     public IEnumerable<Entity> GetEntities<T1, T2, T3>()
     {
-        return GetAllMatchingArchetypes(new SortedSet<Type>(TypeComparer.Default) { typeof(T1), typeof(T2), typeof(T3) })
+        return GetAllMatchingArchetypes(new List<Type>() { typeof(T1), typeof(T2), typeof(T3) })
             .SelectMany(e => e.GetEntities());
     }
     
@@ -229,7 +229,7 @@ public sealed class World
     /// <returns>All entities with the specified component types.</returns>
     public IEnumerable<Entity> GetEntities<T1, T2, T3, T4>()
     {
-        return GetAllMatchingArchetypes(new SortedSet<Type>(TypeComparer.Default) { typeof(T1), typeof(T2), typeof(T3), typeof(T4) })
+        return GetAllMatchingArchetypes(new List<Type>() { typeof(T1), typeof(T2), typeof(T3), typeof(T4) })
             .SelectMany(e => e.GetEntities());
     }
 }

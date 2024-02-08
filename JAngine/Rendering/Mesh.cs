@@ -10,9 +10,9 @@ public readonly struct Vertex3D
     public readonly Vector2 TexCoord;
     public readonly Vector3 Normal;
 
-    public Vertex3D(Vector3 vPosition, Vector2 texCoord, Vector3 normal)
+    public Vertex3D(Vector3 position, Vector2 texCoord, Vector3 normal)
     {
-        vPosition = vPosition;
+        vPosition = position;
         TexCoord = texCoord;
         Normal = normal;
     }
@@ -43,7 +43,7 @@ public class Mesh<TVertex, TInstance> : IDisposable
             {typeof(double), (1, typeof(double))}
         };
 
-    private static readonly List<VertexArray> _vaos;
+    private readonly List<VertexArray> _vaos = new List<VertexArray>();
 
     public Mesh(Window window, string name, TVertex[] vertices, uint[] indices)
     {
@@ -63,6 +63,7 @@ public class Mesh<TVertex, TInstance> : IDisposable
     public void BindToShader(Shader shader)
     {
         VertexArray vao = new VertexArray(Window, Name + ".vao", shader, ElementBuffer);
+        _vaos.Add(vao);
         AddAttributes(VertexBuffer, 0);
         AddAttributes(InstanceBuffer, 1);
         

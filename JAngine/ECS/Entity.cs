@@ -37,9 +37,9 @@ public sealed class Entity
     /// <param name="value">The value of the new component.</param>
     public void AddComponent<T>(T value)
     {
-        SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
-        newComponentTypes.Add(typeof(T));
-        SetArchetype(newComponentTypes, value);
+        // SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
+        // newComponentTypes.Add(typeof(T));
+        // SetArchetype(newComponentTypes, value);
     }
     
     /// <summary>
@@ -48,9 +48,9 @@ public sealed class Entity
     /// <typeparam name="T">The type of the new component.</typeparam>
     public void AddComponent<T>()
     {
-        SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
-        newComponentTypes.Add(typeof(T));
-        SetArchetype(newComponentTypes);
+        // SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
+        // newComponentTypes.Add(typeof(T));
+        // SetArchetype(newComponentTypes);
     }
 
     /// <summary>
@@ -59,9 +59,9 @@ public sealed class Entity
     /// <typeparam name="T">The type of the new component.</typeparam>
     public void RemoveComponent<T>()
     {
-        SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
-        newComponentTypes.Remove(typeof(T));
-        SetArchetype(newComponentTypes);
+        // SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
+        // newComponentTypes.Remove(typeof(T));
+        // SetArchetype(newComponentTypes);
     }
 
     private void SetArchetype(SortedSet<Type> newComponentTypes, object? value = null)

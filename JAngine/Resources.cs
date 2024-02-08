@@ -13,6 +13,7 @@ public interface IResourceLoader<out T>
     /// <summary>
     /// Loads a single resource of the specified type from a stream.
     /// </summary>
+    /// <param name="window">The window this resource will belong to.</param>
     /// <param name="filePath">The file path of the loaded file.</param>
     /// <param name="stream">The stream to load the resource from.</param>
     /// <returns>The loaded resource.</returns>
