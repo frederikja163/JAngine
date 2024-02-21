@@ -81,6 +81,17 @@ public readonly struct Vec2
     {
         return new Vec2(left.X / right, left.Y / right);
     }
+
+    /// <summary>
+    /// Divides a float with a vector.
+    /// </summary>
+    /// <param name="left">The float to be divided.</param>
+    /// <param name="right">The value to divide with.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator /(float left, Vec2 right)
+    {
+        return new Vec2(left / right.X, left / right.Y);
+    }
     
     /// <summary>
     /// Calculates the length of the vector.
@@ -88,7 +99,7 @@ public readonly struct Vec2
     /// <returns>Returns the length of the vector, i.e. '√(X² + Y²)'.</returns>
     public float Length()
     {
-        return (float)Math.Sqrt(Math.Pow(_x, 2) + Math.Pow(_y, 2));
+        return (float)Math.Sqrt(_x * _x + _y * _y);
     }
 
     /// <summary>
@@ -117,7 +128,7 @@ public readonly struct Vec2
     /// <param name="p0">Specifies the first of two points.</param>
     /// <param name="p1">Specifies the second of two points.</param>
     /// <returns>Returns the distance between the two points p0 and p1. i.e., 'length(p0 - p1)'.</returns>
-    public static float Distance(Vec2 p0, Vec2 p1)
+    public static float Distance(Vec2 p0, Vec2 p1) // TODO: fix when overloading minus
     {
         return (float)Math.Sqrt(Math.Pow(p0.X - p1.X, 2) + Math.Pow(p0.Y - p1.Y, 2));
     }
