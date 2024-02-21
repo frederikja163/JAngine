@@ -50,12 +50,32 @@ public readonly struct Vec2
     public float G => _y;
 
     /// <summary>
+    /// Multiplies a vector with a float.
+    /// </summary>
+    /// <param name="vec">The vector to multiply.</param>
+    /// <param name="value">The value to multiply.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator *(Vec2 vec, float value)
+    {
+        return new Vec2(vec.X * value, vec.Y * value);
+    }
+    
+    /// <summary>
     /// Calculates the length of the vector.
     /// </summary>
     /// <returns>Returns the length of the vector, i.e. '√(X² + Y²)'.</returns>
     public float Length()
     {
         return (float)Math.Sqrt(Math.Pow(_x, 2) + Math.Pow(_y, 2));
+    }
+
+    /// <summary>
+    /// Calculates the unit vector in the same direction as the original vector.
+    /// </summary>
+    /// <returns>Returns a vector with the same direction as its parameter, v, but with length 1.</returns>
+    public Vec2 Normalize()
+    {
+        return this * (1 / Length());
     }
     
     /// <summary>
