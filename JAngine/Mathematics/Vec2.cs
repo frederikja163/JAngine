@@ -52,12 +52,23 @@ public readonly struct Vec2
     /// <summary>
     /// Multiplies a vector with a float.
     /// </summary>
-    /// <param name="vec">The vector to multiply.</param>
-    /// <param name="value">The value to multiply.</param>
+    /// <param name="left">The vector to multiply.</param>
+    /// <param name="right">The value to multiply.</param>
     /// <returns>Returns a new vector.</returns>
-    public static Vec2 operator *(Vec2 vec, float value)
+    public static Vec2 operator *(Vec2 left, float right)
     {
-        return new Vec2(vec.X * value, vec.Y * value);
+        return new Vec2(left.X * right, left.Y * right);
+    }
+
+    /// <summary>
+    /// Multiplies a vector with a float.
+    /// </summary>
+    /// <param name="left">The value to multiply.</param>
+    /// <param name="right">The vector to multiply.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator *(float left, Vec2 right)
+    {
+        return right * left;
     }
     
     /// <summary>
