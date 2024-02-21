@@ -35,7 +35,7 @@ public sealed class Window : IDisposable
     /// Initialize a new instance of the <see cref="Window"/> class.
     /// </summary>
     /// <param name="title">The title of the new window.</param>
-    /// TODO: Use some create new window object and allow restoring old window size and other settings from a file.
+    // TODO: Use some create new window object and allow restoring old window size and other settings from a file.
     public Window(string title, int width, int height)
     {
         _handle = Glfw.CreateWindow(width, height, title, Glfw.Monitor.Null, Glfw.Window.Null);
@@ -81,7 +81,7 @@ public sealed class Window : IDisposable
             {
                 vao.Bind();
                 vao.Shader.Bind();
-                Gl.DrawElementsInstanced(Gl.PrimitiveType.Triangles, vao.PointCount, Gl.DrawElementsType.UnsignedInt, 0, 1);
+                Gl.DrawElementsInstanced(Gl.PrimitiveType.Triangles, vao.PointCount, Gl.DrawElementsType.UnsignedInt, 0, vao.InstanceCount);
             }
             
             Glfw.SwapBuffers(_handle);

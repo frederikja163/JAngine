@@ -22,6 +22,7 @@ public sealed class VertexArray : IGlObject, IDisposable
     Window IGlObject.Window => _window;
     uint IGlObject.Handle => _handle;
     internal int PointCount => _ebo.Count;
+    public int InstanceCount { get; set; }
 
     public BufferBinding BindBuffer<T>(IBuffer<T> buffer, int offset = 0)
         where T : unmanaged

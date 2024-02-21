@@ -49,7 +49,7 @@ public sealed class Buffer<T> : IBuffer<T>
     {
         if (size > Capacity)
         {
-            int capacity = Capacity;
+            int capacity = Math.Max(Capacity, 1);
             while (size > capacity)
             {
                 capacity *= 2;

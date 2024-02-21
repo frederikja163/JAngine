@@ -5,7 +5,7 @@ namespace JAngine.ECS;
 /// <summary>
 /// A world containing entities, can also compute changes to said entities using systems.
 /// </summary>
-public sealed class World
+internal sealed class World
 {
     private static ICollection<ISystem> s_systems = Assemblies.CreateInstances<ISystem>().ToList();
     public static event Action<World>? WorldCreated;

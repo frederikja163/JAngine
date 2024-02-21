@@ -41,6 +41,33 @@ public sealed class ShaderAttributeAttribute : Attribute
     }
 }
 
+public class Instance<T>
+    where T : unmanaged
+{
+    private readonly Buffer<T> _buffer;
+    private readonly int _index;
+
+    public Instance(Buffer<T> buffer, T data = default)
+    {
+        _buffer = buffer;
+        _index = buffer.Count;
+        buffer.SetSubData(_index, data);
+    }
+
+    public T Data
+    {
+        get
+        {
+            return _buffer[_index];
+        }
+        
+        set
+        {
+            _buffer[_index] = value;
+        }
+    }
+}
+
 public class Mesh<TVertex, TInstance> : IDisposable
     where TVertex : unmanaged
     where TInstance : unmanaged
@@ -64,7 +91,7 @@ public class Mesh<TVertex, TInstance> : IDisposable
         Window = window;
         Name = name;
         VertexBuffer = new Buffer<TVertex>(window, name + ".vbo", Gl.BufferUsage.StaticDraw, vertices);
-        InstanceBuffer = new Buffer<TInstance>(window, name + ".ivbo", Gl.BufferUsage.StaticDraw, 1);
+        InstanceBuffer = new Buffer<TInstance>(window, name + ".ivbo", Gl.BufferUsage.StaticDraw, 0);
         ElementBuffer = new Buffer<uint>(window, name + ".ibo", Gl.BufferUsage.StaticDraw, indices);
     }
     
@@ -80,6 +107,7 @@ public class Mesh<TVertex, TInstance> : IDisposable
         _vaos.Add(vao);
         AddAttributes(VertexBuffer, 0);
         AddAttributes(InstanceBuffer, 1);
+        vao.InstanceCount = InstanceBuffer.Count;
         
         void AddAttributes<T>(IBuffer<T> buffer, uint divisor)
             where T : unmanaged
@@ -105,6 +133,15 @@ public class Mesh<TVertex, TInstance> : IDisposable
                 }
             }
         }
+    }
+
+    public Instance<TInstance> AddInstance(TInstance data = default)
+    {
+        foreach (VertexArray vao in _vaos)
+        {
+            vao.InstanceCount += 1;
+        }
+        return new Instance<TInstance>(InstanceBuffer, data);
     }
     
     public void Dispose()

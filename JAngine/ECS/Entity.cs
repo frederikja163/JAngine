@@ -5,7 +5,7 @@ namespace JAngine.ECS;
 /// <summary>
 /// An entity in the world containing different components. To create an entity see <see cref="World.CreateEntity(System.Collections.Generic.IEnumerable{object})"/>
 /// </summary>
-public sealed class Entity
+internal sealed class Entity
 {
     internal Entity(EntityArchetype archetype, Guid id)
     {

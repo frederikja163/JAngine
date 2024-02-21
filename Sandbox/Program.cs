@@ -12,13 +12,15 @@ try
     vertexShader.Dispose();
     fragmentShader.Dispose();
 
-    new Mesh3D(window, "Square", new Vertex3D[]
+    Mesh3D mesh = new Mesh3D(window, "Square", new Vertex3D[]
     {
         new Vertex3D(0, 0, 0),
-        new Vertex3D(0, 2, 0),
+        new Vertex3D(0, 1, 0),
         new Vertex3D(1, 1, 0),
         new Vertex3D(1, 0, 0),
-    }, new uint[] { 0, 1, 2, 0, 2, 3 }).BindToShader(shader);
+    }, new uint[] { 0, 1, 2, 0, 2, 3 });
+    mesh.AddInstance();
+    mesh.BindToShader(shader);
     
     Window.Run();
 }
