@@ -70,6 +70,17 @@ public readonly struct Vec2
     {
         return right * left;
     }
+
+    /// <summary>
+    /// Divides a vector with a float.
+    /// </summary>
+    /// <param name="left">The vector to be divided.</param>
+    /// <param name="right">The value to divide with.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator /(Vec2 left, float right)
+    {
+        return new Vec2(left.X / right, left.Y / right);
+    }
     
     /// <summary>
     /// Calculates the length of the vector.
