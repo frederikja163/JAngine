@@ -262,6 +262,8 @@ public readonly struct Vec2
         return n * -1;
     }
 
+    //public static Vec2 Max
+    
     /// <summary>
     /// Returns the lesser of two values.
     /// </summary>
