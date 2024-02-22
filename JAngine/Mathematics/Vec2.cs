@@ -125,6 +125,17 @@ public readonly struct Vec2
     {
         return new Vec2(left.X + right, left.Y + right);
     }
+
+    /// <summary>
+    /// Adds 2 vectors.
+    /// </summary>
+    /// <param name="left">The vector to add.</param>
+    /// <param name="right">The vector to add.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator +(Vec2 left, Vec2 right)
+    {
+        return new Vec2(left.X + right.X, left.Y + right.Y);
+    }
     
     /// <summary>
     /// Calculates the length of the vector.
