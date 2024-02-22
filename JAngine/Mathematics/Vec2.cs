@@ -85,12 +85,23 @@ public readonly struct Vec2
     /// <summary>
     /// Divides a float with a vector.
     /// </summary>
-    /// <param name="left">The float to be divided.</param>
-    /// <param name="right">The value to divide with.</param>
+    /// <param name="left">The value to be divided.</param>
+    /// <param name="right">The vector to divide with.</param>
     /// <returns>Returns a new vector.</returns>
     public static Vec2 operator /(float left, Vec2 right)
     {
         return new Vec2(left / right.X, left / right.Y);
+    }
+
+    /// <summary>
+    /// Divides a vector with a vector.
+    /// </summary>
+    /// <param name="left">The vector to be divided.</param>
+    /// <param name="right">The vector to divide with.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator /(Vec2 left, Vec2 right)
+    {
+        return new Vec2(left.X / right.X, left.Y / right.Y);
     }
     
     /// <summary>
