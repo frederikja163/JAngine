@@ -72,6 +72,17 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Multiplies two vectors.
+    /// </summary>
+    /// <param name="left">The vector to multiply.</param>
+    /// <param name="right">The vector to multiply.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator *(Vec2 left, Vec2 right)
+    {
+        return new Vec2(left.X * right.X, left.Y * right.Y);
+    }
+
+    /// <summary>
     /// Divides a vector with a float.
     /// </summary>
     /// <param name="left">The vector to be divided.</param>
