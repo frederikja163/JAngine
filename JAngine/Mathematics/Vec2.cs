@@ -127,6 +127,17 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Adds a float to both values of a vector.
+    /// </summary>
+    /// <param name="left">The value to add.</param>
+    /// <param name="right">The vector to be added to.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator +(float left, Vec2 right)
+    {
+        return right + left;
+    }
+
+    /// <summary>
     /// Adds 2 vectors.
     /// </summary>
     /// <param name="left">The vector to add.</param>
