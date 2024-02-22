@@ -169,6 +169,17 @@ public readonly struct Vec2
     {
         return new Vec2(left - right.X, left - right.Y);
     }
+
+    /// <summary>
+    /// Subtracts a vector from a vector.
+    /// </summary>
+    /// <param name="left">The vector to subtract from.</param>
+    /// <param name="right">The vector to be subtracted.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator -(Vec2 left, Vec2 right)
+    {
+        return new Vec2(left.X - right.X, left.Y - right.Y);
+    }
     
     /// <summary>
     /// Calculates the length of the vector.
@@ -185,7 +196,7 @@ public readonly struct Vec2
     /// <returns>Returns a vector with the same direction as its parameter, v, but with length 1.</returns>
     public Vec2 Normalize()
     {
-        return this * (1 / Length());
+        return this / Length();
     }
     
     /// <summary>
@@ -204,9 +215,11 @@ public readonly struct Vec2
     /// </summary>
     /// <param name="p0">Specifies the first of two points.</param>
     /// <param name="p1">Specifies the second of two points.</param>
-    /// <returns>Returns the distance between the two points p0 and p1. i.e., 'length(p0 - p1)'.</returns>
-    public static float Distance(Vec2 p0, Vec2 p1) // TODO: fix when overloading minus
+    /// <returns>Returns the distance between the two points p0 and p1. i.e., 'Length(p0 - p1)'.</returns>
+    public static float Distance(Vec2 p0, Vec2 p1)
     {
-        return (float)Math.Sqrt(Math.Pow(p0.X - p1.X, 2) + Math.Pow(p0.Y - p1.Y, 2));
+        Vec2 vector = p0 - p1;
+
+        return vector.Length();
     }
 }
