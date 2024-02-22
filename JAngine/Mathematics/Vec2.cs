@@ -114,6 +114,17 @@ public readonly struct Vec2
     {
         return new Vec2(left.X / right.X, left.Y / right.Y);
     }
+
+    /// <summary>
+    /// Adds a float to both values of a vector.
+    /// </summary>
+    /// <param name="left">The vector to be added to.</param>
+    /// <param name="right">The value to add.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator +(Vec2 left, float right)
+    {
+        return new Vec2(left.X + right, left.Y + right);
+    }
     
     /// <summary>
     /// Calculates the length of the vector.
