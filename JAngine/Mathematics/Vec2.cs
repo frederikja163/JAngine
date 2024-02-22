@@ -258,4 +258,17 @@ public readonly struct Vec2
 
         return vector.Length();
     }
+
+    /// <summary>
+    /// Calculates the reflection direction for an incident vector.
+    /// </summary>
+    /// <param name="i">Specifies the incident vector.</param>
+    /// <param name="n">Specifies the normal vector.</param>
+    /// <returns>For a given incident vector I and surface normal N reflect returns the reflection direction calculated as 'i - 2 * Dot(n, i) * n'.</returns>
+    public static Vec2 Reflect(Vec2 i, Vec2 n)
+    {
+        n.Normalize();
+        
+        return i - 2 * Dot(i, n) * n;
+    }
 }
