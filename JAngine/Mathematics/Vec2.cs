@@ -1,4 +1,6 @@
-﻿namespace JAngine.Mathematics;
+﻿// All methods are based on OpenGL (https://registry.khronos.org/OpenGL-Refpages/gl4/)
+
+namespace JAngine.Mathematics;
 
 /// <summary>
 /// A vector with 2 float components.
@@ -30,25 +32,91 @@ public readonly struct Vec2
     }
 
     /// <summary>
-    /// Returns the first value of the vector.
+    /// Returns the first component of the vector.
     /// </summary>
     public float X => _x;
     
     /// <summary>
-    /// Returns the second value of the vector.
+    /// Returns the second component of the vector.
     /// </summary>
     public float Y => _y;
     
     /// <summary>
-    /// Returns the first value of the vector.
+    /// Returns the first component of the vector.
     /// </summary>
     public float R => _x;
     
     /// <summary>
-    /// Returns the second value of the vector.
+    /// Returns the second component of the vector.
     /// </summary>
     public float G => _y;
 
+    /// <summary>
+    /// Adds a float to both components of a vector.
+    /// </summary>
+    /// <param name="left">The vector to be added to.</param>
+    /// <param name="right">The value to add.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator +(Vec2 left, float right)
+    {
+        return new Vec2(left.X + right, left.Y + right);
+    }
+
+    /// <summary>
+    /// Adds a float to both components of a vector.
+    /// </summary>
+    /// <param name="left">The value to add.</param>
+    /// <param name="right">The vector to be added to.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator +(float left, Vec2 right)
+    {
+        return right + left;
+    }
+
+    /// <summary>
+    /// Adds 2 vectors.
+    /// </summary>
+    /// <param name="left">The vector to add.</param>
+    /// <param name="right">The vector to add.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator +(Vec2 left, Vec2 right)
+    {
+        return new Vec2(left.X + right.X, left.Y + right.Y);
+    }
+    
+    /// <summary>
+    /// Subtracts a float from both components of a vector.
+    /// </summary>
+    /// <param name="left">The vector to subtract from.</param>
+    /// <param name="right">The value to be subtracted.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator -(Vec2 left, float right)
+    {
+        return new Vec2(left.X - right, left.Y - right);
+    }
+
+    /// <summary>
+    /// Subtracts a vector from a float.
+    /// </summary>
+    /// <param name="left">The value to subtract from.</param>
+    /// <param name="right">The vector to be subtracted.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator -(float left, Vec2 right)
+    {
+        return new Vec2(left - right.X, left - right.Y);
+    }
+
+    /// <summary>
+    /// Subtracts a vector from a vector.
+    /// </summary>
+    /// <param name="left">The vector to subtract from.</param>
+    /// <param name="right">The vector to be subtracted.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator -(Vec2 left, Vec2 right)
+    {
+        return new Vec2(left.X - right.X, left.Y - right.Y);
+    }
+    
     /// <summary>
     /// Multiplies a vector with a float.
     /// </summary>
@@ -81,7 +149,7 @@ public readonly struct Vec2
     {
         return new Vec2(left.X * right.X, left.Y * right.Y);
     }
-
+    
     /// <summary>
     /// Divides a vector with a float.
     /// </summary>
@@ -114,75 +182,9 @@ public readonly struct Vec2
     {
         return new Vec2(left.X / right.X, left.Y / right.Y);
     }
-
+    
     /// <summary>
-    /// Adds a float to both values of a vector.
-    /// </summary>
-    /// <param name="left">The vector to be added to.</param>
-    /// <param name="right">The value to add.</param>
-    /// <returns>Returns a new vector.</returns>
-    public static Vec2 operator +(Vec2 left, float right)
-    {
-        return new Vec2(left.X + right, left.Y + right);
-    }
-
-    /// <summary>
-    /// Adds a float to both values of a vector.
-    /// </summary>
-    /// <param name="left">The value to add.</param>
-    /// <param name="right">The vector to be added to.</param>
-    /// <returns>Returns a new vector.</returns>
-    public static Vec2 operator +(float left, Vec2 right)
-    {
-        return right + left;
-    }
-
-    /// <summary>
-    /// Adds 2 vectors.
-    /// </summary>
-    /// <param name="left">The vector to add.</param>
-    /// <param name="right">The vector to add.</param>
-    /// <returns>Returns a new vector.</returns>
-    public static Vec2 operator +(Vec2 left, Vec2 right)
-    {
-        return new Vec2(left.X + right.X, left.Y + right.Y);
-    }
-
-    /// <summary>
-    /// Subtracts a float from both values of a vector.
-    /// </summary>
-    /// <param name="left">The vector to subtract from.</param>
-    /// <param name="right">The value to be subtracted.</param>
-    /// <returns>Returns a new vector.</returns>
-    public static Vec2 operator -(Vec2 left, float right)
-    {
-        return new Vec2(left.X - right, left.Y - right);
-    }
-
-    /// <summary>
-    /// Subtracts a vector from a float.
-    /// </summary>
-    /// <param name="left">The value to subtract from.</param>
-    /// <param name="right">The vector to be subtracted.</param>
-    /// <returns>Returns a new vector.</returns>
-    public static Vec2 operator -(float left, Vec2 right)
-    {
-        return new Vec2(left - right.X, left - right.Y);
-    }
-
-    /// <summary>
-    /// Subtracts a vector from a vector.
-    /// </summary>
-    /// <param name="left">The vector to subtract from.</param>
-    /// <param name="right">The vector to be subtracted.</param>
-    /// <returns>Returns a new vector.</returns>
-    public static Vec2 operator -(Vec2 left, Vec2 right)
-    {
-        return new Vec2(left.X - right.X, left.Y - right.Y);
-    }
-
-    /// <summary>
-    /// Compares 2 vectors for equal values.
+    /// Compares 2 vectors for equal components.
     /// </summary>
     /// <param name="left">The vector to compare.</param>
     /// <param name="right">The vector to compare.</param>
@@ -193,7 +195,7 @@ public readonly struct Vec2
     }
     
     /// <summary>
-    /// Compares 2 vectors for non-equal values.
+    /// Compares 2 vectors for non-equal components.
     /// </summary>
     /// <param name="left">The vector to compare.</param>
     /// <param name="right">The vector to compare.</param>
