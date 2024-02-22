@@ -180,6 +180,28 @@ public readonly struct Vec2
     {
         return new Vec2(left.X - right.X, left.Y - right.Y);
     }
+
+    /// <summary>
+    /// Compares 2 vectors for equal values.
+    /// </summary>
+    /// <param name="left">The vector to compare.</param>
+    /// <param name="right">The vector to compare.</param>
+    /// <returns>Returns a boolean.</returns>
+    public static bool operator ==(Vec2 left, Vec2 right)
+    {
+        return (left.X == right.X) && (left.Y == right.Y);
+    }
+    
+    /// <summary>
+    /// Compares 2 vectors for non-equal values.
+    /// </summary>
+    /// <param name="left">The vector to compare.</param>
+    /// <param name="right">The vector to compare.</param>
+    /// <returns>Returns a boolean.</returns>
+    public static bool operator !=(Vec2 left, Vec2 right)
+    {
+        return !(left == right);
+    }
     
     /// <summary>
     /// Calculates the length of the vector.
