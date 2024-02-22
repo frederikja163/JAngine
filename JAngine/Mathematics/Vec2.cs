@@ -263,6 +263,23 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Returns the lesser of two values.
+    /// </summary>
+    /// <param name="left">Specify the first value to compare.</param>
+    /// <param name="right">Specify the second value to compare.</param>
+    /// <returns>Returns the minimum of the two parameters. It returns right if right is less than left, otherwise it returns left.</returns>
+    public static Vec2 Min(Vec2 left, float right)
+    {
+        return new Vec2(Math.Min(left.X, right), Math.Min(left.Y, right));
+    }
+    
+    /// <inheritdoc cref="Min(JAngine.Mathematics.Vec2,float)"/>
+    public static Vec2 Min(Vec2 left, Vec2 right)
+    {
+        return new Vec2(Math.Min(left.X, right.X), Math.Min(left.Y, right.Y));
+    }
+
+    /// <summary>
     /// Calculates the reflection direction for an incident vector.
     /// </summary>
     /// <param name="i">Specifies the incident vector.</param>
