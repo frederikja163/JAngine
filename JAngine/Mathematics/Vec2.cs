@@ -224,15 +224,16 @@ public readonly struct Vec2
     /// <summary>
     /// Return a vector pointing in the same direction as another.
     /// </summary>
+    /// <param name="n">Specifies the vector to orient.</param>
     /// <param name="i">Specifies the incident vector.</param>
     /// <param name="nRef">Specifies the reference vector.</param>
     /// <returns>Returns a vector that points away from a surface as defined by its normal. If Dot(nRef, i) ≺ 0 faceforward returns N, otherwise it returns -N.</returns>
-    public Vec2 Faceforward(Vec2 i, Vec2 nRef)
+    public static Vec2 Faceforward(Vec2 n, Vec2 i, Vec2 nRef)
     {
         if (Vec2.Dot(i, nRef) < 0)
-            return this;
+            return n;
 
-        return this * -1;
+        return n * -1;
     }
     
     /// <summary>
