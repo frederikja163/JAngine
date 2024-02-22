@@ -222,6 +222,30 @@ public readonly struct Vec2
     {
         return this / Length();
     }
+    
+    /// <summary>
+    /// Calculates the distance between two points.
+    /// </summary>
+    /// <param name="p0">Specifies the first of two points.</param>
+    /// <param name="p1">Specifies the second of two points.</param>
+    /// <returns>Returns the distance between the two points p0 and p1. i.e., 'Length(p0 - p1)'.</returns>
+    public static float Distance(Vec2 p0, Vec2 p1)
+    {
+        Vec2 vector = p0 - p1;
+
+        return vector.Length();
+    }
+    
+    /// <summary>
+    /// Calculates the dot product of two vectors.
+    /// </summary>
+    /// <param name="left">Specifies the first of two vectors.</param>
+    /// <param name="right">Specifies the second of two vectors.</param>
+    /// <returns>Returns the dot product of two vectors, left and right. i.e., 'left.X * right.X + left.Y * right.Y'.</returns>
+    public static float Dot(Vec2 left, Vec2 right)
+    {
+        return left.X * right.X + left.Y * right.Y;
+    }
 
     /// <summary>
     /// Return a vector pointing in the same direction as another.
@@ -236,30 +260,6 @@ public readonly struct Vec2
             return n;
 
         return n * -1;
-    }
-    
-    /// <summary>
-    /// Calculates the dot product of two vectors.
-    /// </summary>
-    /// <param name="left">Specifies the first of two vectors.</param>
-    /// <param name="right">Specifies the second of two vectors.</param>
-    /// <returns>Returns the dot product of two vectors, left and right. i.e., 'left.X * right.X + left.Y * right.Y'.</returns>
-    public static float Dot(Vec2 left, Vec2 right)
-    {
-        return left.X * right.X + left.Y * right.Y;
-    }
-    
-    /// <summary>
-    /// Calculates the distance between two points.
-    /// </summary>
-    /// <param name="p0">Specifies the first of two points.</param>
-    /// <param name="p1">Specifies the second of two points.</param>
-    /// <returns>Returns the distance between the two points p0 and p1. i.e., 'Length(p0 - p1)'.</returns>
-    public static float Distance(Vec2 p0, Vec2 p1)
-    {
-        Vec2 vector = p0 - p1;
-
-        return vector.Length();
     }
 
     /// <summary>
