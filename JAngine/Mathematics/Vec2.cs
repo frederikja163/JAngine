@@ -147,6 +147,17 @@ public readonly struct Vec2
     {
         return new Vec2(left.X + right.X, left.Y + right.Y);
     }
+
+    /// <summary>
+    /// Subtracts a float from both values of a vector.
+    /// </summary>
+    /// <param name="left">The vector to subtract from.</param>
+    /// <param name="right">The value to be subtracted.</param>
+    /// <returns>Returns a new vector.</returns>
+    public static Vec2 operator -(Vec2 left, float right)
+    {
+        return new Vec2(left.X - right, left.Y - right);
+    }
     
     /// <summary>
     /// Calculates the length of the vector.
