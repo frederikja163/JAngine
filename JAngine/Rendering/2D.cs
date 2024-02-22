@@ -8,14 +8,11 @@ public readonly struct Vertex2D
     public readonly Vector2 Position;
     [ShaderAttribute("vTexCoord")]
     public readonly Vector2 TexCoord;
-    [ShaderAttribute("vColor")]
-    public readonly Vector4 Color = Vector4.One;
 
-    public Vertex2D(Vector2 position, Vector2 texCoord, Vector4 color)
+    public Vertex2D(Vector2 position, Vector2 texCoord)
     {
         Position = position;
         TexCoord = texCoord;
-        Color = color;
     }
     
     public Vertex2D(float x, float y)
@@ -26,8 +23,15 @@ public readonly struct Vertex2D
 
 public readonly struct Instance2D
 {
+    [ShaderAttribute("vColor")]
+    public readonly Vector4 Color = Vector4.One;
     [ShaderAttribute("vTransform{0}")]
     public readonly Matrix4x4 Transformation;
+
+    public Instance2D(Matrix4x4 transformation)
+    {
+        Transformation = transformation;
+    }
 }
 
 public sealed class Mesh2D : Mesh<Vertex2D, Instance2D> {

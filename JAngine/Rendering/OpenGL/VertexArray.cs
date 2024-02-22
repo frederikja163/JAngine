@@ -43,7 +43,7 @@ public sealed class VertexArray : IGlObject, IDisposable
 
     private void UpdateBinding(BufferBinding binding)
     {
-        _window.QueueUpdateUnique(this, binding);
+        _window.QueueUpdate(this, binding);
     }
     
     void IGlObject.DispatchEvent(IGlEvent glEvent)
