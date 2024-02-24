@@ -262,7 +262,22 @@ public readonly struct Vec2
         return n * -1;
     }
 
-    //public static Vec2 Max
+    /// <summary>
+    /// Returns the greater of two values.
+    /// </summary>
+    /// <param name="left">Specify the first value to compare.</param>
+    /// <param name="right">Specify the second value to compare.</param>
+    /// <returns>Returns the maximum of the two parameters. It returns right if right is greater than left, otherwise it returns left.</returns>
+    public static Vec2 Max(Vec2 left, float right)
+    {
+        return new Vec2(Math.Max(left.X, right), Math.Max(left.Y, right));
+    }
+
+    ///<inheritdoc cref="Max(JAngine.Mathematics.Vec2,float)"/>
+    public static Vec2 Max(Vec2 left, Vec2 right)
+    {
+        return new Vec2(Math.Max(left.X, right.X), Math.Max(left.Y, right.Y));
+    }
     
     /// <summary>
     /// Returns the lesser of two values.
