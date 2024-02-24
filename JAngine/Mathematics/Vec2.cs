@@ -222,6 +222,24 @@ public readonly struct Vec2
     {
         return this / Length();
     }
+
+    /// <summary>
+    /// Constrains a value to lie between two further values.
+    /// </summary>
+    /// <param name="val">Specify the value to constrain.</param>
+    /// <param name="min">Specify the lower end of the range into which to constrain val.</param>
+    /// <param name="max">Specify the upper end of the range into which to constrain val.</param>
+    /// <returns>Returns the value of val constrained to the range min to max. The returned value is computed as Min(Max(val, min), max).</returns>
+    public static Vec2 Clamp(Vec2 val, float min, float max)
+    {
+        return new Vec2(Math.Min(Math.Max(val.X, min), max), Math.Min(Math.Max(val.Y, min), max));
+    }
+    
+    /// <inheritdoc cref="Clamp(JAngine.Mathematics.Vec2,float,float)"/>
+    public static Vec2 Clamp(Vec2 val, Vec2 min, Vec2 max)
+    {
+        return new Vec2(Math.Min(Math.Max(val.X, min.X), max.X), Math.Min(Math.Max(val.Y, min.Y), max.Y));
+    }
     
     /// <summary>
     /// Calculates the distance between two points.
