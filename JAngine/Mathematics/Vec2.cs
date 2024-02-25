@@ -265,7 +265,16 @@ public readonly struct Vec2
     /// <returns>Returns -1.0 if the value is less than 0.0, 0.0 if the value is equal to 0.0, and +1.0 if the value is greater than 0.</returns>
     public Vec2 Sign()
     {
-        return new Vec2(Math.Sign(this.X), Math.Sign(this.Y));
+        return new Vec2(Math.Sign(X), Math.Sign(Y));
+    }
+
+    /// <summary>
+    /// Returns the square root of the value.
+    /// </summary>
+    /// <returns>Returns the square root of the value. The result is undefined if ≺0.</returns>
+    public Vec2 Sqrt()
+    {
+        return new Vec2((float)Math.Sqrt(X), (float)Math.Sqrt(Y));
     }
 
     /// <summary>
