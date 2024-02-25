@@ -371,4 +371,24 @@ public readonly struct Vec2
         
         return i - 2 * Dot(i, n) * n;
     }
+
+    /// <summary>
+    /// Performs Hermite interpolation between two values.
+    /// </summary>
+    /// <param name="edge0">Specifies the value of the lower edge of the Hermite function.</param>
+    /// <param name="edge1">Specifies the value of the upper edge of the Hermite function.</param>
+    /// <param name="src">Specifies the source value for interpolation.</param>
+    /// <returns>Performs smooth Hermite interpolation between 0 and 1 when edge0 ≺ src ≺ edge1. This is useful in cases where a threshold function with a smooth transition is desired.</returns>
+    public static Vec2 Smoothstep(float edge0, float edge1, Vec2 src)
+    {
+        var t = Clamp((src - edge0) / (edge1 - edge0), 0, 1);
+        return t * t * (3 - 2 * t);
+    }
+    
+    /// <inheritdoc cref="Smoothstep(float,float,JAngine.Mathematics.Vec2)"/>
+    public static Vec2 Smoothstep(Vec2 edge0, Vec2 edge1, Vec2 src)
+    {
+        var t = Clamp((src - edge0) / (edge1 - edge0), 0, 1);
+        return t * t * (3 - 2 * t);
+    }
 }
