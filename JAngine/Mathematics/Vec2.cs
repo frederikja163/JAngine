@@ -215,6 +215,15 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Finds the nearest integer that is greater than or equal to the value.
+    /// </summary>
+    /// <returns>Returns a value equal to the nearest integer that is greater than or equal to the value.</returns>
+    public Vec2 Ceil()
+    {
+        return new Vec2((float)Math.Ceiling(this.X), (float)Math.Ceiling(this.Y));
+    }
+
+    /// <summary>
     /// Finds the nearest integer less than or equal to the value.
     /// </summary>
     /// <returns>Returns a value equal to the nearest integer that is less than or equal to the value.</returns>
