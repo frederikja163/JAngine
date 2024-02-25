@@ -224,6 +224,15 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Returns the natural exponentiation of the value.
+    /// </summary>
+    /// <returns>Returns the natural exponentiation of the value. i.e., e^this.</returns>
+    public Vec2 Exp()
+    {
+        return Pow(new Vec2((float)Math.E), this);
+    }
+
+    /// <summary>
     /// Finds the nearest integer less than or equal to the value.
     /// </summary>
     /// <returns>Returns a value equal to the nearest integer that is less than or equal to the value.</returns>
