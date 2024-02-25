@@ -378,6 +378,17 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Returns the component of the first parameter raised to the power of the second.
+    /// </summary>
+    /// <param name="left">Specify the value to raise to the power of right.</param>
+    /// <param name="right">Specify the power to which to raise left.</param>
+    /// <returns>Returns the value of left raised to the right power, i.e. left^right. The result is undefined if left≺0 or if left=0 and right≤0.</returns>
+    public static Vec2 Pow(Vec2 left, Vec2 right)
+    {
+        return new Vec2((float)Math.Pow(left.X, right.X), (float)Math.Pow(left.Y, right.Y));
+    }
+
+    /// <summary>
     /// Calculates the reflection direction for an incident vector.
     /// </summary>
     /// <param name="i">Specifies the incident vector.</param>
