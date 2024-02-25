@@ -240,6 +240,15 @@ public readonly struct Vec2
     {
         return this - Floor();
     }
+
+    /// <summary>
+    /// Returns the inverse of the square root of the value.
+    /// </summary>
+    /// <returns>Returns the inverse of the square root of the value; i.e. 1 / Sqrt(). The result is undefined if ≤0.</returns>
+    public Vec2 Inversesqrt()
+    {
+        return 1 / Sqrt();
+    }
     
     /// <summary>
     /// Calculates the length of the vector.
