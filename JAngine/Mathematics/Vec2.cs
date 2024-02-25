@@ -231,6 +231,15 @@ public readonly struct Vec2
     {
         return new Vec2((float)Math.Floor(this.X), (float)Math.Floor(this.Y));
     }
+
+    /// <summary>
+    /// Computes the fractional part of the value.
+    /// </summary>
+    /// <returns>Returns the fractional part of the value. This is calculated as 'this - Floor()'.</returns>
+    public Vec2 Fract()
+    {
+        return this - Floor();
+    }
     
     /// <summary>
     /// Calculates the length of the vector.
