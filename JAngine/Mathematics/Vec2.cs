@@ -204,6 +204,15 @@ public readonly struct Vec2
     {
         return !(left == right);
     }
+
+    /// <summary>
+    /// Returns the absolute value of the vector.
+    /// </summary>
+    /// <returns>Returns the absolute value of the vector.</returns>
+    public Vec2 Abs()
+    {
+        return new Vec2(Math.Abs(this.X), Math.Abs(this.Y));
+    }
     
     /// <summary>
     /// Calculates the length of the vector.
@@ -221,6 +230,15 @@ public readonly struct Vec2
     public Vec2 Normalize()
     {
         return this / Length();
+    }
+
+    /// <summary>
+    /// Extracts the sign of the value.
+    /// </summary>
+    /// <returns>Returns -1.0 if the value is less than 0.0, 0.0 if the value is equal to 0.0, and +1.0 if the value is greater than 0.</returns>
+    public Vec2 Sign()
+    {
+        return new Vec2(Math.Sign(this.X), Math.Sign(this.Y));
     }
 
     /// <summary>
