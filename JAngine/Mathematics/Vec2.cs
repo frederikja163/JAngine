@@ -277,6 +277,11 @@ public readonly struct Vec2
         return (float)Math.Sqrt(_x * _x + _y * _y);
     }
 
+    // public Vec2 Log()
+    // {
+    //     
+    // }
+
     /// <summary>
     /// Calculates the unit vector in the same direction as the original vector.
     /// </summary>
