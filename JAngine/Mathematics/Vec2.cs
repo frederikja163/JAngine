@@ -213,6 +213,15 @@ public readonly struct Vec2
     {
         return new Vec2(Math.Abs(this.X), Math.Abs(this.Y));
     }
+
+    /// <summary>
+    /// Finds the nearest integer less than or equal to the value.
+    /// </summary>
+    /// <returns>Returns a value equal to the nearest integer that is less than or equal to the value.</returns>
+    public Vec2 Floor()
+    {
+        return new Vec2((float)Math.Floor(this.X), (float)Math.Floor(this.Y));
+    }
     
     /// <summary>
     /// Calculates the length of the vector.
