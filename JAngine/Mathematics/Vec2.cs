@@ -233,6 +233,15 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Returns 2 raised to the power of the value.
+    /// </summary>
+    /// <returns>Returns 2 raised to the power of the value. i.e., 2^this.</returns>
+    public Vec2 Exp2()
+    {
+        return Pow(new Vec2(2), this);
+    }
+
+    /// <summary>
     /// Finds the nearest integer less than or equal to the value.
     /// </summary>
     /// <returns>Returns a value equal to the nearest integer that is less than or equal to the value.</returns>
