@@ -224,6 +224,15 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Converts a quantity in radians to degrees.
+    /// </summary>
+    /// <returns>Returns a quantity specified in radians converted into degrees. The return value is (180×value)/π.</returns>
+    public Vec2 Degrees()
+    {
+        return (this * 180) / (float)Math.PI;
+    }
+
+    /// <summary>
     /// Returns the natural exponentiation of the value.
     /// </summary>
     /// <returns>Returns the natural exponentiation of the value. i.e., e^this.</returns>
