@@ -359,6 +359,15 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Returns the tangent of the value.
+    /// </summary>
+    /// <returns>Returns the trigonometric tangent of the value.</returns>
+    public Vec2 Tan()
+    {
+        return new Vec2((float)Math.Tan(X), (float)Math.Tan(Y));
+    }
+
+    /// <summary>
     /// Constrains a value to lie between two further values.
     /// </summary>
     /// <param name="val">Specify the value to constrain.</param>
