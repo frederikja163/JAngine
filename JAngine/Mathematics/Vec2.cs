@@ -305,6 +305,15 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Converts a quantity in degrees to radians.
+    /// </summary>
+    /// <returns>Returns a quantity specified in degrees converted into radians. The return value is (π×value)/180.</returns>
+    public Vec2 Radians()
+    {
+        return (this * (float)Math.PI) / 180;
+    }
+
+    /// <summary>
     /// Extracts the sign of the value.
     /// </summary>
     /// <returns>Returns -1.0 if the value is less than 0.0, 0.0 if the value is equal to 0.0, and +1.0 if the value is greater than 0.</returns>
