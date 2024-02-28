@@ -224,6 +224,15 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Returns the cosine of the value.
+    /// </summary>
+    /// <returns>Returns the trigonometric cosine of the value.</returns>
+    public Vec2 Cos()
+    {
+        return new Vec2((float)Math.Cos(X), (float)Math.Cos(Y));
+    }
+
+    /// <summary>
     /// Converts a quantity in radians to degrees.
     /// </summary>
     /// <returns>Returns a quantity specified in radians converted into degrees. The return value is (180×value)/π.</returns>
