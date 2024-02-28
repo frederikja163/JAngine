@@ -231,6 +231,15 @@ public readonly struct Vec2
     {
         return new Vec2((float)Math.Asin(X), (float)Math.Asin(Y));
     }
+    
+    /// <summary>
+    /// Returns the arc-tangent of the value.
+    /// </summary>
+    /// <returns>Returns the angle whose tangent is the value. The value returned is in the range [−π/2,π/2].</returns>
+    public Vec2 Atan()
+    {
+        return new Vec2((float)Math.Atan(X), (float)Math.Atan(Y));
+    }
 
     /// <summary>
     /// Finds the nearest integer that is greater than or equal to the value.
@@ -383,6 +392,17 @@ public readonly struct Vec2
     public Vec2 Tan()
     {
         return new Vec2((float)Math.Tan(X), (float)Math.Tan(Y));
+    }
+
+    /// <summary>
+    /// Returns the arc-tangent of the parameters.
+    /// </summary>
+    /// <param name="left">Specify the numerator of the fraction whose arctangent to return.</param>
+    /// <param name="right">Specify the denominator of the fraction whose arctangent to return.</param>
+    /// <returns>Returns the angle whose trigonometric arctangent is left/right. The signs of left and right are used to determine the quadrant that the angle lies in. The value returned by Atan is in the range [−π,π]. The result is undefined if right=0.</returns>
+    public static Vec2 Atan(Vec2 left, Vec2 right)
+    {
+        return new Vec2((float)Math.Atan(left.X / right.X), (float)Math.Atan(left.Y / right.Y));
     }
 
     /// <summary>
