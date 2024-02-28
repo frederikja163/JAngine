@@ -215,6 +215,15 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Returns the arcsine of the value.
+    /// </summary>
+    /// <returns>Returns the angle whose trigonometric sine is value. The range of values returned by Asin is [−π/2,π/2]. The result is undefined if |value|≺1.</returns>
+    public Vec2 Asin()
+    {
+        return new Vec2((float)Math.Asin(X), (float)Math.Asin(Y));
+    }
+
+    /// <summary>
     /// Finds the nearest integer that is greater than or equal to the value.
     /// </summary>
     /// <returns>Returns a value equal to the nearest integer that is greater than or equal to the value.</returns>
