@@ -287,6 +287,15 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Returns the base 2 logarithm of the value.
+    /// </summary>
+    /// <returns>Returns the base 2 logarithm of the value, i.e. the value y which satisfies value=2^y. The result is undefined if ≤0.</returns>
+    public Vec2 Log2()
+    {
+        return new Vec2((float)Math.Log2(X), (float)Math.Log2(Y));
+    }
+
+    /// <summary>
     /// Calculates the unit vector in the same direction as the original vector.
     /// </summary>
     /// <returns>Returns a vector with the same direction as its parameter, v, but with length 1.</returns>
