@@ -215,6 +215,15 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Returns the arccosine of the value.
+    /// </summary>
+    /// <returns>Returns the angle whose trigonometric cosine is value. The range of values returned by acos is [0,π]. The result is undefined if |value|>1.</returns>
+    public Vec2 Acos()
+    {
+        return new Vec2((float)Math.Acos(X), (float)Math.Acos(Y));
+    }
+
+    /// <summary>
     /// Returns the arcsine of the value.
     /// </summary>
     /// <returns>Returns the angle whose trigonometric sine is value. The range of values returned by Asin is [−π/2,π/2]. The result is undefined if |value|≺1.</returns>
