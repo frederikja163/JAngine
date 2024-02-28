@@ -332,6 +332,15 @@ public readonly struct Vec2
     }
 
     /// <summary>
+    /// Returns the sine of the value.
+    /// </summary>
+    /// <returns>Returns the trigonometric sine of the value.</returns>
+    public Vec2 Sin()
+    {
+        return new Vec2((float)Math.Sin(X), (float)Math.Sin(Y));
+    }
+
+    /// <summary>
     /// Returns the square root of the value.
     /// </summary>
     /// <returns>Returns the square root of the value. The result is undefined if ≺0.</returns>
