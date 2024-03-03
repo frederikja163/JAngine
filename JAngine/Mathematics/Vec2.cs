@@ -211,7 +211,7 @@ public readonly struct Vec2
     /// <returns>Returns the absolute value of the vector.</returns>
     public Vec2 Abs()
     {
-        return new Vec2(Math.Abs(this.X), Math.Abs(this.Y));
+        return new Vec2(MathF.Abs(this.X), MathF.Abs(this.Y));
     }
 
     /// <summary>
@@ -220,7 +220,7 @@ public readonly struct Vec2
     /// <returns>Returns the angle whose trigonometric cosine is value. The range of values returned by acos is [0,π]. The result is undefined if |value|>1.</returns>
     public Vec2 Acos()
     {
-        return new Vec2((float)Math.Acos(X), (float)Math.Acos(Y));
+        return new Vec2(MathF.Acos(X), MathF.Acos(Y));
     }
 
     /// <summary>
@@ -229,7 +229,7 @@ public readonly struct Vec2
     /// <returns>Returns the angle whose trigonometric sine is value. The range of values returned by Asin is [−π/2,π/2]. The result is undefined if |value|≺1.</returns>
     public Vec2 Asin()
     {
-        return new Vec2((float)Math.Asin(X), (float)Math.Asin(Y));
+        return new Vec2(MathF.Asin(X), MathF.Asin(Y));
     }
     
     /// <summary>
@@ -238,7 +238,7 @@ public readonly struct Vec2
     /// <returns>Returns the angle whose tangent is the value. The value returned is in the range [−π/2,π/2].</returns>
     public Vec2 Atan()
     {
-        return new Vec2((float)Math.Atan(X), (float)Math.Atan(Y));
+        return new Vec2(MathF.Atan(X), MathF.Atan(Y));
     }
 
     /// <summary>
@@ -247,7 +247,7 @@ public readonly struct Vec2
     /// <returns>Returns a value equal to the nearest integer that is greater than or equal to the value.</returns>
     public Vec2 Ceil()
     {
-        return new Vec2((float)Math.Ceiling(this.X), (float)Math.Ceiling(this.Y));
+        return new Vec2(MathF.Ceiling(this.X), MathF.Ceiling(this.Y));
     }
 
     /// <summary>
@@ -256,7 +256,7 @@ public readonly struct Vec2
     /// <returns>Returns the trigonometric cosine of the value.</returns>
     public Vec2 Cos()
     {
-        return new Vec2((float)Math.Cos(X), (float)Math.Cos(Y));
+        return new Vec2(MathF.Cos(X), MathF.Cos(Y));
     }
 
     /// <summary>
@@ -265,7 +265,7 @@ public readonly struct Vec2
     /// <returns>Returns a quantity specified in radians converted into degrees. The return value is (180×value)/π.</returns>
     public Vec2 Degrees()
     {
-        return (this * 180) / (float)Math.PI;
+        return (this * 180) / MathF.PI;
     }
 
     /// <summary>
@@ -274,7 +274,7 @@ public readonly struct Vec2
     /// <returns>Returns the natural exponentiation of the value. i.e., e^this.</returns>
     public Vec2 Exp()
     {
-        return Pow(new Vec2((float)Math.E), this);
+        return Pow(new Vec2(MathF.E), this);
     }
 
     /// <summary>
@@ -292,7 +292,7 @@ public readonly struct Vec2
     /// <returns>Returns a value equal to the nearest integer that is less than or equal to the value.</returns>
     public Vec2 Floor()
     {
-        return new Vec2((float)Math.Floor(this.X), (float)Math.Floor(this.Y));
+        return new Vec2(MathF.Floor(this.X), MathF.Floor(this.Y));
     }
 
     /// <summary>
@@ -319,7 +319,7 @@ public readonly struct Vec2
     /// <returns>Returns the length of the vector, i.e. '√(X² + Y²)'.</returns>
     public float Length()
     {
-        return (float)Math.Sqrt(_x * _x + _y * _y);
+        return MathF.Sqrt(_x * _x + _y * _y);
     }
 
     /// <summary>
@@ -328,7 +328,7 @@ public readonly struct Vec2
     /// <returns>Returns the natural logarithm of the value, i.e. the value y which satisfies value=e^y. The result is undefined if ≤0.</returns>
     public Vec2 Log()
     {
-        return new Vec2((float)Math.Log(X), (float)Math.Log(Y));
+        return new Vec2(MathF.Log(X), MathF.Log(Y));
     }
 
     /// <summary>
@@ -337,7 +337,7 @@ public readonly struct Vec2
     /// <returns>Returns the base 2 logarithm of the value, i.e. the value y which satisfies value=2^y. The result is undefined if ≤0.</returns>
     public Vec2 Log2()
     {
-        return new Vec2((float)Math.Log2(X), (float)Math.Log2(Y));
+        return new Vec2(MathF.Log2(X), MathF.Log2(Y));
     }
 
     /// <summary>
@@ -355,7 +355,7 @@ public readonly struct Vec2
     /// <returns>Returns a quantity specified in degrees converted into radians. The return value is (π×value)/180.</returns>
     public Vec2 Radians()
     {
-        return (this * (float)Math.PI) / 180;
+        return (this * MathF.PI) / 180;
     }
 
     /// <summary>
@@ -364,7 +364,7 @@ public readonly struct Vec2
     /// <returns>Returns -1.0 if the value is less than 0.0, 0.0 if the value is equal to 0.0, and +1.0 if the value is greater than 0.</returns>
     public Vec2 Sign()
     {
-        return new Vec2(Math.Sign(X), Math.Sign(Y));
+        return new Vec2(MathF.Sign(X), MathF.Sign(Y));
     }
 
     /// <summary>
@@ -373,7 +373,7 @@ public readonly struct Vec2
     /// <returns>Returns the trigonometric sine of the value.</returns>
     public Vec2 Sin()
     {
-        return new Vec2((float)Math.Sin(X), (float)Math.Sin(Y));
+        return new Vec2(MathF.Sin(X), MathF.Sin(Y));
     }
 
     /// <summary>
@@ -382,7 +382,7 @@ public readonly struct Vec2
     /// <returns>Returns the square root of the value. The result is undefined if ≺0.</returns>
     public Vec2 Sqrt()
     {
-        return new Vec2((float)Math.Sqrt(X), (float)Math.Sqrt(Y));
+        return new Vec2(MathF.Sqrt(X), MathF.Sqrt(Y));
     }
 
     /// <summary>
@@ -391,7 +391,7 @@ public readonly struct Vec2
     /// <returns>Returns the trigonometric tangent of the value.</returns>
     public Vec2 Tan()
     {
-        return new Vec2((float)Math.Tan(X), (float)Math.Tan(Y));
+        return new Vec2(MathF.Tan(X), MathF.Tan(Y));
     }
 
     /// <summary>
@@ -402,7 +402,7 @@ public readonly struct Vec2
     /// <returns>Returns the angle whose trigonometric arctangent is left/right. The signs of left and right are used to determine the quadrant that the angle lies in. The value returned by Atan is in the range [−π,π]. The result is undefined if right=0.</returns>
     public static Vec2 Atan(Vec2 left, Vec2 right)
     {
-        return new Vec2((float)Math.Atan(left.X / right.X), (float)Math.Atan(left.Y / right.Y));
+        return new Vec2(MathF.Atan(left.X / right.X), MathF.Atan(left.Y / right.Y));
     }
 
     /// <summary>
@@ -414,13 +414,13 @@ public readonly struct Vec2
     /// <returns>Returns the value of val constrained to the range min to max. The returned value is computed as Min(Max(val, min), max).</returns>
     public static Vec2 Clamp(Vec2 val, float min, float max)
     {
-        return new Vec2(Math.Min(Math.Max(val.X, min), max), Math.Min(Math.Max(val.Y, min), max));
+        return new Vec2(MathF.Min(MathF.Max(val.X, min), max), MathF.Min(MathF.Max(val.Y, min), max));
     }
     
     /// <inheritdoc cref="Clamp(JAngine.Mathematics.Vec2,float,float)"/>
     public static Vec2 Clamp(Vec2 val, Vec2 min, Vec2 max)
     {
-        return new Vec2(Math.Min(Math.Max(val.X, min.X), max.X), Math.Min(Math.Max(val.Y, min.Y), max.Y));
+        return new Vec2(MathF.Min(MathF.Max(val.X, min.X), max.X), MathF.Min(MathF.Max(val.Y, min.Y), max.Y));
     }
     
     /// <summary>
@@ -470,13 +470,13 @@ public readonly struct Vec2
     /// <returns>Returns the maximum of the two parameters. It returns right if right is greater than left, otherwise it returns left.</returns>
     public static Vec2 Max(Vec2 left, float right)
     {
-        return new Vec2(Math.Max(left.X, right), Math.Max(left.Y, right));
+        return new Vec2(MathF.Max(left.X, right), MathF.Max(left.Y, right));
     }
 
     ///<inheritdoc cref="Max(JAngine.Mathematics.Vec2,float)"/>
     public static Vec2 Max(Vec2 left, Vec2 right)
     {
-        return new Vec2(Math.Max(left.X, right.X), Math.Max(left.Y, right.Y));
+        return new Vec2(MathF.Max(left.X, right.X), MathF.Max(left.Y, right.Y));
     }
     
     /// <summary>
@@ -487,13 +487,13 @@ public readonly struct Vec2
     /// <returns>Returns the minimum of the two parameters. It returns right if right is less than left, otherwise it returns left.</returns>
     public static Vec2 Min(Vec2 left, float right)
     {
-        return new Vec2(Math.Min(left.X, right), Math.Min(left.Y, right));
+        return new Vec2(MathF.Min(left.X, right), MathF.Min(left.Y, right));
     }
     
     /// <inheritdoc cref="Min(JAngine.Mathematics.Vec2,float)"/>
     public static Vec2 Min(Vec2 left, Vec2 right)
     {
-        return new Vec2(Math.Min(left.X, right.X), Math.Min(left.Y, right.Y));
+        return new Vec2(MathF.Min(left.X, right.X), MathF.Min(left.Y, right.Y));
     }
 
     /// <summary>
@@ -504,7 +504,7 @@ public readonly struct Vec2
     /// <returns>Returns the value of left raised to the right power, i.e. left^right. The result is undefined if left≺0 or if left=0 and right≤0.</returns>
     public static Vec2 Pow(Vec2 left, Vec2 right)
     {
-        return new Vec2((float)Math.Pow(left.X, right.X), (float)Math.Pow(left.Y, right.Y));
+        return new Vec2(MathF.Pow(left.X, right.X), MathF.Pow(left.Y, right.Y));
     }
 
     /// <summary>
