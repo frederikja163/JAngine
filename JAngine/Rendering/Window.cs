@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using JAngine.ECS;
 using JAngine.Rendering.OpenGL;
 
@@ -13,8 +14,9 @@ public sealed class Window : IDisposable
     private readonly Glfw.Window _handle;
     private readonly List<(IGlObject, IGlEvent)> _updateQueue = new();
     private readonly Dictionary<(IGlObject, Type), int> _uniqueUpdates = new();
-    private readonly List<World> _worlds = new List<World>();
+    private readonly Dictionary<Key, List<KeyBinding>> _keyBindings = new();
     private HashSet<VertexArray> _vaos = new HashSet<VertexArray>();
+    private readonly HashSet<Key> _keysDown = new HashSet<Key>();
     private readonly Thread _renderingThread;
 
     static Window()
@@ -39,6 +41,7 @@ public sealed class Window : IDisposable
     public Window(string title, int width, int height)
     {
         _handle = Glfw.CreateWindow(width, height, title, Glfw.Monitor.Null, Glfw.Window.Null);
+        Glfw.SetKeyCallback(_handle, KeyCallback);
         _renderingThread = new Thread(RenderThread);
         _renderingThread.Start();
         s_windows.Add(this);
@@ -52,8 +55,95 @@ public sealed class Window : IDisposable
     {
         while (s_windows.Any())
         {
-            Glfw.PollEvents();
+            Glfw.WaitEventsTimeout(0.001);
+            foreach (Window window in s_windows)
+            {
+                window.SendHeldKeys();
+            }
         }
+    }
+
+    private void KeyCallback(Glfw.Window window, Glfw.Key gKey, int scancode, Glfw.Action action, Glfw.Mods mods)
+    {
+        if (action == Glfw.Action.Repeat)
+        {
+            return;
+        }
+
+        Key key = GetKeyFromGlfw(gKey) | GetKeyMod();
+        if (action == Glfw.Action.Release && _keysDown.Remove(key))
+        {
+            key |= Key.Release;
+        }
+        else if (action == Glfw.Action.Press && _keysDown.Add(key))
+        {
+            key |= Key.Press;
+        }
+        else
+        {
+            throw new UnreachableException();
+        }
+        
+        SimulateKeyPress(key);
+    }
+
+    private void SendHeldKeys()
+    {
+        Key mods = GetKeyMod();
+        foreach (Key k in _keysDown)
+        {
+            Key key = mods | k | Key.Held;
+
+            SimulateKeyPress(key);
+        }
+    }
+
+    public void SimulateKeyPress(Key key)
+    {
+        if (_keyBindings.TryGetValue(key, out List<KeyBinding>? bindings))
+        {
+            foreach (KeyBinding binding in bindings.Where(b => b.Enabled).ToList())
+            {
+                binding.SimulatePress();
+            }
+        }
+    }
+
+    private Key GetKeyMod()
+    {
+        Key mods = 0;
+        foreach (Key key in _keysDown)
+        {
+            mods |= key;
+        }
+        mods &= (Key)0x0f_ff_00_00;
+        return mods;
+    }
+
+    private static Key GetKeyFromGlfw(Glfw.Key key)
+    {
+        return key switch
+        {
+            Glfw.Key.LeftShift => Key.LShift,
+            Glfw.Key.RightShift => Key.RShift,
+            Glfw.Key.LeftControl => Key.LControl,
+            Glfw.Key.RightControl => Key.RControl,
+            Glfw.Key.LeftAlt => Key.LAlt,
+            Glfw.Key.RightAlt => Key.RAlt,
+            Glfw.Key.LeftSuper => Key.LSuper,
+            Glfw.Key.RightSuper => Key.RSuper,
+            _ => (Key)key,
+        };
+    }
+
+    public void AddKeyBinding(KeyBinding binding)
+    {
+        if (!_keyBindings.TryGetValue(binding.Key, out List<KeyBinding>? bindings))
+        {
+            bindings = new List<KeyBinding>();
+            _keyBindings.Add(binding.Key, bindings);
+        }
+        bindings.Add(binding);
     }
     
     private void RenderThread()

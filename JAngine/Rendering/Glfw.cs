@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace JAngine.Rendering;
 
-public static class Glfw
+internal static class Glfw
 {
     private const string DllName = "glfw";
 
@@ -49,48 +49,6 @@ public static class Glfw
 
         public static Monitor Null { get; } = new Monitor(IntPtr.Zero);
     }
-
-    [DllImport(DllName, EntryPoint = "glfwGetVersion", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void GetVersion(out int major, out int minor, out int rev);
-
-    [DllImport(DllName, EntryPoint = "glfwInit", CallingConvention = CallingConvention.Cdecl)]
-    public static extern bool Init();
-    
-    [DllImport(DllName, EntryPoint = "glfwTerminate", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void Terminate();
-    
-    [DllImport(DllName, EntryPoint = "glfwGetProcAddress", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr GetProcAddress([MarshalAs(UnmanagedType.LPStr)] string procName);
-    
-    [DllImport(DllName, EntryPoint = "glfwMakeContextCurrent", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void MakeContextCurrent(Glfw.Window window);
-
-    [DllImport(DllName, EntryPoint = "glfwSwapBuffers", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void SwapBuffers(Glfw.Window window);
-
-    [DllImport(DllName, EntryPoint = "glfwWindowShouldClose", CallingConvention = CallingConvention.Cdecl)]
-    public static extern bool WindowShouldClose(Glfw.Window window);
-    
-    [DllImport(DllName, EntryPoint = "glfwSetWindowShouldClose", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void WindowSetShouldClose(Glfw.Window window, bool value);
-
-    [DllImport(DllName, EntryPoint = "glfwWindowHint", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void WindowHint(Hint hint, int value);
-    public static void WindowHint(Hint hint, bool value) => WindowHint(hint, value ? 1 : 0);
-    public static void WindowHint(Hint hint, OpenGL value) => WindowHint(hint, (int)value);
-    
-    [DllImport(DllName, EntryPoint = "glfwWindowHintString", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void WindowHint(Hint hint, [MarshalAs(UnmanagedType.LPStr)] string value);
-    
-    [DllImport(DllName, EntryPoint = "glfwCreateWindow", CallingConvention = CallingConvention.Cdecl)]
-    public static extern Glfw.Window CreateWindow(int width, int height, [MarshalAs(UnmanagedType.LPStr)] string title, Monitor monitor, Window share);
-    
-    [DllImport(DllName, EntryPoint = "glfwDestroyWindow", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void DestroyWindow(Window window);
-    
-    
-    [DllImport(DllName, EntryPoint = "glfwPollEvents", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void PollEvents();
 
     
     public enum Hint : int
@@ -216,10 +174,203 @@ public static class Glfw
         X11InstanceName = 0x00024002,
     }
 
+    public enum Key
+    {
+        Space =   32,
+        Apostrophe =   39, /* ' */
+        Comma =   44, /* , */
+        Minus =   45, /* - */
+        Period =   46, /* . */
+        Slash =   47, /* / */
+        Num0 =   48,
+        Num1 =   49,
+        Num2 =   50,
+        Num3 =   51,
+        Num4 =   52,
+        Num5 =   53,
+        Num6 =   54,
+        Num7 =   55,
+        Num8 =   56,
+        Num9 =   57,
+        Semicolon =   59, /* ; */
+        Equal =   61, /* = */
+        A =   65,
+        B =   66,
+        C =   67,
+        D =   68,
+        E =   69,
+        F =   70,
+        G =   71,
+        H =   72,
+        I =   73,
+        J =   74,
+        K =   75,
+        L =   76,
+        M =   77,
+        N =   78,
+        O =   79,
+        P =   80,
+        Q =   81,
+        R =   82,
+        S =   83,
+        T =   84,
+        U =   85,
+        V =   86,
+        W =   87,
+        X =   88,
+        Y =   89,
+        Z =   90,
+        LeftBracket =   91, /* [ */
+        Backslash =   92, /* \ */
+        RightBracket =   93, /* ] */
+        GraveAccent =   96, /* ` */
+        World1 =   161, /* non-US #1 */
+        World2 =   162, /* non-US #2 */
+        Escape =   256,
+        Enter =   257,
+        Tab =   258,
+        Backspace =   259,
+        Insert =   260,
+        Delete =   261,
+        Right =   262,
+        Left =   263,
+        Down =   264,
+        Up =   265,
+        PageUp =   266,
+        PageDown =   267,
+        Home =   268,
+        End =   269,
+        CapsLock =   280,
+        ScrollLock =   281,
+        NumLock =   282,
+        PrintScreen =   283,
+        Pause =   284,
+        F1 =   290,
+        F2 =   291,
+        F3 =   292,
+        F4 =   293,
+        F5 =   294,
+        F6 =   295,
+        F7 =   296,
+        F8 =   297,
+        F9 =   298,
+        F10 =   299,
+        F11 =   300,
+        F12 =   301,
+        F13 =   302,
+        F14 =   303,
+        F15 =   304,
+        F16 =   305,
+        F17 =   306,
+        F18 =   307,
+        F19 =   308,
+        F20 =   309,
+        F21 =   310,
+        F22 =   311,
+        F23 =   312,
+        F24 =   313,
+        F25 =   314,
+        Kp0 =   320,
+        Kp1 =   321,
+        Kp2 =   322,
+        Kp3 =   323,
+        Kp4 =   324,
+        Kp5 =   325,
+        Kp6 =   326,
+        Kp7 =   327,
+        Kp8 =   328,
+        Kp9 =   329,
+        KpDecimal =   330,
+        KpDivide =   331,
+        KpMultiply =   332,
+        KpSubtract =   333,
+        KpAdd =   334,
+        KpEnter =   335,
+        KpEqual =   336,
+        LeftShift =   340,
+        LeftControl =   341,
+        LeftAlt =   342,
+        LeftSuper =   343,
+        RightShift =   344,
+        RightControl =   345,
+        RightAlt =   346,
+        RightSuper =   347,
+        Menu =   348,
+        Last =   Menu,
+    }
+
+    public enum Action
+    {
+        Release = 0,
+        Press = 1,
+        Repeat = 2,
+    }
+
+    [Flags]
+    public enum Mods
+    {
+        Shift = 0x0001,
+        Control = 0x0002,
+        Alt = 0x0004,
+        Super = 0x0008,
+        CapsLock = 0x0010,
+        NumLock = 0x0020,
+    }
+
     public enum OpenGL
     {
         AnyProfile = 0,
         CoreProfile = 0x00032001,
         CompatProfile = 0x00032002,
     }
+
+    [DllImport(DllName, EntryPoint = "glfwGetVersion", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void GetVersion(out int major, out int minor, out int rev);
+
+    [DllImport(DllName, EntryPoint = "glfwInit", CallingConvention = CallingConvention.Cdecl)]
+    public static extern bool Init();
+    
+    [DllImport(DllName, EntryPoint = "glfwTerminate", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void Terminate();
+    
+    [DllImport(DllName, EntryPoint = "glfwGetProcAddress", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr GetProcAddress([MarshalAs(UnmanagedType.LPStr)] string procName);
+    
+    [DllImport(DllName, EntryPoint = "glfwMakeContextCurrent", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void MakeContextCurrent(Glfw.Window window);
+
+    [DllImport(DllName, EntryPoint = "glfwSwapBuffers", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SwapBuffers(Glfw.Window window);
+
+    [DllImport(DllName, EntryPoint = "glfwWindowShouldClose", CallingConvention = CallingConvention.Cdecl)]
+    public static extern bool WindowShouldClose(Glfw.Window window);
+    
+    [DllImport(DllName, EntryPoint = "glfwSetWindowShouldClose", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void WindowSetShouldClose(Glfw.Window window, bool value);
+
+    [DllImport(DllName, EntryPoint = "glfwWindowHint", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void WindowHint(Hint hint, int value);
+    public static void WindowHint(Hint hint, bool value) => WindowHint(hint, value ? 1 : 0);
+    public static void WindowHint(Hint hint, OpenGL value) => WindowHint(hint, (int)value);
+    
+    [DllImport(DllName, EntryPoint = "glfwWindowHintString", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void WindowHint(Hint hint, [MarshalAs(UnmanagedType.LPStr)] string value);
+    
+    [DllImport(DllName, EntryPoint = "glfwCreateWindow", CallingConvention = CallingConvention.Cdecl)]
+    public static extern Glfw.Window CreateWindow(int width, int height, [MarshalAs(UnmanagedType.LPStr)] string title, Monitor monitor, Window share);
+    
+    [DllImport(DllName, EntryPoint = "glfwDestroyWindow", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void DestroyWindow(Window window);
+    
+    [DllImport(DllName, EntryPoint = "glfwPollEvents", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void PollEvents();
+    
+    [DllImport(DllName, EntryPoint = "glfwWaitEventsTimeout", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void WaitEventsTimeout(double timeout);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void KeyCallback(Window window, Key key, int scancode, Action action, Mods mods);
+    
+    [DllImport(DllName, EntryPoint = "glfwSetKeyCallback", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetKeyCallback(Window window, KeyCallback keyCallback);
 }

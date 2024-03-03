@@ -22,6 +22,24 @@ try
     }, new uint[] { 0, 1, 2, 0, 2, 3 });
     mesh.AddInstance(new Instance2D(Matrix4x4.Identity));
     mesh.BindToShader(shader);
+
+    KeyBinding a = new KeyBinding(Key.P | Key.LShift | Key.Release);
+    a.Enabled = false;
+    KeyBinding b = new KeyBinding(Key.Escape | Key.Press);
+    a.OnPress += () =>
+    {
+        a.Enabled = false;
+        b.Enabled = true;
+        Log.Info("Menu");
+    };
+    b.OnPress += () =>
+    {
+        a.Enabled = true;
+        b.Enabled = false;
+        Log.Info("Game");
+    };
+    window.AddKeyBinding(a);
+    window.AddKeyBinding(b);
     
     Window.Run();
 }
