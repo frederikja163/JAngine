@@ -66,10 +66,10 @@ public readonly struct Vec4
     public float G => _y;
 
     /// <inheritdoc cref="Z"/>
-    public float B => _y;
+    public float B => _z;
 
     /// <inheritdoc cref="W"/>
-    public float A => _y;
+    public float A => _w;
 
     /// <summary>
     /// Adds a float to all components of a vector.
