@@ -26,13 +26,13 @@ try
     KeyBinding a = new KeyBinding(Key.P | Key.LShift | Key.Release);
     a.Enabled = false;
     KeyBinding b = new KeyBinding(Key.Escape | Key.Press);
-    a.OnPress += () =>
+    a.OnActivate += () =>
     {
         a.Enabled = false;
         b.Enabled = true;
         Log.Info("Menu");
     };
-    b.OnPress += () =>
+    b.OnActivate += () =>
     {
         a.Enabled = true;
         b.Enabled = false;
@@ -40,6 +40,7 @@ try
     };
     window.AddKeyBinding(a);
     window.AddKeyBinding(b);
+    window.AddKeyBinding(Key.MouseLeft | Key.Press, () => Log.Info("Pew"));
     
     Window.Run();
 }

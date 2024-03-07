@@ -42,6 +42,7 @@ public sealed class Window : IDisposable
     {
         _handle = Glfw.CreateWindow(width, height, title, Glfw.Monitor.Null, Glfw.Window.Null);
         Glfw.SetKeyCallback(_handle, KeyCallback);
+        Glfw.SetMouseCallback(_handle, MouseCallback);
         _renderingThread = new Thread(RenderThread);
         _renderingThread.Start();
         s_windows.Add(this);
@@ -61,6 +62,30 @@ public sealed class Window : IDisposable
                 window.SendHeldKeys();
             }
         }
+    }
+
+    private void MouseCallback(Glfw.Window window, Glfw.MouseButton button, Glfw.Action action, Glfw.Mods mods)
+    {
+        if (action == Glfw.Action.Repeat)
+        {
+            return;
+        }
+        
+        Key key = GetMouseButtonFromGlfw(button) | GetKeyMod();
+        if (action == Glfw.Action.Release && _keysDown.Remove(key))
+        {
+            key |= Key.Release;
+        }
+        else if (action == Glfw.Action.Press && _keysDown.Add(key))
+        {
+            key |= Key.Press;
+        }
+        else
+        {
+            throw new UnreachableException();
+        }
+        
+        SimulateKeyPress(key);
     }
 
     private void KeyCallback(Glfw.Window window, Glfw.Key gKey, int scancode, Glfw.Action action, Glfw.Mods mods)
@@ -119,6 +144,11 @@ public sealed class Window : IDisposable
         mods &= (Key)0x0f_ff_00_00;
         return mods;
     }
+    
+    private static Key GetMouseButtonFromGlfw(Glfw.MouseButton key)
+    {
+        return (Key)((int)key << 12);
+    }
 
     private static Key GetKeyFromGlfw(Glfw.Key key)
     {
@@ -136,6 +166,13 @@ public sealed class Window : IDisposable
         };
     }
 
+    public KeyBinding AddKeyBinding(Key key, Action onActivate)
+    {
+        KeyBinding binding = new KeyBinding(key, onActivate);
+        AddKeyBinding(binding);
+        return binding;
+    }
+    
     public void AddKeyBinding(KeyBinding binding)
     {
         if (!_keyBindings.TryGetValue(binding.Key, out List<KeyBinding>? bindings))

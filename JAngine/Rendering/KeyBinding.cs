@@ -126,6 +126,21 @@ public enum Key
     RightSuper =   347,
     Menu =   348,
     
+    // Buttons
+    // 0b 00000000 00000000 00xx0000 00000000
+    Mouse1   = 0,
+    Mouse2   = 1,
+    Mouse3   = 2,
+    Mouse4   = 3,
+    Mouse5   = 4,
+    Mouse6   = 5,
+    Mouse7   = 6,
+    Mouse8   = 7,
+    MouseLast   = Mouse8,
+    MouseLeft   = Mouse1,
+    MouseRight   = Mouse2,
+    MouseMiddle   = Mouse3,
+    
     // Mods
     // 0b 00000000 xxxxxxxx 00000000 00000000
     LShift = 0x0001 << 16,
@@ -148,10 +163,10 @@ public enum Key
 public sealed class KeyBinding
 {
 
-    public KeyBinding(Key key, Action onPress)
+    public KeyBinding(Key key, Action onActivate)
     {
         Key = key;
-        OnPress = onPress;
+        OnActivate = onActivate;
     }
     
     public KeyBinding(Key key)
@@ -160,11 +175,11 @@ public sealed class KeyBinding
     }
     
     public Key Key { get; set; }
-    public event Action? OnPress = null;
+    public event Action? OnActivate = null;
     public bool Enabled { get; set; } = true;
 
     public void SimulatePress()
     {
-        OnPress?.Invoke();
+        OnActivate?.Invoke();
     }
 }

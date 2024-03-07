@@ -299,6 +299,22 @@ internal static class Glfw
         Last =   Menu,
     }
 
+    public enum MouseButton
+    {
+        Button1   = 0,
+        Button2   = 1,
+        Button3   = 2,
+        Button4   = 3,
+        Button5   = 4,
+        Button6   = 5,
+        Button7   = 6,
+        Button8   = 7,
+        Last   = Button8,
+        Left   = Button1,
+        Right   = Button2,
+        Middle   = Button3,
+    }
+
     public enum Action
     {
         Release = 0,
@@ -373,4 +389,10 @@ internal static class Glfw
     
     [DllImport(DllName, EntryPoint = "glfwSetKeyCallback", CallingConvention = CallingConvention.Cdecl)]
     public static extern void SetKeyCallback(Window window, KeyCallback keyCallback);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void MouseCallback(Window window, MouseButton button, Action action, Mods mods);
+    
+    [DllImport(DllName, EntryPoint = "glfwSetMouseButtonCallback", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetMouseCallback(Window window, MouseCallback mouseCallback);
 }
