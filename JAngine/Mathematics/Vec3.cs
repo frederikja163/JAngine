@@ -366,6 +366,20 @@ public readonly struct Vec3
             MathF.Min(MathF.Max(val.Z, min.Z), max.Z));
     }
 
+    /// <summary>
+    /// Calculates the cross product of two vectors.
+    /// </summary>
+    /// <param name="left">Specifies the first of two vectors.</param>
+    /// <param name="right">Specifies the second of two vectors.</param>
+    /// <returns>Returns the cross product of two vectors, left and right.</returns>
+    public static Vec3 Cross(Vec3 left, Vec3 right)
+    {
+        return new Vec3(
+            left.Y * right.Z - right.Y * left.Z,
+            left.Z * right.X - right.Z * left.X,
+            left.X * right.Y - right.X * left.Y);
+    }
+
     /// <inheritdoc cref="Vec4.Distance"/>
     public static float Distance(Vec3 p0, Vec3 p1)
     {
