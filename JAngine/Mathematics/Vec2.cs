@@ -205,213 +205,139 @@ public readonly struct Vec2
         return !(left == right);
     }
 
-    /// <summary>
-    /// Returns the absolute value of the vector.
-    /// </summary>
-    /// <returns>Returns the absolute value of the vector.</returns>
+    /// <inheritdoc cref="Vec4.Abs"/>
     public Vec2 Abs()
     {
         return new Vec2(MathF.Abs(this.X), MathF.Abs(this.Y));
     }
 
-    /// <summary>
-    /// Returns the arccosine of the value.
-    /// </summary>
-    /// <returns>Returns the angle whose trigonometric cosine is value. The range of values returned by acos is [0,π]. The result is undefined if |value|>1.</returns>
+    /// <inheritdoc cref="Vec4.Acos"/>
     public Vec2 Acos()
     {
         return new Vec2(MathF.Acos(X), MathF.Acos(Y));
     }
 
-    /// <summary>
-    /// Returns the arcsine of the value.
-    /// </summary>
-    /// <returns>Returns the angle whose trigonometric sine is value. The range of values returned by Asin is [−π/2,π/2]. The result is undefined if |value|≺1.</returns>
+    /// <inheritdoc cref="Vec4.Asin"/>
     public Vec2 Asin()
     {
         return new Vec2(MathF.Asin(X), MathF.Asin(Y));
     }
     
-    /// <summary>
-    /// Returns the arc-tangent of the value.
-    /// </summary>
-    /// <returns>Returns the angle whose tangent is the value. The value returned is in the range [−π/2,π/2].</returns>
+    /// <inheritdoc cref="Vec4.Atan()"/>
     public Vec2 Atan()
     {
         return new Vec2(MathF.Atan(X), MathF.Atan(Y));
     }
 
-    /// <summary>
-    /// Finds the nearest integer that is greater than or equal to the value.
-    /// </summary>
-    /// <returns>Returns a value equal to the nearest integer that is greater than or equal to the value.</returns>
+    /// <inheritdoc cref="Vec4.Ceil"/>
     public Vec2 Ceil()
     {
         return new Vec2(MathF.Ceiling(this.X), MathF.Ceiling(this.Y));
     }
 
-    /// <summary>
-    /// Returns the cosine of the value.
-    /// </summary>
-    /// <returns>Returns the trigonometric cosine of the value.</returns>
+    /// <inheritdoc cref="Vec4.Cos"/>
     public Vec2 Cos()
     {
         return new Vec2(MathF.Cos(X), MathF.Cos(Y));
     }
 
-    /// <summary>
-    /// Converts a quantity in radians to degrees.
-    /// </summary>
-    /// <returns>Returns a quantity specified in radians converted into degrees. The return value is (180×value)/π.</returns>
+    /// <inheritdoc cref="Vec4.Degrees"/>
     public Vec2 Degrees()
     {
         return (this * 180) / MathF.PI;
     }
 
-    /// <summary>
-    /// Returns the natural exponentiation of the value.
-    /// </summary>
-    /// <returns>Returns the natural exponentiation of the value. i.e., e^this.</returns>
+    /// <inheritdoc cref="Vec4.Exp"/>
     public Vec2 Exp()
     {
         return Pow(new Vec2(MathF.E), this);
     }
 
-    /// <summary>
-    /// Returns 2 raised to the power of the value.
-    /// </summary>
-    /// <returns>Returns 2 raised to the power of the value. i.e., 2^this.</returns>
+    /// <inheritdoc cref="Vec4.Exp2"/>
     public Vec2 Exp2()
     {
         return Pow(new Vec2(2), this);
     }
 
-    /// <summary>
-    /// Finds the nearest integer less than or equal to the value.
-    /// </summary>
-    /// <returns>Returns a value equal to the nearest integer that is less than or equal to the value.</returns>
+    /// <inheritdoc cref="Vec4.Floor"/>
     public Vec2 Floor()
     {
         return new Vec2(MathF.Floor(this.X), MathF.Floor(this.Y));
     }
 
-    /// <summary>
-    /// Computes the fractional part of the value.
-    /// </summary>
-    /// <returns>Returns the fractional part of the value. This is calculated as 'this - Floor()'.</returns>
+    /// <inheritdoc cref="Vec4.Fract"/>
     public Vec2 Fract()
     {
         return this - Floor();
     }
 
-    /// <summary>
-    /// Returns the inverse of the square root of the value.
-    /// </summary>
-    /// <returns>Returns the inverse of the square root of the value; i.e. 1 / Sqrt(). The result is undefined if ≤0.</returns>
+    /// <inheritdoc cref="Vec4.Inversesqrt"/>
     public Vec2 Inversesqrt()
     {
         return 1 / Sqrt();
     }
     
-    /// <summary>
-    /// Calculates the length of the vector.
-    /// </summary>
-    /// <returns>Returns the length of the vector, i.e. '√(X² + Y²)'.</returns>
+    /// <inheritdoc cref="Vec4.Length"/>
     public float Length()
     {
         return MathF.Sqrt(_x * _x + _y * _y);
     }
 
-    /// <summary>
-    /// Returns the natural logarithm of the value.
-    /// </summary>
-    /// <returns>Returns the natural logarithm of the value, i.e. the value y which satisfies value=e^y. The result is undefined if ≤0.</returns>
+    /// <inheritdoc cref="Vec4.Log"/>
     public Vec2 Log()
     {
         return new Vec2(MathF.Log(X), MathF.Log(Y));
     }
 
-    /// <summary>
-    /// Returns the base 2 logarithm of the value.
-    /// </summary>
-    /// <returns>Returns the base 2 logarithm of the value, i.e. the value y which satisfies value=2^y. The result is undefined if ≤0.</returns>
+    /// <inheritdoc cref="Vec4.Log2"/>
     public Vec2 Log2()
     {
         return new Vec2(MathF.Log2(X), MathF.Log2(Y));
     }
 
-    /// <summary>
-    /// Calculates the unit vector in the same direction as the original vector.
-    /// </summary>
-    /// <returns>Returns a vector with the same direction as its parameter, v, but with length 1.</returns>
+    /// <inheritdoc cref="Vec4.Normalize"/>
     public Vec2 Normalize()
     {
         return this / Length();
     }
 
-    /// <summary>
-    /// Converts a quantity in degrees to radians.
-    /// </summary>
-    /// <returns>Returns a quantity specified in degrees converted into radians. The return value is (π×value)/180.</returns>
+    /// <inheritdoc cref="Vec4.Radians"/>
     public Vec2 Radians()
     {
         return (this * MathF.PI) / 180;
     }
 
-    /// <summary>
-    /// Extracts the sign of the value.
-    /// </summary>
-    /// <returns>Returns -1.0 if the value is less than 0.0, 0.0 if the value is equal to 0.0, and +1.0 if the value is greater than 0.</returns>
+    /// <inheritdoc cref="Vec4.Sign"/>
     public Vec2 Sign()
     {
         return new Vec2(MathF.Sign(X), MathF.Sign(Y));
     }
 
-    /// <summary>
-    /// Returns the sine of the value.
-    /// </summary>
-    /// <returns>Returns the trigonometric sine of the value.</returns>
+    /// <inheritdoc cref="Vec4.Sin"/>
     public Vec2 Sin()
     {
         return new Vec2(MathF.Sin(X), MathF.Sin(Y));
     }
 
-    /// <summary>
-    /// Returns the square root of the value.
-    /// </summary>
-    /// <returns>Returns the square root of the value. The result is undefined if ≺0.</returns>
+    /// <inheritdoc cref="Vec4.Sqrt"/>
     public Vec2 Sqrt()
     {
         return new Vec2(MathF.Sqrt(X), MathF.Sqrt(Y));
     }
 
-    /// <summary>
-    /// Returns the tangent of the value.
-    /// </summary>
-    /// <returns>Returns the trigonometric tangent of the value.</returns>
+    /// <inheritdoc cref="Vec4.Tan"/>
     public Vec2 Tan()
     {
         return new Vec2(MathF.Tan(X), MathF.Tan(Y));
     }
 
-    /// <summary>
-    /// Returns the arc-tangent of the parameters.
-    /// </summary>
-    /// <param name="left">Specify the numerator of the fraction whose arctangent to return.</param>
-    /// <param name="right">Specify the denominator of the fraction whose arctangent to return.</param>
-    /// <returns>Returns the angle whose trigonometric arctangent is left/right. The signs of left and right are used to determine the quadrant that the angle lies in. The value returned by Atan is in the range [−π,π]. The result is undefined if right=0.</returns>
+    /// <inheritdoc cref="Vec4.Atan(Vec4, Vec4)"/>
     public static Vec2 Atan(Vec2 left, Vec2 right)
     {
         return new Vec2(MathF.Atan(left.X / right.X), MathF.Atan(left.Y / right.Y));
     }
 
-    /// <summary>
-    /// Constrains a value to lie between two further values.
-    /// </summary>
-    /// <param name="val">Specify the value to constrain.</param>
-    /// <param name="min">Specify the lower end of the range into which to constrain val.</param>
-    /// <param name="max">Specify the upper end of the range into which to constrain val.</param>
-    /// <returns>Returns the value of val constrained to the range min to max. The returned value is computed as Min(Max(val, min), max).</returns>
+    /// <inheritdoc cref="Vec4.Clamp(Vec4, float, float)"/>
     public static Vec2 Clamp(Vec2 val, float min, float max)
     {
         return new Vec2(MathF.Min(MathF.Max(val.X, min), max), MathF.Min(MathF.Max(val.Y, min), max));
@@ -423,12 +349,7 @@ public readonly struct Vec2
         return new Vec2(MathF.Min(MathF.Max(val.X, min.X), max.X), MathF.Min(MathF.Max(val.Y, min.Y), max.Y));
     }
     
-    /// <summary>
-    /// Calculates the distance between two points.
-    /// </summary>
-    /// <param name="p0">Specifies the first of two points.</param>
-    /// <param name="p1">Specifies the second of two points.</param>
-    /// <returns>Returns the distance between the two points p0 and p1. i.e., 'Length(p0 - p1)'.</returns>
+    /// <inheritdoc cref="Vec4.Distance"/>
     public static float Distance(Vec2 p0, Vec2 p1)
     {
         Vec2 vector = p0 - p1;
@@ -436,24 +357,13 @@ public readonly struct Vec2
         return vector.Length();
     }
     
-    /// <summary>
-    /// Calculates the dot product of two vectors.
-    /// </summary>
-    /// <param name="left">Specifies the first of two vectors.</param>
-    /// <param name="right">Specifies the second of two vectors.</param>
-    /// <returns>Returns the dot product of two vectors, left and right. i.e., 'left.X * right.X + left.Y * right.Y'.</returns>
+    /// <inheritdoc cref="Vec4.Dot"/>
     public static float Dot(Vec2 left, Vec2 right)
     {
         return left.X * right.X + left.Y * right.Y;
     }
 
-    /// <summary>
-    /// Return a vector pointing in the same direction as another.
-    /// </summary>
-    /// <param name="n">Specifies the vector to orient.</param>
-    /// <param name="i">Specifies the incident vector.</param>
-    /// <param name="nRef">Specifies the reference vector.</param>
-    /// <returns>Returns a vector that points away from a surface as defined by its normal. If Dot(nRef, i) ≺ 0 faceforward returns N, otherwise it returns -N.</returns>
+    /// <inheritdoc cref="Vec4.Faceforward"/>
     public static Vec2 Faceforward(Vec2 n, Vec2 i, Vec2 nRef)
     {
         if (Vec2.Dot(i, nRef) < 0)
@@ -462,57 +372,37 @@ public readonly struct Vec2
         return n * -1;
     }
 
-    /// <summary>
-    /// Returns the greater of two values.
-    /// </summary>
-    /// <param name="left">Specify the first value to compare.</param>
-    /// <param name="right">Specify the second value to compare.</param>
-    /// <returns>Returns the maximum of the two parameters. It returns right if right is greater than left, otherwise it returns left.</returns>
+    /// <inheritdoc cref="Vec4.Max(Vec4, float)"/>
     public static Vec2 Max(Vec2 left, float right)
     {
         return new Vec2(MathF.Max(left.X, right), MathF.Max(left.Y, right));
     }
 
-    ///<inheritdoc cref="Max(JAngine.Mathematics.Vec2,float)"/>
+    /// <inheritdoc cref="Vec4.Max(Vec4, Vec4)"/>
     public static Vec2 Max(Vec2 left, Vec2 right)
     {
         return new Vec2(MathF.Max(left.X, right.X), MathF.Max(left.Y, right.Y));
     }
     
-    /// <summary>
-    /// Returns the lesser of two values.
-    /// </summary>
-    /// <param name="left">Specify the first value to compare.</param>
-    /// <param name="right">Specify the second value to compare.</param>
-    /// <returns>Returns the minimum of the two parameters. It returns right if right is less than left, otherwise it returns left.</returns>
+    /// <inheritdoc cref="Vec4.Min(Vec4, float)"/>
     public static Vec2 Min(Vec2 left, float right)
     {
         return new Vec2(MathF.Min(left.X, right), MathF.Min(left.Y, right));
     }
     
-    /// <inheritdoc cref="Min(JAngine.Mathematics.Vec2,float)"/>
+    /// <inheritdoc cref="Vec4.Min(Vec4, Vec4)"/>
     public static Vec2 Min(Vec2 left, Vec2 right)
     {
         return new Vec2(MathF.Min(left.X, right.X), MathF.Min(left.Y, right.Y));
     }
 
-    /// <summary>
-    /// Returns the component of the first parameter raised to the power of the second.
-    /// </summary>
-    /// <param name="left">Specify the value to raise to the power of right.</param>
-    /// <param name="right">Specify the power to which to raise left.</param>
-    /// <returns>Returns the value of left raised to the right power, i.e. left^right. The result is undefined if left≺0 or if left=0 and right≤0.</returns>
+    /// <inheritdoc cref="Vec4.Pow"/>
     public static Vec2 Pow(Vec2 left, Vec2 right)
     {
         return new Vec2(MathF.Pow(left.X, right.X), MathF.Pow(left.Y, right.Y));
     }
 
-    /// <summary>
-    /// Calculates the reflection direction for an incident vector.
-    /// </summary>
-    /// <param name="i">Specifies the incident vector.</param>
-    /// <param name="n">Specifies the normal vector.</param>
-    /// <returns>For a given incident vector I and surface normal N reflect returns the reflection direction calculated as 'i - 2 * Dot(n, i) * n'.</returns>
+    /// <inheritdoc cref="Vec4.Reflect"/>
     public static Vec2 Reflect(Vec2 i, Vec2 n)
     {
         n.Normalize();
@@ -520,20 +410,14 @@ public readonly struct Vec2
         return i - 2 * Dot(i, n) * n;
     }
 
-    /// <summary>
-    /// Performs Hermite interpolation between two values.
-    /// </summary>
-    /// <param name="edge0">Specifies the value of the lower edge of the Hermite function.</param>
-    /// <param name="edge1">Specifies the value of the upper edge of the Hermite function.</param>
-    /// <param name="src">Specifies the source value for interpolation.</param>
-    /// <returns>Performs smooth Hermite interpolation between 0 and 1 when edge0 ≺ src ≺ edge1. This is useful in cases where a threshold function with a smooth transition is desired.</returns>
+    /// <inheritdoc cref="Vec4.Smoothstep(float, float, Vec4)"/>
     public static Vec2 Smoothstep(float edge0, float edge1, Vec2 src)
     {
         var t = Clamp((src - edge0) / (edge1 - edge0), 0, 1);
         return t * t * (3 - 2 * t);
     }
     
-    /// <inheritdoc cref="Smoothstep(float,float,JAngine.Mathematics.Vec2)"/>
+    /// <inheritdoc cref="Vec4.Smoothstep(Vec4, Vec4, Vec4)"/>
     public static Vec2 Smoothstep(Vec2 edge0, Vec2 edge1, Vec2 src)
     {
         var t = Clamp((src - edge0) / (edge1 - edge0), 0, 1);
