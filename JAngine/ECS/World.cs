@@ -5,10 +5,10 @@ namespace JAngine.ECS;
 /// <summary>
 /// A world containing entities, can also compute changes to said entities using systems.
 /// </summary>
-internal sealed class World
+public sealed class World
 {
     private static ICollection<ISystem> s_systems = Assemblies.CreateInstances<ISystem>().ToList();
-    public static event Action<World>? WorldCreated;
+    public static event Action<World>? OnWorldCreated;
 
     private readonly HashSet<EntityArchetype> _archetypes = new();
 
@@ -17,10 +17,10 @@ internal sealed class World
     /// </summary>
     public World()
     {
-        WorldCreated?.Invoke(this);
+        OnWorldCreated?.Invoke(this);
     }
     
-    internal EntityArchetype GetExistingArchetype(IEnumerable<Type> types)
+    internal EntityArchetype GetArchetype(IEnumerable<Type> types)
     {
         EntityArchetype key = new EntityArchetype(this, types);
         if (!_archetypes.TryGetValue(key, out EntityArchetype? archetype))
@@ -53,13 +53,14 @@ internal sealed class World
     /// <returns>The newly created entity.</returns>
     public Entity CreateEntity(IEnumerable components)
     {
-        return CreateEntity(components.OfType<object>().ToArray());
+        Entity entity = CreateEntity(components.OfType<object>().ToArray());
+        return entity;
     }
     
     /// <inheritdoc cref="CreateEntity(System.Collections.IEnumerable)"/>
     public Entity CreateEntity(params object[] components)
     {
-        EntityArchetype archetype = GetExistingArchetype(components.Select(c => c.GetType()));
+        EntityArchetype archetype = GetArchetype(components.Select(c => c.GetType()));
         return archetype.AddEntity(null, components);
     }
 

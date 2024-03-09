@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
 namespace JAngine.ECS;
@@ -5,7 +6,7 @@ namespace JAngine.ECS;
 /// <summary>
 /// An entity in the world containing different components. To create an entity see <see cref="World.CreateEntity(System.Collections.Generic.IEnumerable{object})"/>
 /// </summary>
-internal sealed class Entity
+public sealed class Entity
 {
     internal Entity(EntityArchetype archetype, Guid id)
     {
@@ -37,9 +38,9 @@ internal sealed class Entity
     /// <param name="value">The value of the new component.</param>
     public void AddComponent<T>(T value)
     {
-        // SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
-        // newComponentTypes.Add(typeof(T));
-        // SetArchetype(newComponentTypes, value);
+        SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.GetComponentTypes(), TypeComparer.Default);
+        newComponentTypes.Add(typeof(T));
+        SetArchetype(newComponentTypes, value);
     }
     
     /// <summary>
@@ -48,9 +49,9 @@ internal sealed class Entity
     /// <typeparam name="T">The type of the new component.</typeparam>
     public void AddComponent<T>()
     {
-        // SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
-        // newComponentTypes.Add(typeof(T));
-        // SetArchetype(newComponentTypes);
+        SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.GetComponentTypes(), TypeComparer.Default);
+        newComponentTypes.Add(typeof(T));
+        SetArchetype(newComponentTypes);
     }
 
     /// <summary>
@@ -59,9 +60,18 @@ internal sealed class Entity
     /// <typeparam name="T">The type of the new component.</typeparam>
     public void RemoveComponent<T>()
     {
-        // SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.ComponentTypes, TypeComparer.Default);
-        // newComponentTypes.Remove(typeof(T));
-        // SetArchetype(newComponentTypes);
+        SortedSet<Type> newComponentTypes = new SortedSet<Type>(Archetype.GetComponentTypes(), TypeComparer.Default);
+        newComponentTypes.Remove(typeof(T));
+        SetArchetype(newComponentTypes);
+    }
+
+    /// <summary>
+    /// Gets all component types on this entity.
+    /// </summary>
+    /// <returns>Returns all types of components on this entity.</returns>
+    public IEnumerable<Type> GetComponentTypes()
+    {
+        return Archetype.GetComponentTypes();
     }
 
     private void SetArchetype(SortedSet<Type> newComponentTypes, object? value = null)
@@ -71,7 +81,7 @@ internal sealed class Entity
         {
             componentValues.Add(value);
         }
-        Archetype = World.GetExistingArchetype(newComponentTypes);
+        Archetype = World.GetArchetype(newComponentTypes);
         Archetype.AddEntity(this, componentValues);
     }
 }
