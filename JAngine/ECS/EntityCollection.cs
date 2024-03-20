@@ -1,11 +1,11 @@
 namespace JAngine.ECS;
 
 /// <summary>
-/// A collection of events for a type of entity.
+/// Shared methods, data and events for a collection of entities.
 /// </summary>
-public sealed class EntityEvents
+public sealed class EntityCollection
 {
-    internal EntityEvents(SortedSet<Type> componentTypes)
+    internal EntityCollection(SortedSet<Type> componentTypes)
     {
         
     }
@@ -17,7 +17,7 @@ public sealed class EntityEvents
     /// <summary>
     /// An entity matching this event type was destroyed (removed from the world).
     /// </summary>
-    public event Action<Entity>? OnEntityDestroyed;
+    internal event Action<Entity>? OnEntityDestroyed;
     
     /// <summary>
     /// An entity has been modified to match this event type (components were added).
