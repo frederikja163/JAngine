@@ -1,8 +1,11 @@
 using System.Diagnostics;
+using System.Numerics;
 using JAngine.ECS;
 using JAngine.Rendering.OpenGL;
 
 namespace JAngine.Rendering;
+
+public delegate void MouseMovedDelegate(Window window, float x, float y);
 
 /// <summary>
 /// A window used for drawing to the screen and as a context to a renderer.
@@ -18,6 +21,7 @@ public sealed class Window : IDisposable
     private HashSet<VertexArray> _vaos = new HashSet<VertexArray>();
     private readonly HashSet<Key> _keysDown = new HashSet<Key>();
     private readonly Thread _renderingThread;
+    private MouseMovedDelegate? _onMouseMoved;
 
     static Window()
     {
@@ -43,9 +47,16 @@ public sealed class Window : IDisposable
         _handle = Glfw.CreateWindow(width, height, title, Glfw.Monitor.Null, Glfw.Window.Null);
         Glfw.SetKeyCallback(_handle, KeyCallback);
         Glfw.SetMouseCallback(_handle, MouseCallback);
+        Glfw.SetCursorPosCallback(_handle, CursorPositionCallback);
         _renderingThread = new Thread(RenderThread);
         _renderingThread.Start();
         s_windows.Add(this);
+    }
+    
+    public event MouseMovedDelegate? OnMouseMoved
+    {
+        add => _onMouseMoved += value;
+        remove => _onMouseMoved -= value;
     }
 
     /// <summary>
@@ -61,6 +72,21 @@ public sealed class Window : IDisposable
             {
                 window.SendHeldKeys();
             }
+        }
+    }
+
+    private void CursorPositionCallback(Glfw.Window window, double xpos, double ypos)
+    {
+        _onMouseMoved?.Invoke(this, (float)xpos, (float)ypos);
+    }
+
+    public Vector2 CursorPosition
+    {
+        get
+        {
+            Glfw.GetCursorPos(_handle, out double xPos, out double yPos);
+            Vector2 pos = new Vector2((float)xPos, (float)yPos);
+            return pos;
         }
     }
 

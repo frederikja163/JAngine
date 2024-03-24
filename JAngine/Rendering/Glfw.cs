@@ -395,4 +395,14 @@ internal static class Glfw
     
     [DllImport(DllName, EntryPoint = "glfwSetMouseButtonCallback", CallingConvention = CallingConvention.Cdecl)]
     public static extern void SetMouseCallback(Window window, MouseCallback mouseCallback);
+    
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void CursorPositionCallback(Window window, double xPos, double yPos);
+    
+    [DllImport(DllName, EntryPoint = "glfwSetCursorPosCallback", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetCursorPosCallback(Window window, CursorPositionCallback cursorPositionCallback);
+    
+    [DllImport(DllName, EntryPoint = "glfwGetCursorPos", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void GetCursorPos(Window window, out double xPos, out double yPos);
+
 }

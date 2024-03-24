@@ -103,7 +103,7 @@ public sealed class Shader : IGlObject, IDisposable
 {
     internal sealed record Attribute
     {
-        public Attribute(string name, int location, int size, Gl.AttributeType type)
+        internal Attribute(string name, int location, int size, Gl.AttributeType type)
         {
             Name = name;
             Location = location;
@@ -116,10 +116,10 @@ public sealed class Shader : IGlObject, IDisposable
         internal int Size { get; }
         internal Gl.AttributeType Type { get; }
     }
-    
-    internal sealed class Uniform
+
+    private sealed class Uniform
     {
-        public Uniform(string name, int location, int size, Gl.UniformType type)
+        internal Uniform(string name, int location, int size, Gl.UniformType type)
         {
             Name = name;
             Location = location;
