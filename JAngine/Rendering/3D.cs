@@ -32,7 +32,7 @@ public readonly struct Instance3D
     public readonly Matrix4x4 Transformation;
 }
 
-public sealed class Mesh3D : Mesh<Vertex3D, Instance3D>
+public sealed class Mesh3D
 {
     private record VertexIndex(int PosIndex, int TexCoordIndex, int NormalIndex)
     {
@@ -108,7 +108,7 @@ public sealed class Mesh3D : Mesh<Vertex3D, Instance3D>
         return new Mesh3D(window, Path.GetFileNameWithoutExtension(path) + ".mesh", vertices.ToArray(), indices);
     }
 
-    public Mesh3D(Window window, string name, Vertex3D[] vertices, uint[] indices) : base(window, name, vertices, indices)
+    public Mesh3D(Window window, string name, Vertex3D[] vertices, uint[] indices)
     {
     }
 }

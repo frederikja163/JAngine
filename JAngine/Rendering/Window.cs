@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Numerics;
-using JAngine.ECS;
 using JAngine.Rendering.OpenGL;
 
 namespace JAngine.Rendering;

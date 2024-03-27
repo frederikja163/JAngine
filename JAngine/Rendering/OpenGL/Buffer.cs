@@ -103,8 +103,7 @@ public sealed class Buffer<T> : IBuffer<T>
     public string Name { get; }
     Window IGlObject.Window => _window;
     uint IGlObject.Handle => _handle;
-    private int Capacity => _data.Length;
-    int IBuffer<T>.Capacity => _data.Length;
+    public int Capacity => _data.Length;
 
     public int Count { get; private set; }
 

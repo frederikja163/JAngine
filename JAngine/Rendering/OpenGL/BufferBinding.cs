@@ -3,7 +3,7 @@ namespace JAngine.Rendering.OpenGL;
 public sealed class BufferBinding : IGlEvent
 {
     // TODO: Consider merging this type with Shader.Attribute
-    internal sealed record Attribute(string Name, int Count, Gl.VertexAttribType Type, uint Divisor);
+    internal sealed record Attribute(string Name, int Count, Gl.VertexAttribType Type, int Divisor);
     private readonly List<Attribute> _attributes = new List<Attribute>();
 
     internal BufferBinding(IGlObject buffer, uint index, int offset)
@@ -26,7 +26,7 @@ public sealed class BufferBinding : IGlEvent
         }
     }
 
-    public BufferBinding AddAttribute(string attributeName, int count, uint divisor = 0)
+    public BufferBinding AddAttribute(string attributeName, int count, int divisor = 0)
     {
         lock (_attributes)
         {

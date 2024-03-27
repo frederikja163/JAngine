@@ -5,7 +5,7 @@ public sealed class VertexArray : IGlObject, IDisposable
     private readonly Window _window;
     private uint _handle;
     private readonly IBuffer<uint> _ebo;
-    private readonly Dictionary<IGlObject, BufferBinding> _attributeBuffers = new();
+    private readonly Dictionary<IBuffer, BufferBinding> _attributeBuffers = new();
     
     public VertexArray(Window window, string name, Shader shader, IBuffer<uint> ebo)
     {
@@ -22,10 +22,9 @@ public sealed class VertexArray : IGlObject, IDisposable
     Window IGlObject.Window => _window;
     uint IGlObject.Handle => _handle;
     internal int PointCount => _ebo.Count;
-    public int InstanceCount { get; set; }
+    public int InstanceCount { get; set; } = 1;
 
-    public BufferBinding BindBuffer<T>(IBuffer<T> buffer, int offset = 0)
-        where T : unmanaged
+    public BufferBinding BindBuffer(IBuffer buffer, int offset = 0)
     {
         lock (_attributeBuffers)
         {
@@ -40,7 +39,7 @@ public sealed class VertexArray : IGlObject, IDisposable
             return binding;
         }
     }
-
+    
     private void UpdateBinding(BufferBinding binding)
     {
         _window.QueueUpdate(this, binding);
@@ -68,7 +67,7 @@ public sealed class VertexArray : IGlObject, IDisposable
                     uint location = (uint)shaderAttrib.Location;
                     Gl.EnableVertexArrayAttrib(_handle, location);
                     Gl.VertexArrayAttribBinding(_handle, location, binding.Index);
-                    Gl.VertexArrayBindingDivisor(_handle, binding.Index, attribute.Divisor);
+                    Gl.VertexArrayBindingDivisor(_handle, binding.Index, (uint)attribute.Divisor);
                     Gl.VertexArrayAttribFormat(_handle, location, attribute.Count, attribute.Type, false, relativeOffset);
                     relativeOffset += (uint)attribute.Count * sizeof(float);
                 }

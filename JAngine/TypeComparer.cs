@@ -2,7 +2,7 @@ namespace JAngine;
 
 internal sealed class TypeComparer : IComparer<Type>, IEqualityComparer<Type>
 {
-    internal static readonly TypeComparer Default = new TypeComparer();
+    internal static TypeComparer Default { get; } = new TypeComparer();
     
     public int Compare(Type? x, Type? y)
     {

@@ -1,15 +1,21 @@
 namespace JAngine.Rendering.OpenGL;
 
-public interface IBuffer<T> : IGlObject, IDisposable, IEnumerable<T>
+public interface IBuffer: IGlObject, IDisposable
+{
+    public Type UnderlyingType { get; }
+    public int Capacity { get; }
+    public int Count { get; }
+    public void EnsureCapacity(int size);
+}
+
+public interface IBuffer<T> : IBuffer, IEnumerable<T>
     where T : unmanaged
 {
-    int Capacity { get; }
-    int Count { get; }
-    void EnsureCapacity(int size);
-    T this[Index index] { get; set; }
-    Span<T> this[Range range] { get; }
-    void SetSubData(int offset, params T[] data);
-    int FindIndex(T value);
+    Type IBuffer.UnderlyingType => typeof(T);
+    public T this[Index index] { get; set; }
+    public Span<T> this[Range range] { get; }
+    public void SetSubData(int offset, params T[] data);
+    public int FindIndex(T value);
 }
 
 internal sealed class UpdateDataEvent : IGlEvent

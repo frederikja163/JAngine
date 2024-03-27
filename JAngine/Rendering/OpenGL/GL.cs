@@ -5,23 +5,13 @@ namespace JAngine.Rendering.OpenGL;
 using Enum = System.UInt32;
 using Boolean = System.Boolean;
 using Bitfield = System.UInt32;
-using Byte = System.SByte;
-using UByte = System.Byte;
-using Short = System.Int16;
-using UShort = System.UInt16;
 using Int = System.Int32;
 using Uint = System.UInt32;
-using ClampX = System.Int32;
 using SizeI = System.Int32;
-using Float = System.Single;
-using ClampF = System.Single;
-using ClampD = System.Double;
 using Char = System.Byte;
-using Half = System.UInt16;
-using Fixed = System.Int32;
 using IntPtr = System.IntPtr;
 using SizeIPtr = System.IntPtr;
-using Uint64 = System.UInt64;
+
 // Sync
 // Context
 // Event

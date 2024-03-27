@@ -33,10 +33,3 @@ public readonly struct Instance2D
         Transformation = transformation;
     }
 }
-
-public sealed class Mesh2D : Mesh<Vertex2D, Instance2D> {
-    public Mesh2D(Window window, string name, Vertex2D[] vertices, uint[] indices)
-        : base(window, name, vertices, indices)
-    {
-    }
-}

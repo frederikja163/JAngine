@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Numerics;
 using System.Reflection;
 using JAngine.Rendering.OpenGL;
@@ -15,35 +14,93 @@ public sealed class ShaderAttributeAttribute : Attribute
     }
 }
 
-public class Instance<T>
-    where T : unmanaged
+public sealed class Mesh: IDisposable
 {
-    private readonly Buffer<T> _buffer;
-    private readonly int _index;
-
-    public Instance(Buffer<T> buffer, T data = default)
+    private readonly List<VertexArray> _vaos;
+    private readonly Dictionary<Type, (IBuffer buffer, int divisor)> _buffers;
+    private readonly IBuffer<uint> _ebo;
+    
+    public Mesh(Window window, string name, IBuffer<uint> indexBuffer)
     {
-        _buffer = buffer;
-        _index = buffer.Count;
-        buffer.SetSubData(_index, data);
+        Window = window;
+        Name = name;
+        _vaos = new List<VertexArray>();
+        _ebo = indexBuffer;
+        _buffers = new Dictionary<Type, (IBuffer buffer, int divisor)>(TypeComparer.Default);
     }
+    
+    public Window Window { get; }
+    public string Name { get; }
 
-    public T Data
+    public void AddAttribute<T>(int divisor = 0, params T[] data) where T : unmanaged
     {
-        get
+        if (_buffers.TryGetValue(typeof(T), out (IBuffer buffer, int divisor) tuple))
         {
-            return _buffer[_index];
+            throw new Exception($"Mesh {Name} already contains an attribute for {typeof(T).FullName}");
         }
+        tuple.buffer = new Buffer<T>(Window, $"{Name}.buffer");
+        tuple.divisor = divisor;
+        _buffers.Add(typeof(T), tuple);
         
-        set
+        foreach (VertexArray vao in _vaos)
         {
-            _buffer[_index] = value;
+            AddAttributes(vao, tuple.buffer, tuple.divisor);
         }
     }
-}
+    
+    public void BindToShader(Shader shader)
+    {
+        VertexArray vao = new VertexArray(Window, Name + ".vao", shader, _ebo);
+        _vaos.Add(vao);
 
-internal static class Mesh
-{
+        foreach ((IBuffer buffer, int divisor) in _buffers.Values)
+        {
+            AddAttributes(vao, buffer, divisor);
+        }
+    }
+
+    private static void AddAttributes(VertexArray vao, IBuffer buffer, int divisor)
+    {
+        BufferBinding binding = vao.BindBuffer(buffer);
+
+        foreach (FieldInfo field in buffer.UnderlyingType.GetRuntimeFields())
+        {
+            if (!Mesh.CsTypesToAttributes.TryGetValue(field.FieldType,
+                    out (int attributeCount, int count, Type type) tuple))
+            {
+                throw new Exception(
+                    $"Field of type {field.FieldType.Name} is not supported on vertex or instance fields.");
+            }
+
+            ShaderAttributeAttribute? attribute = field.GetCustomAttribute<ShaderAttributeAttribute>();
+            for (int i = 0; i < tuple.attributeCount; i++)
+            {
+                if (attribute is not null)
+                {
+                    binding.AddAttribute(string.Format(attribute.NameInShader, i), tuple.count, divisor);
+                }
+                else
+                {
+                    binding.AddAttribute(field.Name, tuple.count, divisor);
+                }
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        _ebo.Dispose();
+        foreach ((IBuffer buffer, _) in _buffers.Values)
+        {
+            buffer.Dispose();
+        }
+        foreach (VertexArray vao in _vaos)
+        {
+            vao.Dispose();
+        }
+    }
+    
+    // TODO: Convert to function with switch.
     internal static readonly IReadOnlyDictionary<Type, (int attribCount, int count, Type type)> CsTypesToAttributes =
         new Dictionary<Type, (int attribCount, int count, Type type)>()
         {
@@ -59,85 +116,5 @@ internal static class Mesh
             {typeof(Matrix4x4), (4, 4, typeof(float))},
             {typeof(Matrix3x2), (3, 2, typeof(float))},
         };
-}
-
-public class Mesh<TVertex, TInstance> : IDisposable
-    where TVertex : unmanaged
-    where TInstance : unmanaged
-{
-
-    private readonly List<VertexArray> _vaos = new List<VertexArray>();
-
-    public Mesh(Window window, string name, TVertex[] vertices, uint[] indices)
-    {
-        Window = window;
-        Name = name;
-        VertexBuffer = new Buffer<TVertex>(window, name + ".vbo", Gl.BufferUsage.StaticDraw, vertices);
-        InstanceBuffer = new Buffer<TInstance>(window, name + ".ivbo", Gl.BufferUsage.StaticDraw, 0);
-        ElementBuffer = new Buffer<uint>(window, name + ".ibo", Gl.BufferUsage.StaticDraw, indices);
-    }
-    
-    public Window Window { get; }
-    public string Name { get; }
-    public Buffer<TVertex> VertexBuffer { get; }
-    public Buffer<TInstance> InstanceBuffer { get; }
-    public Buffer<uint> ElementBuffer { get; }
-
-    public void BindToShader(Shader shader)
-    {
-        VertexArray vao = new VertexArray(Window, Name + ".vao", shader, ElementBuffer);
-        _vaos.Add(vao);
-        AddAttributes(VertexBuffer, 0);
-        AddAttributes(InstanceBuffer, 1);
-        vao.InstanceCount = InstanceBuffer.Count;
-        
-        void AddAttributes<T>(IBuffer<T> buffer, uint divisor)
-            where T : unmanaged
-        {
-            BufferBinding binding = vao.BindBuffer(buffer);
-
-            foreach (FieldInfo field in typeof(T).GetRuntimeFields())
-            {
-                if (!Mesh.CsTypesToAttributes.TryGetValue(field.FieldType, out (int attributeCount, int count, Type type) tuple))
-                {
-                    throw new Exception(
-                        $"Field of type {field.FieldType.Name} is not supported on vertex or instance fields.");
-                }
-
-                ShaderAttributeAttribute? attribute = field.GetCustomAttributes<ShaderAttributeAttribute>().FirstOrDefault();
-                for (int i = 0; i < tuple.attributeCount; i++)
-                {
-                    if (attribute is not null)
-                    {
-                        binding.AddAttribute(string.Format(attribute.NameInShader, i), tuple.count, divisor);
-                    }
-                    else
-                    {
-                        binding.AddAttribute(field.Name, tuple.count, divisor);
-                    }
-                }
-            }
-        }
-    }
-
-    public Instance<TInstance> AddInstance(TInstance data = default)
-    {
-        foreach (VertexArray vao in _vaos)
-        {
-            vao.InstanceCount += 1;
-        }
-        return new Instance<TInstance>(InstanceBuffer, data);
-    }
-    
-    public void Dispose()
-    {
-        ElementBuffer.Dispose();
-        InstanceBuffer.Dispose();
-        VertexBuffer.Dispose();
-        foreach (VertexArray vao in _vaos)
-        {
-            vao.Dispose();
-        }
-    }
 }
 
