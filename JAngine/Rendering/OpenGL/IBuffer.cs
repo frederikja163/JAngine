@@ -1,6 +1,8 @@
+using System.Collections;
+
 namespace JAngine.Rendering.OpenGL;
 
-public interface IBuffer: IGlObject, IDisposable
+public interface IBuffer: IGlObject, IEnumerable, IDisposable
 {
     public Type UnderlyingType { get; }
     public int Capacity { get; }
@@ -14,7 +16,9 @@ public interface IBuffer<T> : IBuffer, IEnumerable<T>
     Type IBuffer.UnderlyingType => typeof(T);
     public T this[Index index] { get; set; }
     public Span<T> this[Range range] { get; }
-    public void SetSubData(int offset, params T[] data);
+    public void SetSubData(int offset, T data);
+    public void SetSubData(int offset, ReadOnlySpan<T> data);
+    public void Clear();
     public int FindIndex(T value);
 }
 

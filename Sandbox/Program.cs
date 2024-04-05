@@ -13,34 +13,29 @@ try
     vertexShader.Dispose();
     fragmentShader.Dispose();
 
-    Mesh2D mesh = new Mesh2D(window, "Square", new Vertex2D[]
-    {
-        new Vertex2D(0, 0),
-        new Vertex2D(0, 1),
-        new Vertex2D(1, 1),
-        new Vertex2D(1, 0),
-    }, new uint[] { 0, 1, 2, 0, 2, 3 });
+    Mesh mesh = new Mesh(window, "Square");
+    // mesh.AddIndices(new uint[] { 0, 1, 2, 0, 2, 3 });
+    mesh.AddVertexAttribute<Vertex2D>();
+    // mesh.AddVertices<Vertex2D>(new Vertex2D[]{
+    //     new Vertex2D(0, 0),
+    //     new Vertex2D(0, 0.5f),
+    //     new Vertex2D(1, 1),
+    //     new Vertex2D(1, 0),
+    // });
+    mesh.AddInstanceAttribute<Instance2D>();
     mesh.AddInstance(new Instance2D(Matrix4x4.Identity));
     mesh.BindToShader(shader);
-
-    KeyBinding a = new KeyBinding(Key.P | Key.LShift | Key.Release);
-    a.Enabled = false;
-    KeyBinding b = new KeyBinding(Key.Escape | Key.Press);
-    a.OnActivate += () =>
+    
+    window.AddKeyBinding(Key.A | Key.Press, () =>
     {
-        a.Enabled = false;
-        b.Enabled = true;
-        Log.Info("Menu");
-    };
-    b.OnActivate += () =>
+        //mesh.GetVertex<Vertex2D>(0).Data = new Vertex2D(Random.Shared.NextSingle(), Random.Shared.NextSingle());
+        BufferDataReference<Vertex2D> reference = mesh.AddVertex(new Vertex2D(Random.Shared.NextSingle(), Random.Shared.NextSingle()));
+        mesh.AddIndex((uint)reference.Index);
+    });
+    window.AddKeyBinding(Key.Escape | Key.Press, () =>
     {
-        a.Enabled = true;
-        b.Enabled = false;
-        Log.Info("Game");
-    };
-    window.AddKeyBinding(a);
-    window.AddKeyBinding(b);
-    window.AddKeyBinding(Key.MouseLeft | Key.Press, () => Log.Info("Pew"));
+        mesh.ClearIndices();
+    });
     
     Window.Run();
 }

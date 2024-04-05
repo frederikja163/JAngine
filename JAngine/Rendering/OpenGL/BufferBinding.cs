@@ -25,6 +25,8 @@ public sealed class BufferBinding : IGlEvent
             _onAction -= value;
         }
     }
+    
+    internal bool IsQueued { get; set; }
 
     public BufferBinding AddAttribute(string attributeName, int count, int divisor = 0)
     {

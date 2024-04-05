@@ -54,7 +54,10 @@ public sealed class Buffer<T> : IBuffer<T>
             {
                 capacity *= 2;
             }
+
+            T[] oldData = _data;
             _data = new T[capacity];
+            Array.Copy(oldData, _data, oldData.Length);
             if (!_window.ReplaceUpdateUnique(this, UpdateDataEvent.SkipInstance))
             {
                 _window.QueueUpdateUnique(this, UpdateDataEvent.SkipInstance);
@@ -71,10 +74,15 @@ public sealed class Buffer<T> : IBuffer<T>
 
     public Span<T> this[Range range] => _data[range];
 
-    public void SetSubData(int offset, params T[] data)
+    public void SetSubData(int offset, T data)
+    {
+        SetSubData(offset, stackalloc T[1]{data});
+    }
+    
+    public void SetSubData(int offset, ReadOnlySpan<T> data)
     {
         EnsureCapacity(offset + data.Length);
-        Array.Copy(data, 0, _data, offset, data.Length);
+        Array.Copy(data.ToArray(), 0, _data, offset, data.Length);
         int lastIndex = offset + data.Length;
         if (Count < lastIndex)
         {
@@ -84,6 +92,29 @@ public sealed class Buffer<T> : IBuffer<T>
         _firstUpdateIndex = Math.Min(_firstUpdateIndex, offset);
         _lastUpdateIndex = Math.Max(_lastUpdateIndex, lastIndex);
         _window.QueueUpdateUnique(this, UpdateDataEvent.Default);
+    }
+
+    public int Add(T value)
+    {
+        int index = Count;
+        EnsureCapacity(index + 1);
+        SetSubData(index, value);
+        return index;
+    }
+    
+    public int Add(ReadOnlySpan<T> value)
+    {
+        int index = Count;
+        EnsureCapacity(index + value.Length);
+        SetSubData(index, value);
+        return index;
+    }
+
+    public void Clear()
+    {
+        Array.Clear(_data);
+        _window.ReplaceUpdateUnique(this, UpdateDataEvent.SkipInstance);
+        _window.QueueUpdateUnique(this, UpdateCapacityEvent.Singleton);
     }
 
     public int FindIndex(T value)
@@ -126,7 +157,7 @@ public sealed class Buffer<T> : IBuffer<T>
                 }
                 
                 Gl.NamedBufferSubData<T>(_handle, (IntPtr)_firstUpdateIndex * sizeof(T),
-                    (IntPtr)(_firstUpdateIndex - _lastUpdateIndex) * sizeof(T), ref _data[_firstUpdateIndex]);
+                    (IntPtr)(_lastUpdateIndex - _firstUpdateIndex) * sizeof(T), ref _data[_firstUpdateIndex]);
                 (_firstUpdateIndex, _lastUpdateIndex) = (_data.Length - 1, 0);
                 break;
             case DisposeEvent:

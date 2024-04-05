@@ -42,6 +42,12 @@ public sealed class VertexArray : IGlObject, IDisposable
     
     private void UpdateBinding(BufferBinding binding)
     {
+        if (binding.IsQueued)
+        {
+            return;
+        }
+
+        binding.IsQueued = true;
         _window.QueueUpdate(this, binding);
     }
     
@@ -55,6 +61,7 @@ public sealed class VertexArray : IGlObject, IDisposable
                 Gl.VertexArrayElementBuffer(_handle, _ebo.Handle);
                 break;
             case BufferBinding binding:
+                binding.IsQueued = false;
                 uint relativeOffset = 0;
                 foreach (BufferBinding.Attribute attribute in binding.GetAttributes())
                 {
