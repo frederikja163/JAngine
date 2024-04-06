@@ -26,7 +26,7 @@ try
     mesh.AddInstance(new Instance2D(Matrix4x4.Identity));
     mesh.BindToShader(shader);
     
-    window.AddKeyBinding(Key.A | Key.Press, () =>
+    window.AddKeyBinding(Key.A | Key.Held, () =>
     {
         //mesh.GetVertex<Vertex2D>(0).Data = new Vertex2D(Random.Shared.NextSingle(), Random.Shared.NextSingle());
         BufferDataReference<Vertex2D> reference = mesh.AddVertex(new Vertex2D(Random.Shared.NextSingle(), Random.Shared.NextSingle()));

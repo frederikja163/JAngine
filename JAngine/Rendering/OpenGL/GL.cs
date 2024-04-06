@@ -276,6 +276,8 @@ internal static unsafe class Gl
         // GL_UNSIGNED_INT_10F_11F_11F_REV
     }
 
+    private static readonly delegate* unmanaged<int, int, int, int, void> ViewportPtr =
+        (delegate* unmanaged<int, int, int, int, void>)Glfw.GetProcAddress("glViewport");
     private static readonly delegate* unmanaged<float, float, float, float, void> ClearColorPtr =
         (delegate* unmanaged<float, float, float, float, void>)Glfw.GetProcAddress("glClearColor");
     private static readonly delegate* unmanaged<ClearBufferMask, void> ClearPtr =
@@ -359,6 +361,11 @@ internal static unsafe class Gl
     private static readonly delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Uint, void> VertexArrayAttribLFormatPtr =
         (delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Uint, void>)Glfw.GetProcAddress("glVertexArrayAttribLFormat");
 
+    internal static void Viewport(int x, int y, int width, int height)
+    {
+        ViewportPtr(x, y, width, height);
+    }
+    
     internal static void ClearColor(float r, float g, float b, float a)
     {
         ClearColorPtr(r, g, b, a);

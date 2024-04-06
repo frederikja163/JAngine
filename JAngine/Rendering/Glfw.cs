@@ -363,6 +363,18 @@ internal static class Glfw
     
     [DllImport(DllName, EntryPoint = "glfwSetWindowShouldClose", CallingConvention = CallingConvention.Cdecl)]
     public static extern void WindowSetShouldClose(Glfw.Window window, bool value);
+    
+    [DllImport(DllName, EntryPoint = "glfwSetWindowSize", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetWindowSize(Glfw.Window window, int width, int height);
+    
+    [DllImport(DllName, EntryPoint = "glfwGetWindowSize", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void GetWindowSize(Glfw.Window window, out int width, out int height);
+    
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void WindowSizeCallback(Window window, int width, int height);
+    
+    [DllImport(DllName, EntryPoint = "glfwSetWindowSizeCallback", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetWindowSizeCallback(Glfw.Window window, WindowSizeCallback windowSizeCallback);
 
     [DllImport(DllName, EntryPoint = "glfwWindowHint", CallingConvention = CallingConvention.Cdecl)]
     public static extern void WindowHint(Hint hint, int value);

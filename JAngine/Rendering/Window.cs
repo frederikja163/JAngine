@@ -4,6 +4,7 @@ using JAngine.Rendering.OpenGL;
 
 namespace JAngine.Rendering;
 
+public delegate void WindowResizeDelegate(Window window, int width, int height);
 public delegate void MouseMovedDelegate(Window window, float x, float y);
 
 /// <summary>
@@ -20,8 +21,16 @@ public sealed class Window : IDisposable
     private HashSet<VertexArray> _vaos = new HashSet<VertexArray>();
     private readonly HashSet<Key> _keysDown = new HashSet<Key>();
     private readonly Thread _renderingThread;
+    private WindowResizeDelegate? _onWindowResize;
     private MouseMovedDelegate? _onMouseMoved;
+    private int _viewportWidth;
+    private int _viewportHeight;
 
+    private readonly Glfw.WindowSizeCallback _sizeCallback;
+    private readonly Glfw.KeyCallback _keyCallback;
+    private readonly Glfw.MouseCallback _mouseCallback;
+    private readonly Glfw.CursorPositionCallback _cursorPositionCallback;
+    
     static Window()
     {
         Glfw.GetVersion(out int major, out int minor, out int rev);
@@ -44,14 +53,35 @@ public sealed class Window : IDisposable
     public Window(string title, int width, int height)
     {
         _handle = Glfw.CreateWindow(width, height, title, Glfw.Monitor.Null, Glfw.Window.Null);
-        Glfw.SetKeyCallback(_handle, KeyCallback);
-        Glfw.SetMouseCallback(_handle, MouseCallback);
-        Glfw.SetCursorPosCallback(_handle, CursorPositionCallback);
+        _keyCallback = KeyCallback;
+        Glfw.SetKeyCallback(_handle, _keyCallback);
+        _mouseCallback = MouseCallback;
+        Glfw.SetMouseCallback(_handle, _mouseCallback);
+        _cursorPositionCallback = CursorPositionCallback;
+        Glfw.SetCursorPosCallback(_handle, _cursorPositionCallback);
+        _sizeCallback = SizeCallback;
+        Glfw.SetWindowSizeCallback(_handle, _sizeCallback);
         _renderingThread = new Thread(RenderThread);
+        _renderingThread.IsBackground = true;
         _renderingThread.Start();
         s_windows.Add(this);
     }
     
+    public int Width { get; private set; }
+    public int Height { get; private set; }
+
+    private void SizeCallback(Glfw.Window window, int width, int height)
+    {
+        Width = width;
+        Height = height;
+    }
+
+    public event WindowResizeDelegate? OnWindowResize
+    {
+        add => _onWindowResize += value;
+        remove => _onWindowResize -= value;
+    }
+
     public event MouseMovedDelegate? OnMouseMoved
     {
         add => _onMouseMoved += value;
@@ -215,6 +245,13 @@ public sealed class Window : IDisposable
         Gl.ClearColor(1, 0, 1, 1);
         while (IsOpen)
         {
+            if (_viewportWidth != Width || _viewportHeight != Height)
+            {
+                _viewportWidth = Width;
+                _viewportHeight = Height;
+                Gl.Viewport(0, 0, _viewportWidth, _viewportHeight);
+            }
+            
             Gl.Clear(Gl.ClearBufferMask.ColorBuffer);
             
             List<(IGlObject, IGlEvent)> objects;
