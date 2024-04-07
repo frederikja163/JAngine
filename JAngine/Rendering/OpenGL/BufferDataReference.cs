@@ -1,5 +1,7 @@
 namespace JAngine.Rendering.OpenGL;
 
+public delegate void DataUpdatedDelegate<T>(BufferDataReference<T> reference) where T : unmanaged;
+
 public sealed class BufferDataReference<T>
     where T : unmanaged
 {
@@ -12,5 +14,15 @@ public sealed class BufferDataReference<T>
     }
     
     public int Index { get; }
-    public T Data { get => _buffer[Index]; set => _buffer.SetSubData(Index, value); }
+    public T Data
+    {
+        get => _buffer[Index];
+        set
+        {
+            _buffer.SetSubData(Index, value);
+            OnDataUpdated?.Invoke(this);
+        }
+    }
+
+    public event DataUpdatedDelegate<T>? OnDataUpdated;
 }

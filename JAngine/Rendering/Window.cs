@@ -5,7 +5,7 @@ using JAngine.Rendering.OpenGL;
 namespace JAngine.Rendering;
 
 public delegate void WindowResizeDelegate(Window window, int width, int height);
-public delegate void MouseMovedDelegate(Window window, float x, float y);
+public delegate void MouseMovedDelegate(Window window, Vector2 mouseDelta);
 
 /// <summary>
 /// A window used for drawing to the screen and as a context to a renderer.
@@ -59,6 +59,8 @@ public sealed class Window : IDisposable
         Glfw.SetMouseCallback(_handle, _mouseCallback);
         _cursorPositionCallback = CursorPositionCallback;
         Glfw.SetCursorPosCallback(_handle, _cursorPositionCallback);
+        Glfw.GetCursorPos(_handle, out double x, out double y);
+        CursorPosition = new Vector2((float)x, (float)y);
         _sizeCallback = SizeCallback;
         Glfw.SetWindowSizeCallback(_handle, _sizeCallback);
         _renderingThread = new Thread(RenderThread);
@@ -106,17 +108,16 @@ public sealed class Window : IDisposable
 
     private void CursorPositionCallback(Glfw.Window window, double xpos, double ypos)
     {
-        _onMouseMoved?.Invoke(this, (float)xpos, (float)ypos);
+        Vector2 position = new Vector2((float)xpos, (float)ypos);
+        Vector2 delta = CursorPosition - position;
+        CursorPosition = position;
+        _onMouseMoved?.Invoke(this, delta);
     }
 
     public Vector2 CursorPosition
     {
-        get
-        {
-            Glfw.GetCursorPos(_handle, out double xPos, out double yPos);
-            Vector2 pos = new Vector2((float)xPos, (float)yPos);
-            return pos;
-        }
+        get;
+        private set;
     }
 
     private void MouseCallback(Glfw.Window window, Glfw.MouseButton button, Glfw.Action action, Glfw.Mods mods)

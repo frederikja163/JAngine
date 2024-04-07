@@ -1,4 +1,6 @@
 using System.Numerics;
+using JAngine.Extensions;
+using JAngine.Rendering.OpenGL;
 
 namespace JAngine.Rendering;
 
@@ -26,10 +28,117 @@ public readonly struct Instance2D
     [ShaderAttribute("vColor")]
     public readonly Vector4 Color = Vector4.One;
     [ShaderAttribute("vTransform{0}")]
-    public readonly Matrix4x4 Transformation;
+    public readonly Matrix4x4 Transformation = Matrix4x4.Identity;
 
-    public Instance2D(Matrix4x4 transformation)
+    public Instance2D(Matrix4x4 transformation, Vector4 color)
     {
         Transformation = transformation;
+        Color = color;
+    }
+}
+
+public sealed class Instance2DRef
+{
+    private readonly BufferDataReference<Instance2D> _dataRef;
+    private bool _isSelfUpdating = false;
+    private Vector4 _color;
+    private Vector3 _position;
+    private Vector3 _scale;
+    private Quaternion _rotation;
+
+    private Instance2DRef(BufferDataReference<Instance2D> dataRef)
+    {
+        _dataRef = dataRef;
+        _dataRef.OnDataUpdated += UpdateReference;
+        UpdateReference(_dataRef);
+    }
+
+    public static implicit operator Instance2DRef(BufferDataReference<Instance2D> dataRef)
+    {
+        return new Instance2DRef(dataRef);
+    }
+
+    private void UpdateReference(BufferDataReference<Instance2D> reference)
+    {
+        if (_isSelfUpdating)
+        {
+            _isSelfUpdating = false;
+            return;
+        }
+        _color = _dataRef.Data.Color;
+        _dataRef.Data.Transformation.TryDecomposeTRS(out _position, out _rotation, out _scale);
+    }
+
+    public Instance2D Data
+    {
+        get => _dataRef.Data;
+        set => _dataRef.Data = value;
+    }
+
+    public Instance2D Instance2D
+    {
+        get => _dataRef.Data;
+        set => _dataRef.Data = value;
+    }
+
+    public Vector4 Color
+    {
+        get => _color;
+        set
+        {
+            _color = value;
+            Update();
+        }
+    }
+
+    public Vector3 Position
+    {
+        get => _position;
+        set
+        {
+            _position = value;
+            Update();
+        }
+    }
+
+    public Vector3 Scale
+    {
+        get => _scale;
+        set
+        {
+            _scale = value;
+            Update();
+        }
+    }
+
+    public Quaternion Rotation
+    {
+        get => _rotation;
+        set
+        {
+            _rotation = value;
+            Update();
+        }
+    }
+
+    public void SetAxisAngle(Vector3 axis, float angle)
+    {
+        Rotation = Quaternion.CreateFromAxisAngle(axis, angle);
+    }
+
+    public void RotateAxisAngle(Vector3 axis, float angle)
+    {
+        Rotation *= Quaternion.CreateFromAxisAngle(axis, angle);
+    }
+    
+    private void Update()
+    {
+        _isSelfUpdating = true;
+        _dataRef.Data = new Instance2D(
+            Matrix4x4.CreateScale(_scale) *
+            Matrix4x4.CreateFromQuaternion(_rotation) *
+            Matrix4x4.CreateTranslation(_position)
+            // Matrix4x4.Identity
+            , _color);
     }
 }

@@ -11,7 +11,7 @@ out vec2 fTexCoord;
 out vec4 fColor;
 
 void main() {
-    mat4 transform = transpose(mat4(vTransform0, vTransform1, vTransform2, vTransform3));
+    mat4 transform = (mat4(vTransform0, vTransform1, vTransform2, vTransform3));
     
     gl_Position = transform * vec4(vPosition, 0, 1);
     fTexCoord = vTexCoord;
