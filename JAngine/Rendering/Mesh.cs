@@ -150,14 +150,25 @@ public sealed class Mesh: IDisposable
         Buffer<T> buf = (Buffer<T>)buffer;
         return buf;
     }
+
+    private void UpdateInstanceCount()
+    {
+        int instanceCount = _instanceBuffers.Max(b => b.Value.Count);
+        foreach (VertexArray vao in _vaos)
+        {
+            vao.InstanceCount = instanceCount;
+        }
+    }
     
     public BufferDataReference<T> AddInstance<T>(T data)
         where T : unmanaged
     {
         Buffer<T> buf = GetInstanceBuffer<T>();
-        return new BufferDataReference<T>(buf, buf.Add(data));
+        int index = buf.Add(data);
+        UpdateInstanceCount();
+        return new BufferDataReference<T>(buf, index);
     }
-    
+
     public IEnumerable<BufferDataReference<T>> AddInstances<T>(ReadOnlySpan<T> datas)
         where T : unmanaged
     {
@@ -168,6 +179,7 @@ public sealed class Mesh: IDisposable
         {
             references.Add(new BufferDataReference<T>(buf, index++));
         }
+        UpdateInstanceCount();
 
         return references;
     }

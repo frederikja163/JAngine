@@ -45,6 +45,7 @@ public sealed class Instance2DRef
     private Vector3 _position;
     private Vector3 _scale;
     private Quaternion _rotation;
+    private Matrix4x4 _parentMatrix = Matrix4x4.Identity;
 
     private Instance2DRef(BufferDataReference<Instance2D> dataRef)
     {
@@ -91,6 +92,11 @@ public sealed class Instance2DRef
         }
     }
 
+    public void SetColorNoUpdate(Vector4 value)
+    {
+        _color = value;
+    }
+
     public Vector3 Position
     {
         get => _position;
@@ -99,6 +105,11 @@ public sealed class Instance2DRef
             _position = value;
             Update();
         }
+    }
+
+    public void SetPositionNoUpdate(Vector3 value)
+    {
+        _position = value;
     }
 
     public Vector3 Scale
@@ -111,6 +122,11 @@ public sealed class Instance2DRef
         }
     }
 
+    public void SetScaleNoUpdate(Vector3 value)
+    {
+        Scale = value;
+    }
+
     public Quaternion Rotation
     {
         get => _rotation;
@@ -119,6 +135,26 @@ public sealed class Instance2DRef
             _rotation = value;
             Update();
         }
+    }
+
+    public void SetRotationNoUpdate(Quaternion value)
+    {
+        _rotation = value;
+    }
+
+    public Matrix4x4 ParentMatrix
+    {
+        get => _parentMatrix;
+        set
+        {
+            _parentMatrix = value;
+            Update();
+        }
+    }
+
+    public void SetParentMatrixNoUpdate(Matrix4x4 value)
+    {
+        _parentMatrix = value;
     }
 
     public void SetAxisAngle(Vector3 axis, float angle)
@@ -131,14 +167,15 @@ public sealed class Instance2DRef
         Rotation *= Quaternion.CreateFromAxisAngle(axis, angle);
     }
     
-    private void Update()
+    public void Update()
     {
         _isSelfUpdating = true;
         _dataRef.Data = new Instance2D(
             Matrix4x4.CreateScale(_scale) *
             Matrix4x4.CreateFromQuaternion(_rotation) *
-            Matrix4x4.CreateTranslation(_position)
-            // Matrix4x4.Identity
+            Matrix4x4.CreateTranslation(_position) *
+            // _parentMatrix *
+            Matrix4x4.Identity
             , _color);
     }
 }

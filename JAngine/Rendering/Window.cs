@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Numerics;
+using JAngine.Rendering.Gui;
 using JAngine.Rendering.OpenGL;
 
 namespace JAngine.Rendering;
@@ -10,7 +11,7 @@ public delegate void MouseMovedDelegate(Window window, Vector2 mouseDelta);
 /// <summary>
 /// A window used for drawing to the screen and as a context to a renderer.
 /// </summary>
-public sealed class Window : IDisposable
+public sealed class Window : IDisposable, IGuiElement
 {
     private static readonly HashSet<Window> s_windows = new();
 
@@ -25,6 +26,9 @@ public sealed class Window : IDisposable
     private MouseMovedDelegate? _onMouseMoved;
     private int _viewportWidth;
     private int _viewportHeight;
+    private Matrix4x4 _guiMatrix;
+    private event Action? _positionChanged;
+
 
     private readonly Glfw.WindowSizeCallback _sizeCallback;
     private readonly Glfw.KeyCallback _keyCallback;
@@ -68,7 +72,6 @@ public sealed class Window : IDisposable
         _renderingThread.Start();
         s_windows.Add(this);
     }
-    
     public int Width { get; private set; }
     public int Height { get; private set; }
 
@@ -76,6 +79,8 @@ public sealed class Window : IDisposable
     {
         Width = width;
         Height = height;
+        _guiMatrix = Matrix4x4.CreateScale(2f/width, 2f/height, 1f) * Matrix4x4.CreateTranslation(-1f, -1f, 0f);
+        _positionChanged?.Invoke();
     }
 
     public event WindowResizeDelegate? OnWindowResize
@@ -243,6 +248,7 @@ public sealed class Window : IDisposable
     {
         Glfw.MakeContextCurrent(_handle);
 
+        Gl.Enable(Gl.EnableCap.Blend);
         Gl.ClearColor(1, 0, 1, 1);
         while (IsOpen)
         {
@@ -253,7 +259,7 @@ public sealed class Window : IDisposable
                 Gl.Viewport(0, 0, _viewportWidth, _viewportHeight);
             }
             
-            Gl.Clear(Gl.ClearBufferMask.ColorBuffer);
+            Gl.Clear(Gl.ClearBufferMask.ColorBuffer | Gl.ClearBufferMask.DepthBuffer);
             
             List<(IGlObject, IGlEvent)> objects;
             lock (_updateQueue)
@@ -339,5 +345,20 @@ public sealed class Window : IDisposable
     {
         Glfw.DestroyWindow(_handle);
         s_windows.Remove(this);
+    }
+
+    IGuiElement IGuiElement.Parent => this;
+    Matrix4x4 IGuiElement.TransformMatrix => _guiMatrix;
+
+    float IGuiElement.Width => Width;
+    float IGuiElement.Height => Height;
+    float IGuiElement.X => Width / 2f;
+    float IGuiElement.Y => Height / 2f;
+    float IGuiElement.Layer => -1f;
+    
+    event Action? IGuiElement.PositionChanged
+    {
+        add => _positionChanged += value;
+        remove => _positionChanged -= value;
     }
 }

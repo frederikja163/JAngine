@@ -27,6 +27,39 @@ internal static unsafe class Gl
         StencilBuffer = 0x00000400,
     }
 
+    internal enum EnableCap : Bitfield
+    { 
+        Blend,
+        ClipDistance,
+        ColorLogicOp,
+        CullFace,
+        DebugOutput,
+        DebugOutputSynchronous,
+        DepthClamp,
+        DepthTest,
+        Dither,
+        FramebufferSrgb,
+        LineSmooth,
+        Multisample,
+        PolygonOffsetFill,
+        PolygonOffsetLine,
+        PolygonOffsetPoint,
+        PolygonSmooth,
+        PrimitiveRestart,
+        PrimitiveRestartFixedIndex,
+        RasterizerDiscard,
+        SampleAlphaToCoverage,
+        SampleAlphaToOne,
+        SampleCoverage,
+        SampleShading,
+        SampleMask,
+        ScissorTest,
+        StencilTest,
+        TextureCubeMapSeamless,
+        ProgramPointSize,
+
+    }
+
     internal enum PrimitiveType : Bitfield
     {
         Triangles = 0x0004,
@@ -278,6 +311,10 @@ internal static unsafe class Gl
 
     private static readonly delegate* unmanaged<int, int, int, int, void> ViewportPtr =
         (delegate* unmanaged<int, int, int, int, void>)Glfw.GetProcAddress("glViewport");
+    private static readonly delegate* unmanaged<EnableCap, void> EnablePtr =
+        (delegate* unmanaged<EnableCap, void>)Glfw.GetProcAddress("glEnable");
+    private static readonly delegate* unmanaged<EnableCap, void> DisablePtr =
+        (delegate* unmanaged<EnableCap, void>)Glfw.GetProcAddress("glDisable");
     private static readonly delegate* unmanaged<float, float, float, float, void> ClearColorPtr =
         (delegate* unmanaged<float, float, float, float, void>)Glfw.GetProcAddress("glClearColor");
     private static readonly delegate* unmanaged<ClearBufferMask, void> ClearPtr =
@@ -364,6 +401,16 @@ internal static unsafe class Gl
     internal static void Viewport(int x, int y, int width, int height)
     {
         ViewportPtr(x, y, width, height);
+    }
+
+    internal static void Enable(EnableCap enableCap)
+    {
+        EnablePtr(enableCap);
+    }
+
+    internal static void Disable(EnableCap enableCap)
+    {
+        DisablePtr(enableCap);
     }
     
     internal static void ClearColor(float r, float g, float b, float a)
