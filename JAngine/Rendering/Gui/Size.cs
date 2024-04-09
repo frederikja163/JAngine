@@ -11,6 +11,71 @@ public sealed class Size
     
     internal SizeDelegate SizeDelegate { get; }
 
+    public static Size Function(SizeDelegate sizeDelegate)
+    {
+        return new Size(sizeDelegate);
+    }
+    
+    public static Size operator +(Size left, Size right)
+    {
+        return new Size(w => left.SizeDelegate(w) + right.SizeDelegate(w));
+    }
+    
+    public static Size operator +(Size left, float right)
+    {
+        return new Size(w => left.SizeDelegate(w) + right);
+    }
+    
+    public static Size operator +(float left, Size right)
+    {
+        return new Size(w => left + right.SizeDelegate(w));
+    }
+    
+    public static Size operator -(Size left, Size right)
+    {
+        return new Size(w => left.SizeDelegate(w) - right.SizeDelegate(w));
+    }
+    
+    public static Size operator -(Size left, float right)
+    {
+        return new Size(w => left.SizeDelegate(w) - right);
+    }
+    
+    public static Size operator -(float left, Size right)
+    {
+        return new Size(w => left + right.SizeDelegate(w));
+    }
+    
+    public static Size operator *(Size left, Size right)
+    {
+        return new Size(w => left.SizeDelegate(w) * right.SizeDelegate(w));
+    }
+    
+    public static Size operator *(Size left, float right)
+    {
+        return new Size(w => left.SizeDelegate(w) * right);
+    }
+    
+    public static Size operator *(float left, Size right)
+    {
+        return new Size(w => left * right.SizeDelegate(w));
+    }
+    
+    public static Size operator /(Size left, Size right)
+    {
+        return new Size(w => left.SizeDelegate(w) / right.SizeDelegate(w));
+    }
+    
+    public static Size operator /(Size left, float right)
+    {
+        return new Size(w => left.SizeDelegate(w) / right);
+    }
+    
+    public static Size operator /(float left, Size right)
+    {
+        return new Size(w => left / right.SizeDelegate(w));
+    }
+    
     public static Size Pixels(float pixels)
     {
         return new Size(w => pixels);

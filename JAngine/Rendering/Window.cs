@@ -352,8 +352,8 @@ public sealed class Window : IDisposable, IGuiElement
 
     float IGuiElement.Width => Width;
     float IGuiElement.Height => Height;
-    float IGuiElement.X => Width / 2f;
-    float IGuiElement.Y => Height / 2f;
+    float IGuiElement.X => 0;
+    float IGuiElement.Y => 0;
     float IGuiElement.Layer => -1f;
     
     event Action? IGuiElement.PositionChanged

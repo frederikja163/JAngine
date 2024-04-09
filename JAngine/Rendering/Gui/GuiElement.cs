@@ -52,7 +52,7 @@ public sealed class GuiElement : IGuiElement
                 mesh.AddVertexAttribute<Vertex2D>();
                 mesh.AddVertices<Vertex2D>(new Vertex2D[]
                 {
-                    new(-0.5f, -0.5f), new(-0.5f, 0.5f), new(0.5f, 0.5f), new(0.5f, -0.5f),
+                    new(0, 0), new(0, 1), new(1, 1), new(1, 0),
                 });
                 mesh.AddInstanceAttribute<Instance2D>();
 
@@ -159,8 +159,8 @@ public sealed class GuiElement : IGuiElement
         // _instanceRef.SetParentMatrixNoUpdate(_parent.TransformMatrix);
         _widthVal = Width.SizeDelegate(_parent.Width);
         _heightVal = Height.SizeDelegate(_parent.Height);
-        _xVal = X.PositionDelegate(_parent.Width, _widthVal) + _parent.X - _parent.Width / 2f;
-        _yVal = Y.PositionDelegate(_parent.Height, _heightVal) + _parent.Y - _parent.Height / 2f;
+        _xVal = X.PositionDelegate(_parent.X, _parent.Width, _widthVal);
+        _yVal = Y.PositionDelegate(_parent.Y, _parent.Height, _heightVal);
         Vector3 pos = new Vector3(_xVal, _yVal, _parent.Layer + 1);
         _instanceRef.SetPositionNoUpdate(pos * 2f / windowSize - Vector3.One);
         Vector3 scale = new Vector3(_widthVal, _heightVal, 0);
