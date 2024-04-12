@@ -309,6 +309,51 @@ internal static unsafe class Gl
         // GL_UNSIGNED_INT_10F_11F_11F_REV
     }
 
+    internal enum TextureTarget : Enum
+    {
+        Texture2D = 0x0DE1,
+        ProxyTexture2D = 0x8064,
+        Texture1DArray = 0x8C18,
+        ProxyTexture1DArray = 0x8C19,
+        TextureRectangle = 0x84F5,
+        ProxyTextureRectangle = 0x84F7,
+        TextureCubeMapPositiveX = 0x8515,
+        TextureCubeMapNegativeX = 0x8516,
+        TextureCubeMapPositiveY = 0x8517,
+        TextureCubeMapNegativeY = 0x8518,
+        TextureCubeMapPositiveZ = 0x8519,
+        TextureCubeMapNegativeZ = 0x851A,
+        ProxyTextureCubeMap = 0x851B,
+    }
+
+    internal enum PixelFormat : Enum
+    {
+        Red = 0x1903,
+        Rg = 0x8227,
+        Rgb = 0x1907,
+        Bgr = 0x80E0,
+        Rgba = 0x1908,
+        Bgra = 0x80E1,
+        RedInteger = 0x8D94,
+        RgInteger = 0x8228,
+        RgbInteger = 0x8D98,
+        BgrInteger = 0x8D9A,
+        RgbaInteger = 0x8D99,
+        BgraInteger = 0x8D9B,
+        StencilIndex = 0x1901,
+        DepthComponent = 0x1902,
+        DepthStencil = 0x821A,
+    }
+
+    internal enum PixelType : Enum
+    {
+        GL_UNSIGNED_BYTE0x1401,
+        GL_BYTE0x1400,
+        GL_UNSIGNED_SHORT0x1403,
+        GL_SHORT0x1402
+        // TODO: Not done yet.
+    }
+
     private static readonly delegate* unmanaged<int, int, int, int, void> ViewportPtr =
         (delegate* unmanaged<int, int, int, int, void>)Glfw.GetProcAddress("glViewport");
     private static readonly delegate* unmanaged<EnableCap, void> EnablePtr =
@@ -398,6 +443,14 @@ internal static unsafe class Gl
     private static readonly delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Uint, void> VertexArrayAttribLFormatPtr =
         (delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Uint, void>)Glfw.GetProcAddress("glVertexArrayAttribLFormat");
 
+    private static readonly delegate* unmanaged<SizeI, Uint*, void> GenTexturesPtr =
+        (delegate* unmanaged<SizeI, Uint*, void>)Glfw.GetProcAddress("glGenTextures");
+    private static readonly delegate* unmanaged<SizeI, Uint*, void> DeleteTexturesPtr =
+        (delegate* unmanaged<SizeI, Uint*, void>)Glfw.GetProcAddress("glDeleteTextures");
+    private static readonly delegate* unmanaged<Enum, Int, Int, SizeI, SizeI, int, Enum, Enum, void*, void> TexImage2D =
+        (delegate* unmanaged<Enum, Int, Int, SizeI, SizeI, int, Enum, Enum, void*, void>)Glfw.GetProcAddress("glTexImage2D");
+    
+    
     internal static void Viewport(int x, int y, int width, int height)
     {
         ViewportPtr(x, y, width, height);
@@ -660,5 +713,17 @@ internal static unsafe class Gl
     internal static void VertexArrayAttribLFormat(uint vao, uint attribIndex, int size, VertexAttribType type, uint relativeOffset)
     {
         VertexArrayAttribLFormatPtr(vao, attribIndex, size, type, relativeOffset);
+    }
+    
+    internal static uint GenTexture()
+    {
+        uint texture = 0;
+        GenTexturesPtr(1, &texture);
+        return texture;
+    }
+
+    internal static void DeleteTexture(uint texture)
+    {
+        DeleteVertexArraysPtr(1, &texture);
     }
 }
