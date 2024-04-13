@@ -58,26 +58,17 @@ public sealed class Mesh: IDisposable
         _ebo.SetSubData(0, s);
     }
 
-    public void AddVertexAttribute<T>() where T : unmanaged
-    {
-        if (_vertexBuffers.TryGetValue(typeof(T), out IBuffer? buffer))
-        {
-            throw new Exception($"Mesh {Name} already contains a vertex attribute for {typeof(T).FullName}");
-        }
-        buffer = new Buffer<T>(Window, $"{Name}.vbuffer");
-        _vertexBuffers.Add(typeof(T), buffer);
-        
-        foreach (VertexArray vao in _vaos)
-        {
-            AddAttributes(vao, buffer, 0);
-        }
-    }
-
     private Buffer<T> GetVertexBuffer<T>() where T : unmanaged
     {
         if (!_vertexBuffers.TryGetValue(typeof(T), out IBuffer? buffer))
         {
-            throw new Exception($"Mesh {Name} contains no vertex attribute for {typeof(T).FullName}");
+            buffer = new Buffer<T>(Window, $"{Name}.vbuffer");
+            _vertexBuffers.Add(typeof(T), buffer);
+        
+            foreach (VertexArray vao in _vaos)
+            {
+                AddAttributes(vao, buffer, 0);
+            }
         }
 
         Buffer<T> buf = (Buffer<T>)buffer;
@@ -126,27 +117,18 @@ public sealed class Mesh: IDisposable
             yield return new BufferDataReference<T>(buf, i);
         }
     }
-
-    public void AddInstanceAttribute<T>() where T : unmanaged
-    {
-        if (_instanceBuffers.TryGetValue(typeof(T), out IBuffer? buffer))
-        {
-            throw new Exception($"Mesh {Name} already contains an instance attribute for {typeof(T).FullName}");
-        }
-        buffer = new Buffer<T>(Window, $"{Name}.ibuffer");
-        _instanceBuffers.Add(typeof(T), buffer);
-        
-        foreach (VertexArray vao in _vaos)
-        {
-            AddAttributes(vao, buffer, 1);
-        }
-    }
     
     private Buffer<T> GetInstanceBuffer<T>() where T : unmanaged
     {
         if (!_instanceBuffers.TryGetValue(typeof(T), out IBuffer? buffer))
         {
-            throw new Exception($"Mesh {Name} contains no instance attribute for {typeof(T).FullName}");
+            buffer = new Buffer<T>(Window, $"{Name}.ibuffer");
+            _instanceBuffers.Add(typeof(T), buffer);
+        
+            foreach (VertexArray vao in _vaos)
+            {
+                AddAttributes(vao, buffer, 1);
+            }
         }
 
         Buffer<T> buf = (Buffer<T>)buffer;

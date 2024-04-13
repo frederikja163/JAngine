@@ -74,7 +74,7 @@ public sealed class GuiElement : IGuiElement
             textureIndex = _mesh.AddTexture(texture);
         }
         
-        _instanceRef = _mesh.AddInstance<Instance2D>(new Instance2D(Matrix4x4.Identity, Vector4.One, textureIndex));
+        _instanceRef = _mesh.AddInstance(new Instance2D(Matrix4x4.Identity, Vector4.One, textureIndex, Vector2.Zero, Vector2.One));
         _parent.PositionChanged += UpdatePosition;
         _x = Position.Center();
         _y = Position.Center();
@@ -91,12 +91,10 @@ public sealed class GuiElement : IGuiElement
             {
                 0, 1, 2, 0, 2, 3,
             });
-            mesh.AddVertexAttribute<Vertex2D>();
             mesh.AddVertices<Vertex2D>(new Vertex2D[]
             {
                 new(0, 0), new(0, 1), new(1, 1), new(1, 0),
             });
-            mesh.AddInstanceAttribute<Instance2D>();
             mesh.AddTexture(Texture.White(window));
             mesh.BindToShader(shader);
             _meshes.Add((window, shader), mesh);
@@ -115,10 +113,28 @@ public sealed class GuiElement : IGuiElement
         
     }
 
+    public void AddExtraAttributes<T>(T attributeData)
+        where T : unmanaged
+    {
+        _mesh.AddInstance(attributeData);
+    }
+
     public Vector4 BackgroundColor
     {
         get => _instanceRef.Color;
         set => _instanceRef.Color = value;
+    }
+
+    public Vector2 TextureOffset
+    {
+        get => _instanceRef.TextureOffset;
+        set => _instanceRef.TextureOffset = value;
+    }
+
+    public Vector2 TextureSize
+    {
+        get => _instanceRef.TextureSize;
+        set => _instanceRef.TextureSize = value;
     }
 
     public Position X
@@ -180,7 +196,6 @@ public sealed class GuiElement : IGuiElement
     private void UpdatePosition()
     {
         Vector3 windowSize = new Vector3(_window.Width, _window.Height, 2);
-        // _instanceRef.SetParentMatrixNoUpdate(_parent.TransformMatrix);
         _widthVal = Width.SizeDelegate(_parent.Width);
         _heightVal = Height.SizeDelegate(_parent.Height);
         _xVal = X.PositionDelegate(_parent.X, _parent.Width, _widthVal);

@@ -32,12 +32,18 @@ public readonly struct Instance2D
     public readonly Matrix4x4 Transformation = Matrix4x4.Identity;
     [ShaderAttribute("vTextureIndex")]
     public readonly int TextureIndex = 0;
+    [ShaderAttribute("vTextureOffset")]
+    public readonly Vector2 TextureOffset = Vector2.Zero;
+    [ShaderAttribute("vTextureSize")]
+    public readonly Vector2 TextureSize = Vector2.One;
 
-    public Instance2D(Matrix4x4 transformation, Vector4 color, int textureIndex)
+    public Instance2D(Matrix4x4 transformation, Vector4 color, int textureIndex, Vector2 textureOffset, Vector2 textureSize)
     {
         Transformation = transformation;
         Color = color;
         TextureIndex = textureIndex;
+        TextureOffset = textureOffset;
+        TextureSize = textureSize;
     }
 }
 
@@ -50,6 +56,8 @@ public sealed class Instance2DRef
     private Vector3 _scale;
     private Quaternion _rotation;
     private int _textureIndex;
+    private Vector2 _textureOffset;
+    private Vector2 _textureSize;
     private Matrix4x4 _parentMatrix = Matrix4x4.Identity;
 
     private Instance2DRef(BufferDataReference<Instance2D> dataRef)
@@ -73,6 +81,8 @@ public sealed class Instance2DRef
         }
         _color = _dataRef.Data.Color;
         _textureIndex = _dataRef.Data.TextureIndex;
+        _textureOffset = _dataRef.Data.TextureOffset;
+        _textureSize = _dataRef.Data.TextureSize;
         _dataRef.Data.Transformation.TryDecomposeTRS(out _position, out _rotation, out _scale);
     }
 
@@ -94,6 +104,26 @@ public sealed class Instance2DRef
         set
         {
             _textureIndex = value;
+            Update();
+        }
+    }
+
+    public Vector2 TextureOffset
+    {
+        get => _textureOffset;
+        set
+        {
+            _textureOffset = value;
+            Update();
+        }
+    }
+
+    public Vector2 TextureSize
+    {
+        get => _textureOffset;
+        set
+        {
+            _textureSize = value;
             Update();
         }
     }
@@ -190,7 +220,7 @@ public sealed class Instance2DRef
             Matrix4x4.CreateScale(_scale) *
             Matrix4x4.CreateFromQuaternion(_rotation) *
             Matrix4x4.CreateTranslation(_position)
-            , _color, _textureIndex
+            , _color, _textureIndex, _textureOffset, _textureSize
             );
     }
 }

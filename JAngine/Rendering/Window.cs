@@ -79,6 +79,7 @@ public sealed class Window : IDisposable, IGuiElement
     {
         Width = width;
         Height = height;
+        _onWindowResize?.Invoke(this, width, height);
         _guiMatrix = Matrix4x4.CreateScale(2f/width, 2f/height, 1f) * Matrix4x4.CreateTranslation(-1f, -1f, 0f);
         _positionChanged?.Invoke();
     }
