@@ -18,11 +18,11 @@ try
         Y = Position.LowerMargin(25),
     };
     Position position = Position.Left(hotbar) + margin;
-    for (int i = 0; i < 9; i++)
+    for (int i = 1; i <= 9; i++)
     {
-        GuiElement slot = new GuiElement(hotbar)
+        GuiElement slot = new GuiElement(hotbar, new Texture(window, "Test", new Vector4[,]{{Vector4.UnitX}}))
         {
-            BackgroundColor = Vector4.UnitZ * i / 9f,
+            BackgroundColor = Vector4.One * i / 9f,
             Width = slotSize,
             Height = slotSize,
             X = position,

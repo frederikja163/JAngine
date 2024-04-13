@@ -5,10 +5,10 @@ namespace JAngine.Rendering.OpenGL;
 
 internal sealed class UniformUpdate : IGlEvent
 {
-    internal int Location { get; }
+    internal string Location { get; }
     internal object Value { get; }
 
-    internal UniformUpdate(int location, object value)
+    internal UniformUpdate(string location, object value)
     {
         Location = location;
         Value = value;
@@ -219,15 +219,31 @@ public sealed class Shader : IGlObject, IDisposable
                         Gl.GetActiveUniform(Handle, i, maxLength, null, &size, &type, (byte*)namePtr);
                         int location = Gl.GetUniformLocation(Handle, (byte*)namePtr);
                         string name = Marshal.PtrToStringAnsi(namePtr)!;
-                        
-                        _uniforms.Add(name, new Uniform(name, location, size, type));
+
+                        if (size == 1)
+                        {
+                            _uniforms.Add(name, new Uniform(name, location, size, type));
+                        }
+                        else
+                        {
+                            name = name.Remove(name.Length - 3);
+                            for (int j = 0; j < size; j++)
+                            {
+                                string n = $"{name}[{j}]";
+                                _uniforms.Add(n, new Uniform(n, location + j, size, type));
+                            }
+                        }
                     }
                     Marshal.FreeCoTaskMem(namePtr);
                 }
                 break;
-            case UniformUpdate uniform:
+            case UniformUpdate update:
+                if (!_uniforms.TryGetValue(update.Location, out Uniform? uniform))
+                {
+                    return;
+                }
                 // TODO: Allow more types.
-                switch (uniform.Value)
+                switch (update.Value)
                 {
                     case int value:
                         Gl.Uniform1i(uniform.Location, value);
@@ -243,7 +259,7 @@ public sealed class Shader : IGlObject, IDisposable
 
     public void SetUniform(string name, int value)
     {
-        Window.QueueUpdate(this, new UniformUpdate(_uniforms[name].Location, value));
+        Window.QueueUpdate(this, new UniformUpdate(name, value));
     }
 
     internal bool TryGetAttribute(string name, [NotNullWhen(true)] out Attribute? attribute)

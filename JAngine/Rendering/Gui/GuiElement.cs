@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System.Numerics;
+using JAngine.Extensions;
 using JAngine.Rendering.OpenGL;
 
 namespace JAngine.Rendering.Gui;
@@ -25,8 +26,10 @@ internal interface IGuiElement
 
 public sealed class GuiElement : IGuiElement
 {
-    private static readonly Dictionary<Window, Mesh> _meshes = new Dictionary<Window, Mesh>();
+    private static readonly Dictionary<(Window, Shader), Mesh> _meshes = new Dictionary<(Window, Shader), Mesh>();
+    private static readonly Dictionary<Window, Shader> _shaders = new Dictionary<Window, Shader>();
     private readonly Window _window;
+    private readonly Shader _shader;
     private readonly Mesh _mesh;
     private readonly Instance2DRef _instanceRef;
     private readonly IGuiElement _parent;
@@ -35,47 +38,43 @@ public sealed class GuiElement : IGuiElement
     private Size _width;
     private Size _height;
 
-    private GuiElement(IGuiElement parent)
+    private GuiElement(IGuiElement parent, Texture? texture = null, Shader? shader = null)
     {
+        
         if (parent is Window window)
         {
             _window = window;
             _parent = parent;
-            if (!_meshes.TryGetValue(_window, out Mesh? mesh))
-            {
-                mesh = new Mesh(_window, "Gui");
-                _meshes.Add(_window, mesh);
-                mesh.AddIndices(new uint[]
-                {
-                    0, 1, 2, 0, 2, 3,
-                });
-                mesh.AddVertexAttribute<Vertex2D>();
-                mesh.AddVertices<Vertex2D>(new Vertex2D[]
-                {
-                    new(0, 0), new(0, 1), new(1, 1), new(1, 0),
-                });
-                mesh.AddInstanceAttribute<Instance2D>();
-
-                ShaderStage vertexShader = Resource.Load<ShaderStage>(window, "JAngine.Shaders.2D.vert");
-                ShaderStage fragmentShader = Resource.Load<ShaderStage>(window, "JAngine.Shaders.2D.frag");
-                Shader shader = new Shader(window, "Shader Program", vertexShader, fragmentShader);
-                vertexShader.Dispose();
-                fragmentShader.Dispose();
-                mesh.BindToShader(shader);
-            }
-            _mesh = mesh;
         }
         else if (parent is GuiElement element)
         {
             _parent = parent;
             _window = element._window;
-            _mesh = element._mesh;
         }
         else
         {
             throw new ArgumentException("Expected either a GuiElement or a window", nameof(parent));
         }
-        _instanceRef = _mesh.AddInstance<Instance2D>(new Instance2D(Matrix4x4.Identity, Vector4.One));
+
+        if (shader is null && !_shaders.TryGetValue(_window, out shader))
+        {
+            ShaderStage vertexShader = Resource.Load<ShaderStage>(_window, "JAngine.Shaders.2D.vert");
+            ShaderStage fragmentShader = Resource.Load<ShaderStage>(_window, "JAngine.Shaders.2D.frag");
+            shader = new Shader(_window, "Shader Program", vertexShader, fragmentShader);
+            _shaders.Add(_window, shader);
+            vertexShader.Dispose();
+            fragmentShader.Dispose();
+        }
+        _shader = shader;
+        _mesh = GetOrCreateMesh(_window, shader);
+
+        int textureIndex = 0;
+        if (texture is not null)
+        {
+            textureIndex = _mesh.AddTexture(texture);
+        }
+        
+        _instanceRef = _mesh.AddInstance<Instance2D>(new Instance2D(Matrix4x4.Identity, Vector4.One, textureIndex));
         _parent.PositionChanged += UpdatePosition;
         _x = Position.Center();
         _y = Position.Center();
@@ -83,12 +82,37 @@ public sealed class GuiElement : IGuiElement
         _height = Size.Fill();
     }
 
-    public GuiElement(Window window) : this((IGuiElement)window)
+    private static Mesh GetOrCreateMesh(Window window, Shader shader)
     {
+        if (!_meshes.TryGetValue((window, shader), out Mesh? mesh))
+        {
+            mesh = new Mesh(window, "Gui");
+            mesh.AddIndices(new uint[]
+            {
+                0, 1, 2, 0, 2, 3,
+            });
+            mesh.AddVertexAttribute<Vertex2D>();
+            mesh.AddVertices<Vertex2D>(new Vertex2D[]
+            {
+                new(0, 0), new(0, 1), new(1, 1), new(1, 0),
+            });
+            mesh.AddInstanceAttribute<Instance2D>();
+            mesh.AddTexture(Texture.White(window));
+            mesh.BindToShader(shader);
+            _meshes.Add((window, shader), mesh);
+        }
+
+        return mesh;
     }
 
-    public GuiElement(GuiElement parent) : this((IGuiElement)parent)
+    public GuiElement(Window window, Texture? texture = null, Shader? shader = null) : this((IGuiElement)window, texture, shader)
     {
+        
+    }
+
+    public GuiElement(GuiElement window, Texture? texture = null, Shader? shader = null) : this((IGuiElement)window, texture, shader)
+    {
+        
     }
 
     public Vector4 BackgroundColor

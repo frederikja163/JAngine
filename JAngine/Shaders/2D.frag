@@ -1,11 +1,12 @@
-#version 330 core
+#version 460 core
 in vec2 fTexCoord;
 in vec4 fColor;
+flat in int fTextureIndex;
 
 uniform sampler2D[32] uTextures;
 
 out vec4 Color;
 
 void main() {
-    Color = vec4(1) * fColor * texture(uTextures[0], fTexCoord);
+    Color = fColor * texture(uTextures[fTextureIndex], fTexCoord);
 }

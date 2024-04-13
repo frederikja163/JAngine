@@ -16,7 +16,7 @@ public sealed class ShaderAttributeAttribute : Attribute
 
 public sealed class Mesh: IDisposable
 {
-    private readonly List<Texture> _textures;
+    private readonly Dictionary<Texture, int> _textures;
     private readonly List<VertexArray> _vaos;
     private readonly Dictionary<Type, IBuffer> _vertexBuffers;
     private readonly Dictionary<Type, IBuffer> _instanceBuffers;
@@ -26,7 +26,7 @@ public sealed class Mesh: IDisposable
     {
         Window = window;
         Name = name;
-        _textures = new List<Texture>();
+        _textures = new Dictionary<Texture, int>();
         _vaos = new List<VertexArray>();
         _ebo = new Buffer<uint>(window, $"{name}.buffer");
         _vertexBuffers = new Dictionary<Type, IBuffer>(TypeComparer.Default);
@@ -208,14 +208,20 @@ public sealed class Mesh: IDisposable
         }
     }
 
-    public void AddTexture(Texture texture)
+    public int AddTexture(Texture texture)
     {
-        _textures.Add(texture);
+        if (!_textures.TryGetValue(texture, out int index))
+        {
+            index = _textures.Count;
+            _textures.Add(texture, index);
+        }
 
         foreach (VertexArray vao in _vaos)
         {
-            vao.AddTexture(texture);
+            vao.SetTexture(index, texture);
         }
+
+        return index;
     }
     
     public void BindToShader(Shader shader)
@@ -223,9 +229,9 @@ public sealed class Mesh: IDisposable
         VertexArray vao = new VertexArray(Window, Name + ".vao", shader, _ebo);
         _vaos.Add(vao);
 
-        foreach (Texture texture in _textures)
+        foreach ((Texture texture, int index) in _textures)
         {
-            vao.AddTexture(texture);
+            vao.SetTexture(index, texture);
         }
 
         foreach (IBuffer buffer in _vertexBuffers.Values)

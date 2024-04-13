@@ -25,9 +25,10 @@ public sealed class VertexArray : IGlObject, IDisposable
     internal int PointCount => _ebo.Count;
     public int InstanceCount { get; set; } = 1;
 
-    public void AddTexture(Texture texture)
+    public void SetTexture(int index, Texture texture)
     {
-        _textures[0] = texture; //TODO
+        _textures[index] = texture;
+        Shader.SetUniform($"uTextures[{index}]", index);
     }
 
     public BufferBinding BindBuffer(IBuffer buffer, int offset = 0)
@@ -102,7 +103,6 @@ public sealed class VertexArray : IGlObject, IDisposable
             Texture? texture = _textures[i];
             if (texture is not null)
             {
-                Shader.SetUniform($"uTextures[{i}]", i);
                 texture.Bind((uint)i);
             }
         }

@@ -4,6 +4,7 @@ namespace JAngine.Rendering.OpenGL;
 
 public sealed class Texture : IGlObject
 {
+    private static Dictionary<Window, Texture> _whiteTextures = new Dictionary<Window, Texture>();
     private uint _handle;
     private readonly Window _window;
     private readonly Vector4[,] _pixels;
@@ -32,6 +33,7 @@ public sealed class Texture : IGlObject
         {
             case CreateEvent:
                 _handle = Gl.CreateTexture(Gl.TextureTarget.Texture2D);
+                Gl.ObjectLabel(Gl.ObjectIdentifier.Texture, _handle, Name);
                 Gl.TextureStorage2D(_handle, 1, Gl.SizedInternalFormat.Rgba32F, Width, Height);
                 break;
             case UpdateDataEvent:
@@ -44,5 +46,16 @@ public sealed class Texture : IGlObject
     internal void Bind(uint unit)
     {
         Gl.BindTextureUnit(unit, _handle);
+    }
+
+    public static Texture White(Window window)
+    {
+        if (!_whiteTextures.TryGetValue(window, out Texture? texture))
+        {
+            texture = new Texture(window, "White", new Vector4[,] { { Vector4.One } });
+            _whiteTextures.Add(window, texture);
+        }
+
+        return texture;
     }
 }

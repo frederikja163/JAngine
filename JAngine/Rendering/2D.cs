@@ -30,11 +30,14 @@ public readonly struct Instance2D
     public readonly Vector4 Color = Vector4.One;
     [ShaderAttribute("vTransform{0}")]
     public readonly Matrix4x4 Transformation = Matrix4x4.Identity;
+    [ShaderAttribute("vTextureIndex")]
+    public readonly int TextureIndex = 0;
 
-    public Instance2D(Matrix4x4 transformation, Vector4 color)
+    public Instance2D(Matrix4x4 transformation, Vector4 color, int textureIndex)
     {
         Transformation = transformation;
         Color = color;
+        TextureIndex = textureIndex;
     }
 }
 
@@ -46,6 +49,7 @@ public sealed class Instance2DRef
     private Vector3 _position;
     private Vector3 _scale;
     private Quaternion _rotation;
+    private int _textureIndex;
     private Matrix4x4 _parentMatrix = Matrix4x4.Identity;
 
     private Instance2DRef(BufferDataReference<Instance2D> dataRef)
@@ -68,6 +72,7 @@ public sealed class Instance2DRef
             return;
         }
         _color = _dataRef.Data.Color;
+        _textureIndex = _dataRef.Data.TextureIndex;
         _dataRef.Data.Transformation.TryDecomposeTRS(out _position, out _rotation, out _scale);
     }
 
@@ -81,6 +86,16 @@ public sealed class Instance2DRef
     {
         get => _dataRef.Data;
         set => _dataRef.Data = value;
+    }
+
+    public int TextureIndex
+    {
+        get => _textureIndex;
+        set
+        {
+            _textureIndex = value;
+            Update();
+        }
     }
 
     public Vector4 Color
@@ -174,9 +189,8 @@ public sealed class Instance2DRef
         _dataRef.Data = new Instance2D(
             Matrix4x4.CreateScale(_scale) *
             Matrix4x4.CreateFromQuaternion(_rotation) *
-            Matrix4x4.CreateTranslation(_position) *
-            // _parentMatrix *
-            Matrix4x4.Identity
-            , _color);
+            Matrix4x4.CreateTranslation(_position)
+            , _color, _textureIndex
+            );
     }
 }
