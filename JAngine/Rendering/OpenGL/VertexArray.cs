@@ -6,6 +6,7 @@ public sealed class VertexArray : IGlObject, IDisposable
     private uint _handle;
     private readonly IBuffer<uint> _ebo;
     private readonly Dictionary<IBuffer, BufferBinding> _attributeBuffers = new();
+    private readonly Texture?[] _textures = new Texture[32];
     
     public VertexArray(Window window, string name, Shader shader, IBuffer<uint> ebo)
     {
@@ -23,6 +24,11 @@ public sealed class VertexArray : IGlObject, IDisposable
     uint IGlObject.Handle => _handle;
     internal int PointCount => _ebo.Count;
     public int InstanceCount { get; set; } = 1;
+
+    public void AddTexture(Texture texture)
+    {
+        _textures[0] = texture; //TODO
+    }
 
     public BufferBinding BindBuffer(IBuffer buffer, int offset = 0)
     {
@@ -90,6 +96,16 @@ public sealed class VertexArray : IGlObject, IDisposable
     internal void Bind()
     {
         Gl.BindVertexArray(_handle);
+        Shader.Bind();
+        for (int i = 0; i < _textures.Length; i++)
+        {
+            Texture? texture = _textures[i];
+            if (texture is not null)
+            {
+                Shader.SetUniform($"uTextures[{i}]", i);
+                texture.Bind((uint)i);
+            }
+        }
     }
 
     public void Dispose()

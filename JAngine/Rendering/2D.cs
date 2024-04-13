@@ -20,6 +20,7 @@ public readonly struct Vertex2D
     public Vertex2D(float x, float y)
     {
         Position = new Vector2(x, y);
+        TexCoord = Position;
     }
 }
 

@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Runtime.InteropServices;
 
 namespace JAngine.Rendering.OpenGL;
@@ -311,12 +312,17 @@ internal static unsafe class Gl
 
     internal enum TextureTarget : Enum
     {
+        Texture1D = 0x0DE0,
         Texture2D = 0x0DE1,
+        Texture3D = 0x806F,
         ProxyTexture2D = 0x8064,
         Texture1DArray = 0x8C18,
+        Texture2DArray = 0x8C1A,
         ProxyTexture1DArray = 0x8C19,
         TextureRectangle = 0x84F5,
         ProxyTextureRectangle = 0x84F7,
+        TextureCubeMap = 0x8513,
+        TextureCubeMapArray = 0x9009,
         TextureCubeMapPositiveX = 0x8515,
         TextureCubeMapNegativeX = 0x8516,
         TextureCubeMapPositiveY = 0x8517,
@@ -324,6 +330,71 @@ internal static unsafe class Gl
         TextureCubeMapPositiveZ = 0x8519,
         TextureCubeMapNegativeZ = 0x851A,
         ProxyTextureCubeMap = 0x851B,
+    }
+
+    internal enum SizedInternalFormat : Enum
+    {
+        R8 = 0x8229,
+        R8Snorm = 0x8F94,
+        R16 = 0x822A,
+        R16Snorm = 0x8F98,
+        Rg8 = 0x822B,
+        Rg8Snorm = 0x8F95,
+        Rg16 = 0x822C,
+        Rg16Snorm = 0x8F99,
+        R3G3B2 = 0x2A10,
+        Rgb4 = 0x804F,
+        Rgb5 = 0x8050,
+        Rgb8 = 0x8051,
+        Rgb8Snorm = 0x8F96,
+        Rgb10 = 0x8052,
+        Rgb12 = 0x8053,
+        Rgb16Snorm = 0x8F9A,
+        Rgba2 = 0x8055,
+        Rgba4 = 0x8056,
+        Rgb5A1 = 0x8057,
+        Rgba8 = 0x8058,
+        Rgba8Snorm = 0x8F97,
+        Rgb10A2 = 0x8059,
+        Rgb10A2Ui = 0x906F,
+        Rgba12 = 0x805A,
+        Rgba16 = 0x805B,
+        Srgb8 = 0x8C41,
+        Srgb8Alpha8 = 0x8C43,
+        R16F = 0x822D,
+        Rg16F = 0x822F,
+        Rgb16F = 0x881B,
+        Rgba16F = 0x881A,
+        R32F = 0x822E,
+        Rg32F = 0x8230,
+        Rgb32F = 0x8815,
+        Rgba32F = 0x8814,
+        R11FG11FB10F = 0x8C3A,
+        Rgb9E5 = 0x8C3D,
+        R8I = 0x8231,
+        R8Ui = 0x8232,
+        R16I = 0x8233,
+        R16Ui = 0x8234,
+        R32I = 0x8235,
+        R32Ui = 0x8236,
+        Rg8I = 0x8237,
+        Rg8Ui = 0x8238,
+        Rg16I = 0x8239,
+        Rg16Ui = 0x823A,
+        Rg32I = 0x823B,
+        Rg32Ui = 0x823C,
+        Rgb8I = 0x8D8F,
+        Rgb8Ui = 0x8D7D,
+        Rgb16I = 0x8D89,
+        Rgb16Ui = 0x8D77,
+        Rgb32I = 0x8D83,
+        Rgb32Ui = 0x8D71,
+        Rgba8I = 0x8D8E,
+        Rgba8Ui = 0x8D7C,
+        Rgba16I = 0x8D88,
+        Rgba16Ui = 0x8D76,
+        Rgba32I = 0x8D82,
+        Rgba32Ui = 0x8D70,
     }
 
     internal enum PixelFormat : Enum
@@ -334,24 +405,29 @@ internal static unsafe class Gl
         Bgr = 0x80E0,
         Rgba = 0x1908,
         Bgra = 0x80E1,
-        RedInteger = 0x8D94,
-        RgInteger = 0x8228,
-        RgbInteger = 0x8D98,
-        BgrInteger = 0x8D9A,
-        RgbaInteger = 0x8D99,
-        BgraInteger = 0x8D9B,
-        StencilIndex = 0x1901,
         DepthComponent = 0x1902,
-        DepthStencil = 0x821A,
+        StencilIndex = 0x1901,
     }
-
+    
     internal enum PixelType : Enum
     {
-        GL_UNSIGNED_BYTE0x1401,
-        GL_BYTE0x1400,
-        GL_UNSIGNED_SHORT0x1403,
-        GL_SHORT0x1402
-        // TODO: Not done yet.
+        UnsignedByte = 0x1401,
+        Byte = 0x1400,
+        UnsignedShort = 0x1403,
+        Short = 0x1402,
+        UnsignedInt = 0x1405,
+        Int = 0x1404,
+        HalfFloat = 0x140B,
+        Float = 0x1406,
+        UnsignedByte332 = 0x8032,
+        UnsignedByte233Rev = 0x8362,
+        UnsignedShort4444Rev = 0x8365,
+        UnsignedShort5551 = 0x8034,
+        UnsignedShort1555Rev = 0x8366,
+        UnsignedInt8888 = 0x8367,
+        UnsignedInt8888Rev = 0x8367,
+        UnsignedInt1010102 = 0x8036,
+        UnsignedInt2101010Rev = 0x8368,
     }
 
     private static readonly delegate* unmanaged<int, int, int, int, void> ViewportPtr =
@@ -393,6 +469,8 @@ internal static unsafe class Gl
         (delegate* unmanaged<Uint, Uint, SizeI, SizeI*, Int*, UniformType*, Char*, void>)Glfw.GetProcAddress("glGetActiveUniform");
     private static readonly delegate* unmanaged<Uint, Char*, Int> GetUniformLocationPtr =
         (delegate* unmanaged<Uint, Char*, Int>)Glfw.GetProcAddress("glGetUniformLocation");
+    private static readonly delegate* unmanaged<Int, Int, void> Uniform1iPtr =
+        (delegate* unmanaged<Int, Int, void>)Glfw.GetProcAddress("glUniform1i");
     
     private static readonly delegate* unmanaged<ShaderType, Uint> CreateShaderPtr =
         (delegate* unmanaged<ShaderType, Uint>)Glfw.GetProcAddress("glCreateShader");
@@ -443,13 +521,19 @@ internal static unsafe class Gl
     private static readonly delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Uint, void> VertexArrayAttribLFormatPtr =
         (delegate* unmanaged<Uint, Uint, Int, VertexAttribType, Uint, void>)Glfw.GetProcAddress("glVertexArrayAttribLFormat");
 
-    private static readonly delegate* unmanaged<SizeI, Uint*, void> GenTexturesPtr =
-        (delegate* unmanaged<SizeI, Uint*, void>)Glfw.GetProcAddress("glGenTextures");
+    private static readonly delegate* unmanaged<TextureTarget, SizeI, Uint*, void> CreateTexturesPtr =
+        (delegate* unmanaged<TextureTarget, SizeI, Uint*, void>)Glfw.GetProcAddress("glCreateTextures");
     private static readonly delegate* unmanaged<SizeI, Uint*, void> DeleteTexturesPtr =
         (delegate* unmanaged<SizeI, Uint*, void>)Glfw.GetProcAddress("glDeleteTextures");
-    private static readonly delegate* unmanaged<Enum, Int, Int, SizeI, SizeI, int, Enum, Enum, void*, void> TexImage2D =
-        (delegate* unmanaged<Enum, Int, Int, SizeI, SizeI, int, Enum, Enum, void*, void>)Glfw.GetProcAddress("glTexImage2D");
-    
+    private static readonly delegate* unmanaged<Uint, Int, SizedInternalFormat, Int, Int, void> TextureStorage2DPtr =
+        (delegate* unmanaged<Uint, Int, SizedInternalFormat, Int, Int, void>)Glfw.GetProcAddress("glTextureStorage2D");
+    private static readonly delegate* unmanaged<Uint, Int, Int, Int, Int, Int, PixelFormat, PixelType, void*, void> TextureSubImage2DPtr =
+        (delegate* unmanaged<Uint, Int, Int, Int, Int, Int, PixelFormat, PixelType, void*, void>)Glfw.GetProcAddress("glTextureSubImage2D");
+    private static readonly delegate* unmanaged<Uint, void> GenerateTextureMipmapPtr =
+        (delegate* unmanaged<Uint, void>)Glfw.GetProcAddress("glGenerateTextureMipmap");
+    private static readonly delegate* unmanaged<Uint, Uint, void> BindTextureUnitPtr =
+        (delegate* unmanaged<Uint, Uint, void>)Glfw.GetProcAddress("glBindTextureUnit");
+
     
     internal static void Viewport(int x, int y, int width, int height)
     {
@@ -553,6 +637,11 @@ internal static unsafe class Gl
     internal static int GetUniformLocation(uint program, byte* namePtr)
     {
         return GetUniformLocationPtr(program, namePtr);
+    }
+
+    internal static void Uniform1i(int location, int v0)
+    {
+        Uniform1iPtr(location, v0);
     }
 
     internal static uint CreateShader(ShaderType shaderType)
@@ -715,15 +804,40 @@ internal static unsafe class Gl
         VertexArrayAttribLFormatPtr(vao, attribIndex, size, type, relativeOffset);
     }
     
-    internal static uint GenTexture()
+    internal static uint CreateTexture(TextureTarget target)
     {
         uint texture = 0;
-        GenTexturesPtr(1, &texture);
+        CreateTexturesPtr(target, 1, &texture);
         return texture;
     }
 
     internal static void DeleteTexture(uint texture)
     {
         DeleteVertexArraysPtr(1, &texture);
+    }
+
+    internal static void TextureStorage2D(uint texture, int levels, SizedInternalFormat internalformat, int width,
+        int height)
+    {
+        TextureStorage2DPtr(texture, levels, internalformat, width, height);
+    }
+    
+    internal static void TextureSubImage2D<T>(uint texture, int level, int xoffset, int yoffset, int width, int height, PixelFormat format, PixelType type, ref T pixels)
+        where T : unmanaged
+    {
+        fixed (void* pixelPtr = &pixels)
+        {
+            TextureSubImage2DPtr(texture, level, xoffset, yoffset, width, height, format, type, pixelPtr);
+        }
+    }
+
+    internal static void GenerateTextureMipmap(uint texture)
+    {
+        GenerateTextureMipmapPtr(texture);
+    }
+
+    internal static void BindTextureUnit(uint unit, uint texture)
+    {
+        BindTextureUnitPtr(unit, texture);
     }
 }

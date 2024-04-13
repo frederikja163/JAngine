@@ -3,6 +3,18 @@ using System.Runtime.InteropServices;
 
 namespace JAngine.Rendering.OpenGL;
 
+internal sealed class UniformUpdate : IGlEvent
+{
+    internal int Location { get; }
+    internal object Value { get; }
+
+    internal UniformUpdate(int location, object value)
+    {
+        Location = location;
+        Value = value;
+    }
+}
+
 public abstract class ShaderStage : IGlObject, IDisposable
 {
     private readonly Gl.ShaderType _type;
@@ -213,11 +225,25 @@ public sealed class Shader : IGlObject, IDisposable
                     Marshal.FreeCoTaskMem(namePtr);
                 }
                 break;
+            case UniformUpdate uniform:
+                // TODO: Allow more types.
+                switch (uniform.Value)
+                {
+                    case int value:
+                        Gl.Uniform1i(uniform.Location, value);
+                        break;
+                }
+                break;
             case DisposeEvent:
                 Gl.DeleteProgram(Handle);
                 Handle = 0;
                 break;
         }
+    }
+
+    public void SetUniform(string name, int value)
+    {
+        Window.QueueUpdate(this, new UniformUpdate(_uniforms[name].Location, value));
     }
 
     internal bool TryGetAttribute(string name, [NotNullWhen(true)] out Attribute? attribute)

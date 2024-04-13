@@ -276,7 +276,6 @@ public sealed class Window : IDisposable, IGuiElement
             foreach (VertexArray vao in _vaos)
             {
                 vao.Bind();
-                vao.Shader.Bind();
                 Gl.DrawElementsInstanced(Gl.PrimitiveType.Triangles, vao.PointCount, Gl.DrawElementsType.UnsignedInt, 0, vao.InstanceCount);
             }
             

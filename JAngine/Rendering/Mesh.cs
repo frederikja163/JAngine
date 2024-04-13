@@ -16,6 +16,7 @@ public sealed class ShaderAttributeAttribute : Attribute
 
 public sealed class Mesh: IDisposable
 {
+    private readonly List<Texture> _textures;
     private readonly List<VertexArray> _vaos;
     private readonly Dictionary<Type, IBuffer> _vertexBuffers;
     private readonly Dictionary<Type, IBuffer> _instanceBuffers;
@@ -25,6 +26,7 @@ public sealed class Mesh: IDisposable
     {
         Window = window;
         Name = name;
+        _textures = new List<Texture>();
         _vaos = new List<VertexArray>();
         _ebo = new Buffer<uint>(window, $"{name}.buffer");
         _vertexBuffers = new Dictionary<Type, IBuffer>(TypeComparer.Default);
@@ -205,11 +207,26 @@ public sealed class Mesh: IDisposable
             yield return new BufferDataReference<T>(buf, i);
         }
     }
+
+    public void AddTexture(Texture texture)
+    {
+        _textures.Add(texture);
+
+        foreach (VertexArray vao in _vaos)
+        {
+            vao.AddTexture(texture);
+        }
+    }
     
     public void BindToShader(Shader shader)
     {
         VertexArray vao = new VertexArray(Window, Name + ".vao", shader, _ebo);
         _vaos.Add(vao);
+
+        foreach (Texture texture in _textures)
+        {
+            vao.AddTexture(texture);
+        }
 
         foreach (IBuffer buffer in _vertexBuffers.Values)
         {
