@@ -353,28 +353,28 @@ internal static class Glfw
     public static extern IntPtr GetProcAddress([MarshalAs(UnmanagedType.LPStr)] string procName);
     
     [DllImport(DllName, EntryPoint = "glfwMakeContextCurrent", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void MakeContextCurrent(Glfw.Window window);
+    public static extern void MakeContextCurrent(Window window);
 
     [DllImport(DllName, EntryPoint = "glfwSwapBuffers", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void SwapBuffers(Glfw.Window window);
+    public static extern void SwapBuffers(Window window);
 
     [DllImport(DllName, EntryPoint = "glfwWindowShouldClose", CallingConvention = CallingConvention.Cdecl)]
-    public static extern bool WindowShouldClose(Glfw.Window window);
+    public static extern bool WindowShouldClose(Window window);
     
     [DllImport(DllName, EntryPoint = "glfwSetWindowShouldClose", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void WindowSetShouldClose(Glfw.Window window, bool value);
+    public static extern void WindowSetShouldClose(Window window, bool value);
     
     [DllImport(DllName, EntryPoint = "glfwSetWindowSize", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void SetWindowSize(Glfw.Window window, int width, int height);
+    public static extern void SetWindowSize(Window window, int width, int height);
     
     [DllImport(DllName, EntryPoint = "glfwGetWindowSize", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void GetWindowSize(Glfw.Window window, out int width, out int height);
+    public static extern void GetWindowSize(Window window, out int width, out int height);
     
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void WindowSizeCallback(Window window, int width, int height);
     
     [DllImport(DllName, EntryPoint = "glfwSetWindowSizeCallback", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void SetWindowSizeCallback(Glfw.Window window, WindowSizeCallback windowSizeCallback);
+    public static extern void SetWindowSizeCallback(Window window, WindowSizeCallback windowSizeCallback);
 
     [DllImport(DllName, EntryPoint = "glfwWindowHint", CallingConvention = CallingConvention.Cdecl)]
     public static extern void WindowHint(Hint hint, int value);
@@ -385,7 +385,7 @@ internal static class Glfw
     public static extern void WindowHint(Hint hint, [MarshalAs(UnmanagedType.LPStr)] string value);
     
     [DllImport(DllName, EntryPoint = "glfwCreateWindow", CallingConvention = CallingConvention.Cdecl)]
-    public static extern Glfw.Window CreateWindow(int width, int height, [MarshalAs(UnmanagedType.LPStr)] string title, Monitor monitor, Window share);
+    public static extern Window CreateWindow(int width, int height, [MarshalAs(UnmanagedType.LPStr)] string title, Monitor monitor, Window share);
     
     [DllImport(DllName, EntryPoint = "glfwDestroyWindow", CallingConvention = CallingConvention.Cdecl)]
     public static extern void DestroyWindow(Window window);
@@ -401,6 +401,12 @@ internal static class Glfw
     
     [DllImport(DllName, EntryPoint = "glfwSetKeyCallback", CallingConvention = CallingConvention.Cdecl)]
     public static extern void SetKeyCallback(Window window, KeyCallback keyCallback);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void CharacterCallback(Window window, int codepoint);
+    
+    [DllImport(DllName, EntryPoint = "glfwSetCharCallback", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SetCharCallback(Window window, CharacterCallback keyCallback);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MouseCallback(Window window, MouseButton button, Action action, Mods mods);

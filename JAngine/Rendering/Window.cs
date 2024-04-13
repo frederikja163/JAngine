@@ -7,6 +7,7 @@ namespace JAngine.Rendering;
 
 public delegate void WindowResizeDelegate(Window window, int width, int height);
 public delegate void MouseMovedDelegate(Window window, Vector2 mouseDelta);
+public delegate void TextTypedDelegate(Window window, char c);
 
 /// <summary>
 /// A window used for drawing to the screen and as a context to a renderer.
@@ -24,6 +25,7 @@ public sealed class Window : IDisposable, IGuiElement
     private readonly Thread _renderingThread;
     private WindowResizeDelegate? _onWindowResize;
     private MouseMovedDelegate? _onMouseMoved;
+    private TextTypedDelegate? _onTextTyped;
     private int _viewportWidth;
     private int _viewportHeight;
     private Matrix4x4 _guiMatrix;
@@ -32,6 +34,7 @@ public sealed class Window : IDisposable, IGuiElement
 
     private readonly Glfw.WindowSizeCallback _sizeCallback;
     private readonly Glfw.KeyCallback _keyCallback;
+    private readonly Glfw.CharacterCallback _characterCallback;
     private readonly Glfw.MouseCallback _mouseCallback;
     private readonly Glfw.CursorPositionCallback _cursorPositionCallback;
     
@@ -57,21 +60,34 @@ public sealed class Window : IDisposable, IGuiElement
     public Window(string title, int width, int height)
     {
         _handle = Glfw.CreateWindow(width, height, title, Glfw.Monitor.Null, Glfw.Window.Null);
+        
         _keyCallback = KeyCallback;
         Glfw.SetKeyCallback(_handle, _keyCallback);
+        _characterCallback = CharacterCallback;
+        Glfw.SetCharCallback(_handle, _characterCallback);
+        
         _mouseCallback = MouseCallback;
         Glfw.SetMouseCallback(_handle, _mouseCallback);
         _cursorPositionCallback = CursorPositionCallback;
         Glfw.SetCursorPosCallback(_handle, _cursorPositionCallback);
         Glfw.GetCursorPos(_handle, out double x, out double y);
         CursorPosition = new Vector2((float)x, (float)y);
+        
         _sizeCallback = SizeCallback;
         Glfw.SetWindowSizeCallback(_handle, _sizeCallback);
+        
         _renderingThread = new Thread(RenderThread);
         _renderingThread.IsBackground = true;
         _renderingThread.Start();
+        
         s_windows.Add(this);
     }
+
+    private void CharacterCallback(Glfw.Window window, int codepoint)
+    {
+        _onTextTyped?.Invoke(this, (char)codepoint);
+    }
+
     public int Width { get; private set; }
     public int Height { get; private set; }
 
@@ -94,6 +110,12 @@ public sealed class Window : IDisposable, IGuiElement
     {
         add => _onMouseMoved += value;
         remove => _onMouseMoved -= value;
+    }
+
+    public TextTypedDelegate? OnTextTyped
+    {
+        get => _onTextTyped;
+        set => _onTextTyped = value;
     }
 
     /// <summary>
