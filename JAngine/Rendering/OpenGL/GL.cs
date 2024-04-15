@@ -29,38 +29,67 @@ internal static unsafe class Gl
     }
 
     internal enum EnableCap : Bitfield
-    { 
-        Blend,
-        ClipDistance,
-        ColorLogicOp,
-        CullFace,
-        DebugOutput,
-        DebugOutputSynchronous,
-        DepthClamp,
-        DepthTest,
-        Dither,
-        FramebufferSrgb,
-        LineSmooth,
-        Multisample,
-        PolygonOffsetFill,
-        PolygonOffsetLine,
-        PolygonOffsetPoint,
-        PolygonSmooth,
-        PrimitiveRestart,
-        PrimitiveRestartFixedIndex,
-        RasterizerDiscard,
-        SampleAlphaToCoverage,
-        SampleAlphaToOne,
-        SampleCoverage,
-        SampleShading,
-        SampleMask,
-        ScissorTest,
-        StencilTest,
-        TextureCubeMapSeamless,
-        ProgramPointSize,
-
+    {
+        Blend = 0x0BE2,
+        ClipDistance0 = 0x3000,
+        ClipDistance1 = 0x3001,
+        ClipDistance2 = 0x3002,
+        ClipDistance3 = 0x3003,
+        ClipDistance4 = 0x3004,
+        ClipDistance5 = 0x3005,
+        ClipDistance6 = 0x3006,
+        ClipDistance7 = 0x3007,
+        ColorLogicOp = 0x0BF2,
+        CullFace = 0x0B44,
+        DebugOutput = 0x92E0,
+        DebugOutputSynchronous = 0x8242,
+        DepthClamp = 0x864F,
+        DepthTest = 0x0B71,
+        Dither = 0x0BD0,
+        FramebufferSrgb = 0x8DB9,
+        LineSmooth = 0x0B20,
+        Multisample = 0x809D,
+        PolygonOffsetFill = 0x8037,
+        PolygonOffsetLine = 0x2A02,
+        PolygonOffsetPoint = 0x2A01,
+        PolygonSmooth = 0x0B41,
+        PrimitiveRestart = 0x8F9D,
+        PrimitiveRestartFixedIndex = 0x8D69,
+        RasterizerDiscard = 0x8C89,
+        SampleAlphaToCoverage = 0x809E,
+        SampleAlphaToOne = 0x809F,
+        SampleCoverage = 0x80A0,
+        SampleShading = 0x8C36,
+        SampleMask = 0x8E51,
+        ScissorTest = 0x0C11,
+        StencilTest = 0x0B90,
+        TextureCubeMapSeamless = 0x884F,
+        ProgramPointSize = 0x8642,
     }
 
+    internal enum BlendFactor : Enum
+    {
+        Zero = 0,
+        One = 1,
+        SrcColor = 0x0300,
+        OneMinusSrcColor = 0x0301,
+        DstColor = 0x0306,
+        OneMinusDstColor = 0x0307,
+        SrcAlpha = 0x0302,
+        OneMinusSrcAlpha = 0x0303,
+        DstAlpha = 0x0304,
+        OneMinusDstAlpha = 0x0305,
+        ConstantColor = 0x8001,
+        OneMinusConstantColor = 0x8002,
+        ConstantAlpha = 0x8003,
+        OneMinusConstantAlpha = 0x8004,
+        SrcAlphaSaturate = 0x0308,
+        Src1Color = 0x88F9,
+        OneMinusSrc1Color = 0x88FA,
+        Src1Alpha = 0x8589,
+        OneMinusSrc1Alpha = 0x88FB,
+    }
+    
     internal enum PrimitiveType : Bitfield
     {
         Triangles = 0x0004,
@@ -436,6 +465,8 @@ internal static unsafe class Gl
         (delegate* unmanaged<EnableCap, void>)Glfw.GetProcAddress("glEnable");
     private static readonly delegate* unmanaged<EnableCap, void> DisablePtr =
         (delegate* unmanaged<EnableCap, void>)Glfw.GetProcAddress("glDisable");
+    private static readonly delegate* unmanaged<BlendFactor, BlendFactor, void> BlendFuncPtr =
+        (delegate* unmanaged<BlendFactor, BlendFactor, void>)Glfw.GetProcAddress("glBlendFunc");
     private static readonly delegate* unmanaged<float, float, float, float, void> ClearColorPtr =
         (delegate* unmanaged<float, float, float, float, void>)Glfw.GetProcAddress("glClearColor");
     private static readonly delegate* unmanaged<ClearBufferMask, void> ClearPtr =
@@ -469,8 +500,8 @@ internal static unsafe class Gl
         (delegate* unmanaged<Uint, Uint, SizeI, SizeI*, Int*, UniformType*, Char*, void>)Glfw.GetProcAddress("glGetActiveUniform");
     private static readonly delegate* unmanaged<Uint, Char*, Int> GetUniformLocationPtr =
         (delegate* unmanaged<Uint, Char*, Int>)Glfw.GetProcAddress("glGetUniformLocation");
-    private static readonly delegate* unmanaged<Int, Int, void> Uniform1iPtr =
-        (delegate* unmanaged<Int, Int, void>)Glfw.GetProcAddress("glUniform1i");
+    private static readonly delegate* unmanaged<Uint, Int, Int, void> ProgramUniform1iPtr =
+        (delegate* unmanaged<Uint, Int, Int, void>)Glfw.GetProcAddress("glProgramUniform1i");
     
     private static readonly delegate* unmanaged<ShaderType, Uint> CreateShaderPtr =
         (delegate* unmanaged<ShaderType, Uint>)Glfw.GetProcAddress("glCreateShader");
@@ -548,6 +579,11 @@ internal static unsafe class Gl
     internal static void Disable(EnableCap enableCap)
     {
         DisablePtr(enableCap);
+    }
+
+    internal static void BlendFunc(BlendFactor sfactor, BlendFactor dfactor)
+    {
+        BlendFuncPtr(sfactor, dfactor);
     }
     
     internal static void ClearColor(float r, float g, float b, float a)
@@ -639,9 +675,9 @@ internal static unsafe class Gl
         return GetUniformLocationPtr(program, namePtr);
     }
 
-    internal static void Uniform1i(int location, int v0)
+    internal static void Uniform1i(uint program, int location, int v0)
     {
-        Uniform1iPtr(location, v0);
+        ProgramUniform1iPtr(program, location, v0);
     }
 
     internal static uint CreateShader(ShaderType shaderType)

@@ -14,6 +14,10 @@ public sealed class VertexArray : IGlObject, IDisposable
         Name = name;
         _ebo = ebo;
         Shader = shader;
+        for (int i = 0; i < 32; i++)
+        {
+            Shader.SetUniform($"uTextures[{i}]", i);
+        }
         _window.QueueUpdate(this, CreateEvent.Singleton);
         _window.AttachVao(this);
     }
@@ -28,7 +32,6 @@ public sealed class VertexArray : IGlObject, IDisposable
     public void SetTexture(int index, Texture texture)
     {
         _textures[index] = texture;
-        Shader.SetUniform($"uTextures[{index}]", index);
     }
 
     public BufferBinding BindBuffer(IBuffer buffer, int offset = 0)

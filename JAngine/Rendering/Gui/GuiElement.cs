@@ -1,7 +1,3 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
 using System.Numerics;
 using JAngine.Extensions;
 using JAngine.Rendering.OpenGL;
@@ -60,7 +56,7 @@ public sealed class GuiElement : IGuiElement
         {
             ShaderStage vertexShader = Resource.Load<ShaderStage>(_window, "JAngine.Shaders.2D.vert");
             ShaderStage fragmentShader = Resource.Load<ShaderStage>(_window, "JAngine.Shaders.2D.frag");
-            shader = new Shader(_window, "Shader Program", vertexShader, fragmentShader);
+            shader = new Shader(_window, "Gui.Shader.2D", vertexShader, fragmentShader);
             _shaders.Add(_window, shader);
             vertexShader.Dispose();
             fragmentShader.Dispose();
@@ -86,7 +82,7 @@ public sealed class GuiElement : IGuiElement
     {
         if (!_meshes.TryGetValue((window, shader), out Mesh? mesh))
         {
-            mesh = new Mesh(window, "Gui");
+            mesh = new Mesh(window, "Gui#" + _meshes.Count);
             mesh.AddIndices(new uint[]
             {
                 0, 1, 2, 0, 2, 3,
@@ -113,10 +109,10 @@ public sealed class GuiElement : IGuiElement
         
     }
 
-    public void AddExtraAttributes<T>(T attributeData)
+    public BufferDataReference<T> AddExtraAttributes<T>(T attributeData)
         where T : unmanaged
     {
-        _mesh.AddInstance(attributeData);
+        return _mesh.AddInstance(attributeData);
     }
 
     public Vector4 BackgroundColor
@@ -200,7 +196,7 @@ public sealed class GuiElement : IGuiElement
         _heightVal = Height.SizeDelegate(_parent.Height);
         _xVal = X.PositionDelegate(_parent.X, _parent.Width, _widthVal);
         _yVal = Y.PositionDelegate(_parent.Y, _parent.Height, _heightVal);
-        Vector3 pos = new Vector3(_xVal, _yVal, _parent.Layer + 1);
+        Vector3 pos = new Vector3(_xVal, _yVal, 0);
         _instanceRef.SetPositionNoUpdate(pos * 2f / windowSize - Vector3.One);
         Vector3 scale = new Vector3(_widthVal, _heightVal, 0);
         _instanceRef.SetScaleNoUpdate(scale * 2 / windowSize);

@@ -73,7 +73,8 @@ public sealed class Position
 
     public static Position LowerMargin(float margin = 0)
     {
-        return new Position((pp, pw, w) => pp + margin);
+        return new Position((pp, pw, w) => 
+            pp + margin);
     }
 
     public static Position Left(float margin = 0) => LowerMargin(margin);

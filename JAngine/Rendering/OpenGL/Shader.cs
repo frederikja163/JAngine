@@ -246,7 +246,7 @@ public sealed class Shader : IGlObject, IDisposable
                 switch (update.Value)
                 {
                     case int value:
-                        Gl.Uniform1i(uniform.Location, value);
+                        Gl.Uniform1i(Handle, uniform.Location, value);
                         break;
                 }
                 break;
@@ -270,5 +270,10 @@ public sealed class Shader : IGlObject, IDisposable
     internal void Bind()
     {
         Gl.UseProgram(Handle);
+    }
+
+    public override string ToString()
+    {
+        return Name;
     }
 }

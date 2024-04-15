@@ -17,7 +17,7 @@ public sealed class Window : IDisposable, IGuiElement
     private static readonly HashSet<Window> s_windows = new();
 
     private readonly Glfw.Window _handle;
-    private readonly List<(IGlObject, IGlEvent)> _updateQueue = new();
+    private readonly List<(IGlObject, IGlEvent, StackTrace?)> _updateQueue = new();
     private readonly Dictionary<(IGlObject, Type), int> _uniqueUpdates = new();
     private readonly Dictionary<Key, List<KeyBinding>> _keyBindings = new();
     private HashSet<VertexArray> _vaos = new HashSet<VertexArray>();
@@ -272,6 +272,8 @@ public sealed class Window : IDisposable, IGuiElement
         Glfw.MakeContextCurrent(_handle);
 
         Gl.Enable(Gl.EnableCap.Blend);
+        Gl.BlendFunc(Gl.BlendFactor.SrcAlpha, Gl.BlendFactor.OneMinusSrcAlpha);
+        // Gl.Enable(Gl.EnableCap.DepthTest);
         Gl.ClearColor(1, 0, 1, 1);
         while (IsOpen)
         {
@@ -284,22 +286,25 @@ public sealed class Window : IDisposable, IGuiElement
             
             Gl.Clear(Gl.ClearBufferMask.ColorBuffer | Gl.ClearBufferMask.DepthBuffer);
             
-            List<(IGlObject, IGlEvent)> objects;
+            List<(IGlObject, IGlEvent, StackTrace?)> objects;
             lock (_updateQueue)
             {
                 objects = _updateQueue.ToList();
                 _updateQueue.Clear();
                 _uniqueUpdates.Clear();
             }
-            foreach ((IGlObject glObject, IGlEvent glEvent) in objects)
+            foreach ((IGlObject glObject, IGlEvent glEvent, StackTrace? stackTrace) in objects)
             {
                 glObject.DispatchEvent(glEvent);
             }
 
-            foreach (VertexArray vao in _vaos)
+            lock (_vaos)
             {
-                vao.Bind();
-                Gl.DrawElementsInstanced(Gl.PrimitiveType.Triangles, vao.PointCount, Gl.DrawElementsType.UnsignedInt, 0, vao.InstanceCount);
+                foreach (VertexArray vao in _vaos)
+                {
+                    vao.Bind();
+                    Gl.DrawElementsInstanced(Gl.PrimitiveType.Triangles, vao.PointCount, Gl.DrawElementsType.UnsignedInt, 0, vao.InstanceCount);
+                }
             }
             
             Glfw.SwapBuffers(_handle);
@@ -321,7 +326,7 @@ public sealed class Window : IDisposable, IGuiElement
     {
         lock (_updateQueue)
         {
-            _updateQueue.Add((glObject, glEvent));
+            _updateQueue.Add((glObject, glEvent, new StackTrace()));
         }
     }
 
@@ -335,7 +340,7 @@ public sealed class Window : IDisposable, IGuiElement
             }
 
             _uniqueUpdates.Add((glObject, glEvent.GetType()), _updateQueue.Count);
-            _updateQueue.Add((glObject, glEvent));
+            _updateQueue.Add((glObject, glEvent, new StackTrace()));
         }
     }
 
@@ -347,19 +352,25 @@ public sealed class Window : IDisposable, IGuiElement
             {
                 return false;
             }
-            _updateQueue[index] = (glObject, glEvent);
+            _updateQueue[index] = (glObject, glEvent, new StackTrace());
+            return true;
         }
-        return true;
     }
 
     internal void AttachVao(VertexArray vao)
     {
-        _vaos.Add(vao);
+        lock (_vaos)
+        {
+            _vaos.Add(vao);
+        }
     }
 
     internal void DetachVao(VertexArray vao)
     {
-        _vaos.Remove(vao);
+        lock (_vaos)
+        {
+            _vaos.Remove(vao);
+        }
     }
 
     /// <inheritdoc cref="IDisposable.Dispose"/>

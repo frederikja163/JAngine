@@ -52,7 +52,7 @@ public sealed class Texture : IGlObject
     {
         if (!_whiteTextures.TryGetValue(window, out Texture? texture))
         {
-            texture = new Texture(window, "White", new Vector4[,] { { Vector4.One } });
+            texture = new Texture(window, "White", new Vector4[,] { { new Vector4(1, 1, 1, 1) } });
             _whiteTextures.Add(window, texture);
         }
 

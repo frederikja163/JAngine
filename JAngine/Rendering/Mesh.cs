@@ -62,7 +62,7 @@ public sealed class Mesh: IDisposable
     {
         if (!_vertexBuffers.TryGetValue(typeof(T), out IBuffer? buffer))
         {
-            buffer = new Buffer<T>(Window, $"{Name}.vbuffer");
+            buffer = new Buffer<T>(Window, $"{Name}.{typeof(T).Name}.vbuffer");
             _vertexBuffers.Add(typeof(T), buffer);
         
             foreach (VertexArray vao in _vaos)
@@ -122,7 +122,7 @@ public sealed class Mesh: IDisposable
     {
         if (!_instanceBuffers.TryGetValue(typeof(T), out IBuffer? buffer))
         {
-            buffer = new Buffer<T>(Window, $"{Name}.ibuffer");
+            buffer = new Buffer<T>(Window, $"{Name}.{typeof(T).Name}.ibuffer");
             _instanceBuffers.Add(typeof(T), buffer);
         
             foreach (VertexArray vao in _vaos)
