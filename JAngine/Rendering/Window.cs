@@ -285,6 +285,7 @@ public sealed class Window : IDisposable, IGuiElement
             }
             
             Gl.Clear(Gl.ClearBufferMask.ColorBuffer | Gl.ClearBufferMask.DepthBuffer);
+            LogTimer timer = Log.Time("Frame", false);
             
             List<(IGlObject, IGlEvent, StackTrace?)> objects;
             lock (_updateQueue)
@@ -306,7 +307,8 @@ public sealed class Window : IDisposable, IGuiElement
                     Gl.DrawElementsInstanced(Gl.PrimitiveType.Triangles, vao.PointCount, Gl.DrawElementsType.UnsignedInt, 0, vao.InstanceCount);
                 }
             }
-            
+
+            timer.Dispose();
             Glfw.SwapBuffers(_handle);
         }
     }

@@ -279,6 +279,13 @@ public static class Log
     }
     
     // TODO: Make sure this has as little overhead as possible.
+    /// <summary>
+    /// Starts a timer and optionally logs the time at the end.
+    /// If the time is not logged at the end you can instead call <see cref="LogTimer(System.String)"/> with the same name.
+    /// </summary>
+    /// <param name="timerName">The name of the timer to log.</param>
+    /// <param name="logAtEnd">If true the timer will be logged when stopped. Otherwise you will have to manually log it using <see cref="LogTimer(System.String)"/></param>
+    /// <returns>The LogTimer keeping track of the current time. Call dispose on it to stop the timer again.</returns>
     public static LogTimer Time(string timerName, bool logAtEnd = true)
     {
         if (!_timers.TryGetValue(timerName, out TimerRecord? record))
@@ -296,6 +303,10 @@ public static class Log
         Info($"Timer {record.Name} has completed {record.Runs} runs with {average.ToStringFormatted()}/run and {record.TotalTime.ToStringFormatted()} total");
     }
 
+    /// <summary>
+    /// Logs the value of a timer by name.
+    /// </summary>
+    /// <param name="timerName">The name of the timer to log.</param>
     public static void LogTimer(string timerName)
     {
         if (!_timers.TryGetValue(timerName, out TimerRecord? record))
@@ -304,6 +315,18 @@ public static class Log
             _timers.Add(timerName, record);
         }
         LogTimer(record);
+    }
+
+    /// <summary>
+    /// Reset the value of a timer by name.
+    /// </summary>
+    /// <param name="timerName">The name of the timer to reset.</param>
+    public static void ResetTimer(string timerName)
+    {
+        if (_timers.TryGetValue(timerName, out TimerRecord? record))
+        {
+            record.Reset();
+        }
     }
     
     /// <summary>
